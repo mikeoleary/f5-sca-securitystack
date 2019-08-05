@@ -1,0 +1,309 @@
+{
+  "Conditions": {
+    "GovCloud": {
+      "Fn::Or": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "AWS::Region"
+            },
+            "us-gov-west-1"
+          ]
+        },
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "AWS::Region"
+            },
+            "us-gov-east-1"
+          ]
+        }
+      ]
+    }
+  },
+  "Parameters": {
+    "pQuickstartS3BucketName": {
+      "Type": "String",
+      "Default": "scca-demo-quickstart",
+      "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-.]*[0-9a-zA-Z])*$",
+      "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, periods (.), and hyphens (-). It cannot start or end with a hyphen (-).",
+      "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
+    },
+    "pQuickstartS3KeyPrefix": {
+      "Type": "String",
+      "Default": "quickstart-f5-scca-security-stack/",
+      "AllowedPattern": "^[0-9a-zA-Z-/]*$",
+      "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
+      "Description": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
+    },
+    "pProject": {
+      "Type": "String",
+      "Default": "quickstart-f5-scca-security",
+      "Description": "Project name to use for tagging"
+    },
+    "pVdssVpcCidr": {
+      "Type": "String",
+      "Default": "10.0.0.0/16",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+      "Description": "CIDR Block for the VDSS VPC",
+      "MaxLength": 18,
+      "MinLength": 9
+    },
+    "licenseKey1": {
+        "AllowedPattern": "([\\x41-\\x5A][\\x41-\\x5A|\\x30-\\x39]{4})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{7})",
+        "ConstraintDescription": "Verify your F5 BYOL regkey.",
+        "Description": "F5 BYOL license key",
+        "MaxLength": "255",
+        "MinLength": "1",
+        "Type": "String"
+       },
+    "licenseKey2": {
+        "AllowedPattern": "([\\x41-\\x5A][\\x41-\\x5A|\\x30-\\x39]{4})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{7})",
+        "ConstraintDescription": "Verify your F5 BYOL regkey.",
+        "Description": "F5 BYOL license key",
+        "MaxLength": "255",
+        "MinLength": "1",
+        "Type": "String"
+      },
+    "licenseKey3": {
+        "AllowedPattern": "([\\x41-\\x5A][\\x41-\\x5A|\\x30-\\x39]{4})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{7})",
+        "ConstraintDescription": "Verify your F5 BYOL regkey.",
+        "Description": "F5 BYOL license key",
+        "MaxLength": "255",
+        "MinLength": "1",
+        "Type": "String"
+       },
+    "licenseKey4": {
+        "AllowedPattern": "([\\x41-\\x5A][\\x41-\\x5A|\\x30-\\x39]{4})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{7})",
+        "ConstraintDescription": "Verify your F5 BYOL regkey.",
+        "Description": "F5 BYOL license key",
+        "MaxLength": "255",
+        "MinLength": "1",
+        "Type": "String"
+       },
+    "pBaselineCompliance": {
+        "AllowedValues" : ["standard", "SCCA", "FINRA", "HIPAA", "Bot Protection"],
+        "ConstraintDescription": "Choose your baseline compliance posture",
+        "Description": "Choose your baseline compliance posture",
+        "MaxLength": "255",
+        "MinLength": "1",
+        "Type": "String"
+        }
+  },
+  "Resources": {
+    "TransitGatewayStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Sub": [
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/aws-quickstart-scca-transit-gateway-stack.json",
+            {
+              "S3Region": {
+                "Fn::If": [
+                  "GovCloud",
+                  "s3-us-gov-west-1",
+                  "s3"
+                ]
+              }
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": {
+              "Ref": "pProject"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "sccaMainStack/TransitGatewayStack"
+      }
+    },
+    "VdssStack": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Sub": [
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/VPC/aws-scca-vdss-stack-singleAZ.template",
+            {
+              "S3Region": {
+                "Fn::If": [
+                  "GovCloud",
+                  "s3-us-gov-west-1",
+                  "s3"
+                ]
+              }
+            }
+          ]
+        },
+        "Parameters": {
+          "pTransitGatewayStackName": {
+            "Fn::GetAtt": [
+              "TransitGatewayStack",
+              "Outputs.StackName"
+            ]
+          },
+          "pVdssVpcCidr": {
+            "Ref": "pVdssVpcCidr"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": {
+              "Ref": "pProject"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "sccaMainStack/VdssStack"
+      }
+    },
+    "F5BIGIP1": {
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+          "TemplateURL": {
+            "Fn::Sub": [
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/BIG-IP/template.json",
+              {
+                "S3Region": {
+                  "Fn::If": [
+                    "GovCloud",
+                    "s3-us-gov-west-1",
+                    "s3"
+                  ]
+                }
+              }
+            ]
+          },
+          "Parameters": {
+            "pBaselineCompliance": {              
+                "Ref": "pBaselineCompliance"
+            },
+            "pVpcStackName": {
+              "Fn::GetAtt": [
+                "VdssStack",
+                "Outputs.StackName"
+              ]
+            },
+            "restrictedSrcAddressApp": "0.0.0.0/0",
+            "licenseKey1": {
+                "Ref": "licenseKey1"
+              },
+            "licenseKey2": {
+                "Ref": "licenseKey2"
+              },
+            "pTier": "Tier2",
+            "sshKey": "mikeo-keypair",
+            "restrictedSrcAddress": "0.0.0.0/0"
+          },
+          "Tags": [
+            {
+              "Key": "Project",
+              "Value": {
+                "Ref": "pProject"
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaMainStack/F5BIGIP1"
+        }
+      },
+    "F5BIGIP2": {
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+          "TemplateURL": {
+            "Fn::Sub": [
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/BIG-IP/template.json",
+              {
+                "S3Region": {
+                  "Fn::If": [
+                    "GovCloud",
+                    "s3-us-gov-west-1",
+                    "s3"
+                  ]
+                }
+              }
+            ]
+          },
+          "Parameters": {
+            "pVpcStackName": {
+              "Fn::GetAtt": [
+                "VdssStack",
+                "Outputs.StackName"
+              ]
+            },
+            "pBaselineCompliance": {              
+                "Ref": "pBaselineCompliance"
+            },
+            "restrictedSrcAddressApp": "0.0.0.0/0",
+            "licenseKey1": {
+                "Ref": "licenseKey3"
+              },
+            "licenseKey2": {
+                "Ref": "licenseKey4"
+              },
+            "pTier": "Tier1",
+            "sshKey": "mikeo-keypair",
+            "restrictedSrcAddress": "0.0.0.0/0"
+          },
+          "Tags": [
+            {
+              "Key": "Project",
+              "Value": {
+                "Ref": "pProject"
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaMainStack/F5BIGIP2"
+        }
+      },
+    "IPSStack": {
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+          "TemplateURL": {
+            "Fn::Sub": [
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/IPS/template.json",
+              {
+                "S3Region": {
+                  "Fn::If": [
+                    "GovCloud",
+                    "s3-us-gov-west-1",
+                    "s3"
+                  ]
+                }
+              }
+            ]
+          },
+          "Parameters": {
+            "pVpcStackName": {
+                "Fn::GetAtt": [
+                  "VdssStack",
+                  "Outputs.StackName"
+                ]
+              },
+            "sshKey": "mikeo-keypair",
+            "SSHLocation": "0.0.0.0/0"
+          },
+          "Tags": [
+            {
+              "Key": "Project",
+              "Value": {
+                "Ref": "pProject"
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaMainStack/VdssStack"
+        }
+      }
+  }
+}

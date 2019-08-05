@@ -1,0 +1,556 @@
+Parameters:
+  pProject:
+    Type: String
+    Default: SCCA-Demo
+    Description: Project name to use for tagging
+  pVdssVpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: Must be a valid IP CIDR range of the form x.x.x.x/x.
+    Description: CIDR Block for the VDSS VPC
+    MaxLength: 18
+    MinLength: 9
+  pTransitGatewayStackName:
+    Type: String
+    Default: SccaTgwStack
+    Description: Transit Gateway Stack Name
+Resources:
+  rVdssVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock:
+        Ref: pVdssVpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: vdss-vpc
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssVpc
+  rVdssIgw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: vdss-igw
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssIgw
+  rVdssIgwAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: rVdssVpc
+      InternetGatewayId:
+        Ref: rVdssIgw
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssIgwAttachment
+  rVdssOutsideRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: rVdssVpc
+      Tags:
+        - Key: Name
+          Value: vdss-outside-rt
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssOutsideRouteTable
+  rVdssOutsideRouteTableIgwRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: rVdssOutsideRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: rVdssIgw
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssOutsideRouteTableIgwRoute
+  rVdssOutsideSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock:
+        Fn::Select:
+          - 0
+          - Fn::Cidr:
+              - Ref: pVdssVpcCidr
+              - 16
+              - "8"
+      VpcId:
+        Ref: rVdssVpc
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: vdss-outside-subnet
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssOutsideSubnetA
+  rVdssOutsideSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: rVdssOutsideRouteTable
+      SubnetId:
+        Ref: rVdssOutsideSubnet
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssOutsideSubnetRouteTableAssociation
+  rNatGatewayEipA:
+    Type: AWS::EC2::EIP
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rNatGatewayEipA
+  rNatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - rNatGatewayEipA
+          - AllocationId
+      SubnetId:
+        Ref: rVdssOutsideSubnet
+      Tags:
+        - Key: Name
+          Value: vdss-nat-gw-a
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rNatGateway
+  rVdssInternalRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: rVdssVpc
+      Tags:
+        - Key: Name
+          Value: vdss-internal-rt
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssInternalRouteTable
+  rVdssDmz1Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock:
+        Fn::Select:
+          - 1
+          - Fn::Cidr:
+              - Ref: pVdssVpcCidr
+              - 16
+              - "8"
+      VpcId:
+        Ref: rVdssVpc
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: Name
+          Value: vdss-dmz-1-subnet
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssDmz1Subnet
+  rVdssDmz1SubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: rVdssVpc
+      Tags:
+        - Key: Name
+          Value: vdss-dmz1subnet-rt
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssDmz1SubnetRouteTable
+  rVdssDmz1RouteTableNatGwRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: rVdssDmz1SubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: rNatGateway
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssDmz1RouteTableNatGwRoute  
+  rVdssDmz1SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: rVdssDmz1SubnetRouteTable
+      SubnetId:
+        Ref: rVdssDmz1Subnet
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssDmz1SubnetRouteTableAssociation
+  rVdssDmz2Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock:
+        Fn::Select:
+          - 2
+          - Fn::Cidr:
+              - Ref: pVdssVpcCidr
+              - 16
+              - "8"
+      VpcId:
+        Ref: rVdssVpc
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: Name
+          Value: vdss-dmz-2-subnet
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssDmz2Subnet
+  rVdssDmz2SubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: rVdssVpc
+      Tags:
+        - Key: Name
+          Value: vdss-dmz2subnet-rt
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssDmz2SubnetRouteTable
+  rVdssDmz2RouteTableNatGwRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: rVdssDmz2SubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: rNatGateway
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssDmz2RouteTableNatGwRoute  
+  rVdssDmz2SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: rVdssDmz2SubnetRouteTable
+      SubnetId:
+        Ref: rVdssDmz2Subnet
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssDmz2SubnetRouteTableAssociation
+  rVdssInsideSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock:
+        Fn::Select:
+          - 3
+          - Fn::Cidr:
+              - Ref: pVdssVpcCidr
+              - 16
+              - "8"
+      VpcId:
+        Ref: rVdssVpc
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: Name
+          Value: vdss-inside-subnet
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssInsideSubnet
+  rVdssInsideSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: rVdssInternalRouteTable
+      SubnetId:
+        Ref: rVdssInsideSubnet
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssInsideSubnetRouteTableAssociation
+  rVdssManagementSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock:
+        Fn::Select:
+          - 4
+          - Fn::Cidr:
+              - Ref: pVdssVpcCidr
+              - 16
+              - "8"
+      VpcId:
+        Ref: rVdssVpc
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: Name
+          Value: vdss-mgmt-subnet
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssManagementSubnet
+  rVdssManagementSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: rVdssOutsideRouteTable
+      SubnetId:
+        Ref: rVdssManagementSubnet
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssManagementSubnetRouteTableAssociation
+  rTransitGatewayAttachement:
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      SubnetIds:
+        - Ref: rVdssOutsideSubnet
+      TransitGatewayId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaTgwId
+      VpcId:
+        Ref: rVdssVpc
+      Tags:
+        - Key: Name
+          Value: vdss-tgw-attachment
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rTransitGatewayAttachement
+  rTransitGatewayRouteTableAssociation:
+    Type: AWS::EC2::TransitGatewayRouteTableAssociation
+    Properties:
+      TransitGatewayAttachmentId:
+        Ref: rTransitGatewayAttachement
+      TransitGatewayRouteTableId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaVdssTgwRouteTableId
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rTransitGatewayRouteTableAssociation
+  rTransitGatewayRouteTablePropagation:
+    Type: AWS::EC2::TransitGatewayRouteTablePropagation
+    Properties:
+      TransitGatewayAttachmentId:
+        Ref: rTransitGatewayAttachement
+      TransitGatewayRouteTableId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaVdssTgwRouteTableId
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rTransitGatewayRouteTablePropagation
+  rMainTransitGatewayRouteDefault:
+    Type: AWS::EC2::TransitGatewayRoute
+    Properties:
+      TransitGatewayRouteTableId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaMainTgwRouteTableId
+      DestinationCidrBlock: 0.0.0.0/0
+      TransitGatewayAttachmentId:
+        Ref: rTransitGatewayAttachement
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rMainTransitGatewayRouteDefault
+  rMainTransitGatewayRouteVdss:
+    Type: AWS::EC2::TransitGatewayRoute
+    Properties:
+      TransitGatewayRouteTableId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaMainTgwRouteTableId
+      DestinationCidrBlock:
+        Ref: pVdssVpcCidr
+      TransitGatewayAttachmentId:
+        Ref: rTransitGatewayAttachement
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rMainTransitGatewayRouteVdss
+  rVdssTransitGatewayRouteDefault:
+    Type: AWS::EC2::TransitGatewayRoute
+    Properties:
+      TransitGatewayRouteTableId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaVdssTgwRouteTableId
+      DestinationCidrBlock: 0.0.0.0/0
+      TransitGatewayAttachmentId:
+        Ref: rTransitGatewayAttachement
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssTransitGatewayRouteDefault
+  rVdssTransitGatewayRouteVdss:
+    Type: AWS::EC2::TransitGatewayRoute
+    Properties:
+      TransitGatewayRouteTableId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaVdssTgwRouteTableId
+      DestinationCidrBlock:
+        Ref: pVdssVpcCidr
+      TransitGatewayAttachmentId:
+        Ref: rTransitGatewayAttachement
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssTransitGatewayRouteVdss
+  rVdmsTransitGatewayRouteDefault:
+    Type: AWS::EC2::TransitGatewayRoute
+    Properties:
+      TransitGatewayRouteTableId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaVdmsTgwRouteTableId
+      DestinationCidrBlock: 0.0.0.0/0
+      TransitGatewayAttachmentId:
+        Ref: rTransitGatewayAttachement
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdmsTransitGatewayRouteDefault
+  rVdmsTransitGatewayRouteVdss:
+    Type: AWS::EC2::TransitGatewayRoute
+    Properties:
+      TransitGatewayRouteTableId:
+        Fn::ImportValue:
+          Fn::Join:
+            - ""
+            - - Ref: pTransitGatewayStackName
+              - -SccaVdmsTgwRouteTableId
+      DestinationCidrBlock:
+        Ref: pVdssVpcCidr
+      TransitGatewayAttachmentId:
+        Ref: rTransitGatewayAttachement
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdmsTransitGatewayRouteVdss
+Outputs:
+  StackName:
+    Value:
+      Ref: AWS::StackName
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -StackName
+  VdssVpcId:
+    Value:
+      Ref: rVdssVpc
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssVpcId
+  VdssOutsideSubnetId:
+    Value:
+      Ref: rVdssOutsideSubnet
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssOutsideSubnetId
+  VdssDmz1SubnetId:
+    Value:
+      Ref: rVdssDmz1Subnet
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssDmz1SubnetId
+  VdssDmz2SubnetId:
+    Value:
+      Ref: rVdssDmz2Subnet
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssDmz2SubnetId
+  VdssInsideSubnetId:
+    Value:
+      Ref: rVdssInsideSubnet
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssInsideSubnetId
+  VdssManagementSubnetId:
+    Value:
+      Ref: rVdssManagementSubnet
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssManagementSubnetId
+  VdssOutsideRouteTable:
+    Value:
+      Ref: rVdssOutsideRouteTable
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssOutsideRouteTable
+  VdssDmz1SubnetRouteTable:
+    Value:
+      Ref: rVdssDmz1SubnetRouteTable
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssDmz1SubnetRouteTable
+  VdssDmz2SubnetRouteTable:
+    Value:
+      Ref: rVdssDmz2SubnetRouteTable
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssDmz2SubnetRouteTable
+  VdssInternalRouteTable:
+    Value:
+      Ref: rVdssInternalRouteTable
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -VdssInternalRouteTable

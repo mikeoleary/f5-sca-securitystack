@@ -1,0 +1,105 @@
+
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "pVpcStackName": {
+            "Type": "String",
+            "Default": "SCCA-Demo",
+            "Description": "VPC Stack used for referencing exported resources"
+        },
+        "pBigIPStackName": {
+            "Type": "String",
+            "Default": "BIGIP",
+            "Description": "BIGIP Stack used for referencing exported resources"
+            },
+        "pTier": {
+            "Type": "String",
+            "Default": "Tier1",
+            "Description": "BIGIP Stack used for referencing exported resources"
+            }
+    },
+"Conditions": { 
+    "Tier1": {
+        "Fn::Equals" : [{"Ref" : "pTier"}, "Tier1"]
+     },
+     "Tier2": {
+        "Fn::Equals" : [{"Ref" : "pTier"}, "Tier2"]
+     }
+},
+"Resources": {
+/*routes pointing to BIGIP External NIC on subnet external to F5 BIGIP */
+  "rInboundRoute1": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+      "RouteTableId": {
+        "Fn::ImportValue": {
+          "Fn::If": [
+              "Tier1",
+                { "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable" },
+                { "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
+          ]
+        }
+       },
+       "DestinationCidrBlock": "10.0.0.0/8",
+       "NetworkInterfaceId": {
+       "Fn::ImportValue": {
+        "Fn::Sub": "${pBigIPStackName}-Bigip2ExternalInterface" }
+        }
+       }
+    }
+  },
+  "rInboundRoute2": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+        "RouteTableId": {
+            "Fn::ImportValue": {
+              "Fn::If": [
+                  "Tier1",
+                    { "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable" },
+                    { "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
+              ]
+            }
+           },
+       "DestinationCidrBlock": "172.16.0.0/12",
+       "NetworkInterfaceId": {
+       "Fn::ImportValue": {
+        "Fn::Sub": "${pBigIPStackName}-Bigip2ExternalInterface" }
+        }
+       }
+    },
+  "rInboundRoute3": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+        "RouteTableId": {
+            "Fn::ImportValue": {
+              "Fn::If": [
+                  "Tier1",
+                    { "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable" },
+                    { "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
+              ]
+            }
+           },
+       "DestinationCidrBlock": "192.168.0.0/16",
+       "NetworkInterfaceId": {
+       "Fn::ImportValue": {
+        "Fn::Sub": "${pBigIPStackName}-Bigip2ExternalInterface" }
+        }
+       }
+    },
+/*routes pointing to BIGIP Internal NIC on Internal Subnet */
+  "rOutboundRoute1": {
+    "Type": "AWS::EC2::Route",
+    "Condition": "Tier2",
+    "Properties": {
+        "RouteTableId": {
+            "Fn::ImportValue": {
+                "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable" },
+                "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
+           },
+       "DestinationCidrBlock": "192.168.0.0/16",
+       "NetworkInterfaceId": {
+       "Fn::ImportValue": {
+        "Fn::Sub": "${pBigIPStackName}-Bigip2ExternalInterface" }
+        }
+    }
+}
