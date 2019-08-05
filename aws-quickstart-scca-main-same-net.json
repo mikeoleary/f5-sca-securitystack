@@ -24,14 +24,14 @@
   "Parameters": {
     "pQuickstartS3BucketName": {
       "Type": "String",
-      "Default": "scca-demo-quickstart",
+      "Default": "f5-sca-securitystack",
       "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-.]*[0-9a-zA-Z])*$",
       "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, periods (.), and hyphens (-). It cannot start or end with a hyphen (-).",
       "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
     },
     "pQuickstartS3KeyPrefix": {
       "Type": "String",
-      "Default": "quickstart-f5-scca-security-stack/",
+      "Default": "master",
       "AllowedPattern": "^[0-9a-zA-Z-/]*$",
       "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
       "Description": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
@@ -97,7 +97,7 @@
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/aws-quickstart-scca-transit-gateway-stack.json",
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/aws-quickstart-scca-transit-gateway-stack.json",
             {
               "S3Region": {
                 "Fn::If": [
@@ -127,7 +127,7 @@
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/VPC/aws-scca-vdss-stack-singleAZ.template",
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-vdss-stack-singleAZ.template",
             {
               "S3Region": {
                 "Fn::If": [
@@ -168,7 +168,7 @@
         "Properties": {
           "TemplateURL": {
             "Fn::Sub": [
-              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/JumpHost/template.json",
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/JumpHost/template.json",
               {
                 "S3Region": {
                   "Fn::If": [
@@ -208,7 +208,7 @@
         "Properties": {
           "TemplateURL": {
             "Fn::Sub": [
-              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/BIG-IP/template.json",
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/template.json",
               {
                 "S3Region": {
                   "Fn::If": [
@@ -279,7 +279,7 @@
         "Properties": {
           "TemplateURL": {
             "Fn::Sub": [
-              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/BIG-IP/template.json",
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/template.json",
               {
                 "S3Region": {
                   "Fn::If": [
@@ -350,7 +350,7 @@
         "Properties": {
           "TemplateURL": {
             "Fn::Sub": [
-              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/IPS/template.json",
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/IPS/template.json",
               {
                 "S3Region": {
                   "Fn::If": [
@@ -390,7 +390,7 @@
         "Properties": {
           "TemplateURL": {
             "Fn::Sub": [
-              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/VPC/route-table-update-post-EC2-builds.json",
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/route-table-update-post-EC2-builds.json",
               {
                 "S3Region": {
                   "Fn::If": [
