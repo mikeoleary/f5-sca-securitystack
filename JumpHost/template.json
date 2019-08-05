@@ -43,35 +43,40 @@
         }
     },         
    "Resources" : {
-      "IpsExternalInterface": {
+      "JumpHostNetworkInterface": {
         "Properties": {
          "Description": "Public External Interface for the IPS",
          "GroupSet": [
           {
-           "Ref": "IpsExternalSecurityGroup"
+           "Ref": "JumpHostSecurityGroup"
           }
          ],
          "SourceDestCheck": false,
          "SubnetId": {
-            "Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-VdssDmz1SubnetId" }
+            "Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-VdssManagementSubnetId" }
          }
         },
         "Type": "AWS::EC2::NetworkInterface"
        },
-      "IpsInternalInterface": {
+       "JumpHostEipAddress": {
         "Properties": {
-         "Description": "Private or Internal Interface of IPS",
-         "GroupSet": [
-          {
-           "Ref": "IpsInternalSecurityGroup"
-          }
-         ],
-         "SourceDestCheck": false,
-         "SubnetId": {
-              "Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetId" }
+         "Domain": "vpc"
+        },
+        "Type": "AWS::EC2::EIP"
+       },
+       "JumpHostEipAddressAssociation": {
+        "Properties": {
+         "AllocationId": {
+          "Fn::GetAtt": [
+           "JumpHostEipAddress",
+           "AllocationId"
+          ]
+         },
+         "NetworkInterfaceId": {
+          "Ref": "JumpHostNetworkInterface"
          }
         },
-        "Type": "AWS::EC2::NetworkInterface"
+        "Type": "AWS::EC2::EIPAssociation"
        },
       "EC2Instance" : {
         "Type" : "AWS::EC2::Instance",
@@ -84,90 +89,7 @@
         "Metadata" : {
           "AWS::CloudFormation::Init" : {
             "configSets" : {
-              "full_install" : [ "install_and_enable_cfn_hup" ] ,
-              "configure_routing" : [ "configure_routing" ] 
-            },
-            "configure_routing": {
-                "commands": {
-                    "01restartNetworking" : {
-                        "command" : "service networking restart"
-                    },
-                    "02enableIpForwarding": {
-                        "command" : "sysctl --system"
-                    },
-                    "03setPersistentRoutes": {
-                        "test" : "[ -f /tmp/addStaticRoutes.sh -a -f /etc/network/interfaces ]",
-                        "command": {
-                        "Fn::Join": [
-                            "",
-                            [
-                                "./addStaticRoutes.sh"
-                            ]
-                           ]
-                        },
-                        "cwd": "/tmp"
-                        },
-                    "04restartNetworking": {
-                        "command" : "service networking restart"
-                    }
-                },
-                "files": {
-                    "/tmp/addStaticRoutes.sh": {
-                        "content": {
-                            "Fn::Join" : ["", 
-                                [
-                                "#!/bin/bash\n",
-                                "apt install prips\n",
-                                "CIDR=",
-                                {
-                                    "Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-Dmz2SubnetIpRange" }
-                                },
-                                "\n",
-                                "IPRANGE=$(prips -d 32 $CIDR)\n",
-                                "ARRIPRANGE=($IPRANGE)\n",
-                                "GW=${ARRIPRANGE[1]}\n",
-                                "echo $GW\n",
-                                "\n",
-                                "cat <<EOT >> /etc/network/interfaces\n",
-                                "\n",
-                                "auto eth1\n",
-                                "iface eth1 inet dhcp\n",
-                                "###persistent static routes\n",
-                                "up route add -net 10.0.0.0 netmask 255.0.0.0 gw $GW\n",
-                                "up route add -net 172.16.0.0 netmask 255.240.0.0 gw $GW\n",
-                                "up route add -net 192.168.0.0 netmask 255.255.0.0 gw $GW\n",
-                                "EOT"
-                                ]
-                            ]
-                        },
-                        "mode": "000755",
-                        "owner": "root",
-                        "group": "root"
-                    },
-                    "/etc/network/interfaces": {
-                        "content" : { "Fn::Join" : ["", [
-                          "# The loopback network interface\n",
-                          "auto lo\n",
-                          "iface lo inet loopback\n",
-                          "\n",
-                          "auto eth0\n",
-                          "iface eth0 inet dhcp\n"
-                        ]]},
-                        "mode"    : "00644",
-                        "owner"   : "root",
-                        "group"   : "root"
-                      },
-                    "/etc/sysctl.conf": {
-                        "content" : { "Fn::Join" : ["", [
-                            "\n",
-                            "net.ipv4.ip_forward=1",
-                            "\n"
-                          ]]},
-                        "mode"    : "00644",
-                        "owner"   : "root",
-                        "group"   : "root"                        
-                    }
-                }
+              "full_install" : [ "install_and_enable_cfn_hup" ]
             },
             "install_and_enable_cfn_hup" : {
               "files" : {
@@ -225,14 +147,7 @@
              "Description": "Public or External Interface of IPS",
              "DeviceIndex": "0",
              "NetworkInterfaceId": {
-              "Ref": "IpsExternalInterface"
-             }
-            },
-            {
-             "Description": "Private or Internal Interface of IPS",
-             "DeviceIndex": "1",
-             "NetworkInterfaceId": {
-              "Ref": "IpsInternalInterface"
+              "Ref": "JumpHostNetworkInterface"
              }
             }
            ],
@@ -263,7 +178,7 @@
                 "/opt/aws/bin/cfn-init -v ",
                "         --stack ", { "Ref" : "AWS::StackName" },
                "         --resource EC2Instance ",
-               "         --configsets full_install,configure_routing ",
+               "         --configsets full_install ",
                "         --region ", { "Ref" : "AWS::Region" }, "\n",
   
                "/opt/aws/bin/cfn-signal -e $? ",
@@ -272,9 +187,9 @@
                "         --region ", { "Ref" : "AWS::Region" }, "\n"
               ]]}}}
       },
-      "IpsExternalSecurityGroup": {
+      "JumpHostSecurityGroup": {
         "Properties": {
-         "GroupDescription": "Public or external interface rules for IPS external interface",
+         "GroupDescription": "Public or external interface rules for jumphost interface",
          "SecurityGroupIngress": [
           {
            "CidrIp": "0.0.0.0/0",
@@ -308,38 +223,7 @@
             "Fn::Join": [
              "",
              [
-              "IPS External Security Group:",
-              {
-               "Ref": "AWS::StackName"
-              }
-             ]
-            ]
-           }
-          }
-         ],
-         "VpcId": {
-          "Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-VdssVpcId" }
-         }
-        },
-        "Type": "AWS::EC2::SecurityGroup"
-       },
-       "IpsInternalSecurityGroup": {
-        "Properties": {
-         "GroupDescription": "Allow All from Intra-VPC only",
-         "SecurityGroupIngress": [
-            {
-                "IpProtocol": "-1",
-                "CidrIp": "0.0.0.0/0"
-              }
-           ],
-         "Tags": [
-          {
-           "Key": "Name",
-           "Value": {
-            "Fn::Join": [
-             "",
-             [
-              "IPS Internal Security Group:",
+              "JumpHost Security Group:",
               {
                "Ref": "AWS::StackName"
               }
@@ -360,23 +244,29 @@
         "Value": {
          "Ref": "AWS::StackName"
         }
-    },  
-    "IpsExternalInterface": {
-        "Description": "External interface of IPS",
-        "Value": {
-         "Ref": "IpsExternalInterface"
-        },
-        "Export" : {
-            "Name" : {"Fn::Sub": "${AWS::StackName}-IpsExternalInterface" }
-        }
     },
-    "IpsInternalInterface": {
-        "Description": "Internal interface of IPS",
+    "JumpHostEipAddress": {
+        "Description": "Public IP address of the JumpHost",
         "Value": {
-         "Ref": "IpsInternalInterface"
+         "Ref": "JumpHostEipAddress"
+        }
+       },
+    "JumpHostPrivateIp": {
+        "Description": "Internally routable IP of the jump host",
+        "Value": {
+         "Fn::GetAtt": [
+          "JumpHostNetworkInterface",
+          "PrimaryPrivateIpAddress"
+         ]
+        }
+       },
+    "JumpHostNetworkInterface": {
+        "Description": "Network interface of JumpHost",
+        "Value": {
+         "Ref": "JumpHostNetworkInterface"
         },
         "Export" : {
-            "Name" : {"Fn::Sub": "${AWS::StackName}-IpsInternalInterface" }
+            "Name" : {"Fn::Sub": "${AWS::StackName}-JumpHostNetworkInterface" }
         }
     }
   }

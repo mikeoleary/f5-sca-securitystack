@@ -83,7 +83,7 @@
         "Type": "String"
        },
     "pBaselineCompliance": {
-        "AllowedValues" : ["standard", "SCCA", "FINRA", "HIPAA", "Bot Protection"],
+        "AllowedValues" : ["standard", "SCCA"],
         "ConstraintDescription": "Choose your baseline compliance posture",
         "Description": "Choose your baseline compliance posture",
         "MaxLength": "255",
@@ -163,6 +163,46 @@
         "aws:cdk:path": "sccaMainStack/VdssStack"
       }
     },
+    "JumpHostStack": {
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+          "TemplateURL": {
+            "Fn::Sub": [
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/JumpHost/template.json",
+              {
+                "S3Region": {
+                  "Fn::If": [
+                    "GovCloud",
+                    "s3-us-gov-west-1",
+                    "s3"
+                  ]
+                }
+              }
+            ]
+          },
+          "Parameters": {
+            "pVpcStackName": {
+                "Fn::GetAtt": [
+                  "VdssStack",
+                  "Outputs.StackName"
+                ]
+              },
+            "sshKey": "mikeo-keypair",
+            "SSHLocation": "0.0.0.0/0"
+          },
+          "Tags": [
+            {
+              "Key": "Project",
+              "Value": {
+                "Ref": "pProject"
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaMainStack/JumpHostStack"
+        }
+      },   
     "F5BIGIP1": {
         "Type": "AWS::CloudFormation::Stack",
         "Properties": {
@@ -190,6 +230,12 @@
                 "Outputs.StackName"
               ]
             },
+            "pJumpHostPrivateIP": {
+                "Fn::GetAtt": [
+                  "JumpHostStack",
+                  "Outputs.JumpHostPrivateIp"
+                ]
+              },
             "restrictedSrcAddressApp": "0.0.0.0/0",
             "licenseKey1": {
                 "Ref": "licenseKey1"
@@ -197,9 +243,23 @@
             "licenseKey2": {
                 "Ref": "licenseKey2"
               },
-            "pTier": "Tier2",
+            "pTier": "Tier1",
             "sshKey": "mikeo-keypair",
-            "restrictedSrcAddress": "0.0.0.0/0"
+            "restrictedSrcAddress": "0.0.0.0/0",
+            "declarationUrlrouting": {
+                "Fn::Sub": [
+                  "https://raw.githubusercontent.com/mikeoleary/aws-sca-resources/master/routingBaseline.json",
+                  {
+                    "S3Region": {
+                      "Fn::If": [
+                        "GovCloud",
+                        "s3-us-gov-west-1",
+                        "s3"
+                      ]
+                    }
+                  }
+                ]
+            }
           },
           "Tags": [
             {
@@ -213,7 +273,7 @@
         "Metadata": {
           "aws:cdk:path": "sccaMainStack/F5BIGIP1"
         }
-      },
+    },
     "F5BIGIP2": {
         "Type": "AWS::CloudFormation::Stack",
         "Properties": {
@@ -238,6 +298,12 @@
                 "Outputs.StackName"
               ]
             },
+            "pJumpHostPrivateIP": {
+                "Fn::GetAtt": [
+                  "JumpHostStack",
+                  "Outputs.JumpHostPrivateIp"
+                ]
+              },
             "pBaselineCompliance": {              
                 "Ref": "pBaselineCompliance"
             },
@@ -248,9 +314,23 @@
             "licenseKey2": {
                 "Ref": "licenseKey4"
               },
-            "pTier": "Tier1",
+            "pTier": "Tier2",
             "sshKey": "mikeo-keypair",
-            "restrictedSrcAddress": "0.0.0.0/0"
+            "restrictedSrcAddress": "0.0.0.0/0",
+            "declarationUrlrouting": {
+                "Fn::Sub": [
+                  "https://raw.githubusercontent.com/mikeoleary/aws-sca-resources/master/routingBaseline.json",
+                  {
+                    "S3Region": {
+                      "Fn::If": [
+                        "GovCloud",
+                        "s3-us-gov-west-1",
+                        "s3"
+                      ]
+                    }
+                  }
+                ]
+            }
           },
           "Tags": [
             {
@@ -302,8 +382,64 @@
           ]
         },
         "Metadata": {
-          "aws:cdk:path": "sccaMainStack/VdssStack"
+          "aws:cdk:path": "sccaMainStack/IPSStack"
+        }
+      },
+      "RouteTableUpdates": {
+        "Type": "AWS::CloudFormation::Stack",
+        "Properties": {
+          "TemplateURL": {
+            "Fn::Sub": [
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}templates/same-net/VPC/route-table-update-post-EC2-builds.json",
+              {
+                "S3Region": {
+                  "Fn::If": [
+                    "GovCloud",
+                    "s3-us-gov-west-1",
+                    "s3"
+                  ]
+                }
+              }
+            ]
+          },
+          "Parameters": {
+            "pVpcStackName": {
+                "Fn::GetAtt": [
+                  "VdssStack",
+                  "Outputs.StackName"
+                ]
+              },
+              "pIPSStackName": {
+                "Fn::GetAtt": [
+                  "IPSStack",
+                  "Outputs.StackName"
+                ]
+              },
+              "pBigIPStackNameTier1": {
+                "Fn::GetAtt": [
+                  "F5BIGIP1",
+                  "Outputs.StackName"
+                ]
+              },
+              "pBigIPStackNameTier2": {
+                "Fn::GetAtt": [
+                  "F5BIGIP2",
+                  "Outputs.StackName"
+                ]
+              }
+          },
+          "Tags": [
+            {
+              "Key": "Project",
+              "Value": {
+                "Ref": "pProject"
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaMainStack/RouteUpdatesStack"
         }
       }
-  }
+    }  
 }

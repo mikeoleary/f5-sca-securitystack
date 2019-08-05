@@ -287,6 +287,29 @@ Resources:
         Ref: rVdssInsideSubnet
     Metadata:
       aws:cdk:path: SccaVdssStack/rVdssInsideSubnetRouteTableAssociation
+  rVdssManagementRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: rVdssVpc
+      Tags:
+        - Key: Name
+          Value: vdss-mgmt-rt
+        - Key: Project
+          Value:
+            Ref: pProject
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssManagementRouteTable
+  rVdssManagementRouteTableIgwRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: rVdssManagementRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: rVdssIgw
+    Metadata:
+      aws:cdk:path: SccaVdssStack/rVdssOutsideRouteTableIgwRoute
   rVdssManagementSubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -315,7 +338,7 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId:
-        Ref: rVdssOutsideRouteTable
+        Ref: rVdssManagementRouteTable
       SubnetId:
         Ref: rVdssManagementSubnet
     Metadata:
@@ -464,6 +487,62 @@ Outputs:
           - ""
           - - Ref: AWS::StackName
             - -StackName
+  OutsideSubnetIpRange:
+    Value:
+      Fn::Select:
+        - 0
+        - Fn::Cidr:
+            - Ref: pVdssVpcCidr
+            - 16
+            - "8"
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -OutsideSubnetIpRange
+  Dmz1SubnetIpRange:
+    Value:
+      Fn::Select:
+        - 1
+        - Fn::Cidr:
+            - Ref: pVdssVpcCidr
+            - 16
+            - "8"
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -Dmz1SubnetIpRange
+  Dmz2SubnetIpRange:
+    Value:
+      Fn::Select:
+        - 2
+        - Fn::Cidr:
+            - Ref: pVdssVpcCidr
+            - 16
+            - "8"
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -Dmz2SubnetIpRange
+  InsideSubnetIpRange:
+    Value:
+      Fn::Select:
+        - 3
+        - Fn::Cidr:
+            - Ref: pVdssVpcCidr
+            - 16
+            - "8"
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Ref: AWS::StackName
+            - -InsideSubnetIpRange
   VdssVpcId:
     Value:
       Ref: rVdssVpc

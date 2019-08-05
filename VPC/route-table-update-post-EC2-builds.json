@@ -7,99 +7,271 @@
             "Default": "SCCA-Demo",
             "Description": "VPC Stack used for referencing exported resources"
         },
-        "pBigIPStackName": {
+        "pIPSStackName": {
             "Type": "String",
-            "Default": "BIGIP",
+            "Default": "IPSStack",
             "Description": "BIGIP Stack used for referencing exported resources"
             },
-        "pTier": {
+        "pBigIPStackNameTier1": {
             "Type": "String",
-            "Default": "Tier1",
+            "Default": "BIGIPStackTier1",
+            "Description": "BIGIP Stack used for referencing exported resources"
+            },
+        "pBigIPStackNameTier2": {
+            "Type": "String",
+            "Default": "BIGIPStackTier2",
             "Description": "BIGIP Stack used for referencing exported resources"
             }
     },
-"Conditions": { 
-    "Tier1": {
-        "Fn::Equals" : [{"Ref" : "pTier"}, "Tier1"]
-     },
-     "Tier2": {
-        "Fn::Equals" : [{"Ref" : "pTier"}, "Tier2"]
-     }
-},
 "Resources": {
-/*routes pointing to BIGIP External NIC on subnet external to F5 BIGIP */
-  "rInboundRoute1": {
+  "rTier1InboundRoute1": {
     "Type": "AWS::EC2::Route",
     "Properties": {
       "RouteTableId": {
         "Fn::ImportValue": {
-          "Fn::If": [
-              "Tier1",
-                { "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable" },
-                { "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
-          ]
+            "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable"
         }
-       },
+        },
        "DestinationCidrBlock": "10.0.0.0/8",
        "NetworkInterfaceId": {
-       "Fn::ImportValue": {
-        "Fn::Sub": "${pBigIPStackName}-Bigip2ExternalInterface" }
+        "Fn::ImportValue": {
+        "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2ExternalInterface" }
         }
        }
-    }
-  },
-  "rInboundRoute2": {
+    },
+  "rTier1InboundRoute2": {
     "Type": "AWS::EC2::Route",
     "Properties": {
         "RouteTableId": {
             "Fn::ImportValue": {
-              "Fn::If": [
-                  "Tier1",
-                    { "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable" },
-                    { "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
-              ]
-            }
-           },
+                "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable"
+            }   
+        },
        "DestinationCidrBlock": "172.16.0.0/12",
        "NetworkInterfaceId": {
        "Fn::ImportValue": {
-        "Fn::Sub": "${pBigIPStackName}-Bigip2ExternalInterface" }
+        "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2ExternalInterface" }
         }
        }
     },
-  "rInboundRoute3": {
+  "rTier1InboundRoute3": {
     "Type": "AWS::EC2::Route",
     "Properties": {
         "RouteTableId": {
             "Fn::ImportValue": {
-              "Fn::If": [
-                  "Tier1",
-                    { "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable" },
-                    { "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
-              ]
+                "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable"
+            }   
+        },
+       "DestinationCidrBlock": "192.168.0.0/16",
+       "NetworkInterfaceId": {
+       "Fn::ImportValue": {
+        "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2ExternalInterface" }
+        }
+       }
+    },
+  "rTier1InboundRoute4": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+        "RouteTableId": {
+        "Fn::ImportValue": {
+            "Fn::Sub": "${pVpcStackName}-VdssDmz1SubnetRouteTable"
+        }
+        },
+        "DestinationCidrBlock": "10.0.0.0/8",
+        "NetworkInterfaceId": {
+        "Fn::ImportValue": {
+         "Fn::Sub": "${pIPSStackName}-IpsExternalInterface" }
+         }
+       }
+    },
+  "rTier1InboundRoute5": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+        "RouteTableId": {
+            "Fn::ImportValue": {
+                "Fn::Sub": "${pVpcStackName}-VdssDmz1SubnetRouteTable"
+            }   
+        },
+        "DestinationCidrBlock": "172.16.0.0/12",
+        "NetworkInterfaceId": {
+        "Fn::ImportValue": {
+            "Fn::Sub": "${pIPSStackName}-IpsExternalInterface" }
+        }
+        }
+    },
+  "rTier1InboundRoute6": {
+    "Type": "AWS::EC2::Route",
+    "Properties": {
+        "RouteTableId": {
+            "Fn::ImportValue": {
+                "Fn::Sub": "${pVpcStackName}-VdssDmz1SubnetRouteTable"
+            }   
+        },
+        "DestinationCidrBlock": "192.168.0.0/16",
+        "NetworkInterfaceId": {
+        "Fn::ImportValue": {
+            "Fn::Sub": "${pIPSStackName}-IpsExternalInterface" }
+        }
+        }
+    },
+    "rTier2OutboundRoute1": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+          "RouteTableId": {
+            "Fn::ImportValue": {
+                "Fn::Sub": "${pVpcStackName}-VdssInternalRouteTable"
             }
-           },
-       "DestinationCidrBlock": "192.168.0.0/16",
-       "NetworkInterfaceId": {
-       "Fn::ImportValue": {
-        "Fn::Sub": "${pBigIPStackName}-Bigip2ExternalInterface" }
-        }
-       }
-    },
-/*routes pointing to BIGIP Internal NIC on Internal Subnet */
-  "rOutboundRoute1": {
-    "Type": "AWS::EC2::Route",
-    "Condition": "Tier2",
-    "Properties": {
-        "RouteTableId": {
+            },
+           "DestinationCidrBlock": "0.0.0.0/0",
+           "NetworkInterfaceId": {
+           "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2InternalInterface" }
+            }
+           }
+        },
+    "rTier2InboundRoute1": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+          "RouteTableId": {
             "Fn::ImportValue": {
-                "Fn::Sub": "${pVpcStackName}-VdssOutsideRouteTable" },
-                "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
-           },
-       "DestinationCidrBlock": "192.168.0.0/16",
-       "NetworkInterfaceId": {
-       "Fn::ImportValue": {
-        "Fn::Sub": "${pBigIPStackName}-Bigip2ExternalInterface" }
+                "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable"
+            }
+            },
+           "DestinationCidrBlock": "10.0.0.0/8",
+           "NetworkInterfaceId": {
+           "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2ExternalInterface" }
+            }
+           }
+        },
+      "rTier2InboundRoute2": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+            "RouteTableId": {
+             "Fn::ImportValue": {
+                "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable"
+             } 
+            },
+           "DestinationCidrBlock": "172.16.0.0/12",
+           "NetworkInterfaceId": {
+           "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2ExternalInterface" }
+            }
+           }
+        },
+      "rTier2InboundRoute3": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+            "RouteTableId": {
+            "Fn::ImportValue": {
+                "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable"
+                }  
+            },
+           "DestinationCidrBlock": "192.168.0.0/16",
+           "NetworkInterfaceId": {
+           "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2ExternalInterface" }
+            }
+           }
+        },
+    "IamRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+        "AssumeRolePolicyDocument": {
+            "Version" : "2012-10-17",
+            "Statement": [ {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": [ "lambda.amazonaws.com" ]
+            },
+            "Action": [ "sts:AssumeRole" ]
+            } ]
+            },
+        "Path": "/",
+        "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        ]
         }
+    },
+  "CustomUpdateRoute1" : {
+    "Type": "Custom::ReplaceRoute",
+    "Version" : "1.0",
+    "Properties" : {
+      "ServiceToken": { "Fn::GetAtt" : ["LambdaReplaceRoute", "Arn"] },
+      "dest_cidr_block" : "0.0.0.0/0",
+      "interface_id" : {
+        "Fn::ImportValue": {
+         "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2InternalInterface" }
+         },
+      "routetable_id" : {
+        "Fn::ImportValue": {
+         "Fn::Sub": "${pVpcStackName}-VdssDmz1SubnetRouteTable" }
+         }
+    }
+  },
+  "CustomUpdateRoute2" : {
+    "Type": "Custom::ReplaceRoute",
+    "Version" : "1.0",
+    "Properties" : {
+      "ServiceToken": { "Fn::GetAtt" : ["LambdaReplaceRoute", "Arn"] },
+      "dest_cidr_block" : "0.0.0.0/0",
+      "interface_id" : {
+        "Fn::ImportValue": {
+         "Fn::Sub": "${pIPSStackName}-IpsInternalInterface" }
+         },
+      "routetable_id" : {
+        "Fn::ImportValue": {
+         "Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetRouteTable" }
+         }
+    }
+  },
+    "LambdaReplaceRoute": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+            "Handler": "index.lambda_handler",
+            "Role": {
+                "Fn::GetAtt": [ 
+                    "IamRole",
+                    "Arn" ]
+                 },
+            "Code": {
+                "ZipFile":  { "Fn::Join": ["\n", [
+                    "import logging",
+                    "import boto3",
+                    "import cfnresponse",
+                    "",
+                    "logger = logging.getLogger()",
+                    "logger.setLevel(logging.INFO)",
+                    "ec2 = boto3.resource('ec2')",
+                    "client = boto3.client('ec2')",
+                    "",
+                    "def lambda_handler(event, context):",
+                    "  try:",
+                    "    logger.info('got event {}'.format(event))",
+                    "    dest_cidr_block = event['ResourceProperties'].get('dest_cidr_block')",
+                    "    interface_id = event['ResourceProperties'].get('interface_id')",
+                    "    routetable_id = event['ResourceProperties'].get('routetable_id')",
+                    "",
+                    "    if event['RequestType'] == 'Create':  #Create Resource",
+                    "      logger.info('dest_cidr_block is {} and interface_id is {} and  routetable_id is {}'.format(dest_cidr_block, interface_id, routetable_id))",
+                    "      response = client.replace_route(DestinationCidrBlock=dest_cidr_block,NetworkInterfaceId=interface_id,RouteTableId=routetable_id)",
+                    "      logger.info('response is {}'.format(response))",
+                    "      cfnresponse.send(event, context, cfnresponse.SUCCESS, response)",
+                    "    if event['RequestType'] == 'Delete':",
+                    "      responseData = {}",
+                    "      cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)",
+                    "  except:",
+                    "    logger.info('FAILED!')",
+                    "    cfnresponse.send(event, context, \"FAILED\", {\"Message\": \"Exception during processing\"})"
+                ]]}
+                },
+            "Runtime": "python2.7",
+            "Timeout": 20,
+            "TracingConfig": {
+                "Mode": "Active"
+            }
+        }
+    }
     }
 }

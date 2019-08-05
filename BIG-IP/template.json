@@ -22,6 +22,9 @@
      },
      "Tier2": {
         "Fn::Equals" : [{"Ref" : "pTier"}, "Tier2"]
+    },
+    "SCCA": {
+       "Fn::Equals" : [{"Ref" : "pBaselineCompliance"}, "SCCA"]
      }
     },
     "Description": "Template v4.2.0: AWS CloudFormation Template for creating a Same-AZ cluster of 3NIC BIG-IPs in an existing VPC **WARNING** This template creates Amazon EC2 Instances. You will be billed for the AWS resources used if you create a stack from this template.",
@@ -138,6 +141,7 @@
         },
         "Parameters": [
          "pVpcStackName",
+         "pJumpHostPrivateIP",
          "pTier",
          "numberOfAdditionalNics",
          "additionalNicLocation"
@@ -189,13 +193,17 @@
          "default": "VIRTUAL SERVICE CONFIGURATION"
         },
         "Parameters": [
-         "declarationUrl"
+         "declarationUrl",
+         "declarationUrlrouting"
         ]
        }
       ],
       "ParameterLabels": {
        "pVpcStackName": {
         "default": "Name of the Stack that deployed the VPC"
+        },
+        "pJumpHostPrivateIP": {
+            "default": "Private IP address of Jump Host"
         },
        "pTier": {
         "default": "Tier1 or Tier2. Defines which Tier of the architecture the BIG-IP devices will sit in."
@@ -221,9 +229,7 @@
        "customImageId": {
         "default": "Custom Image Id"
        },
-       "declarationUrl": {
-        "default": "AS3 Declaration URL"
-       },
+
        "environment": {
         "default": "Environment"
        },
@@ -520,6 +526,11 @@
       "Type": "String",
       "Default": "VDSS"
       },
+      "pJumpHostPrivateIP": {
+        "ConstraintDescription": "JumpHost Private IP address",
+        "Type": "String",
+        "Default": "10.0.4.10"
+        },
       "pTier": {
         "AllowedValues": [
             "Tier1",
@@ -530,7 +541,7 @@
         "Default": "Tier1"
        },
      "pBaselineCompliance": {
-      "AllowedValues" : ["standard", "SCCA", "FINRA", "HIPAA", "Bot Protection"],
+      "AllowedValues" : ["standard", "SCCA"],
       "ConstraintDescription": "Choose your baseline compliance posture",
       "Description": "Choose your baseline compliance posture",
       "MaxLength": "255",
@@ -565,6 +576,12 @@
       "Type": "String"
      },
      "declarationUrl": {
+      "AllowedPattern": "^(http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$|^none$",
+      "Default": "none",
+      "Description": "URL for the AS3 declaration JSON file to be deployed. Leave as **none** to deploy without a service configuration.",
+      "Type": "String"
+     },
+     "declarationUrlrouting": {
       "AllowedPattern": "^(http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$|^none$",
       "Default": "none",
       "Description": "URL for the AS3 declaration JSON file to be deployed. Leave as **none** to deploy without a service configuration.",
@@ -680,12 +697,12 @@
      }
     },
     "Resources": {
-     "Bigip1Instance": {
+     "Bigip1Instance": { 
       "Metadata": {
        "AWS::CloudFormation::Init": {
         "configSets" : {
-            "SCCA" : [ "config", "bigipstig", "dodCerts" ],
-            "standard": [ "config" ]
+            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing" ],
+            "standard": [ "config", "AS3-baseline-routing" ]
           },
         "config": {
          "commands": {
@@ -837,7 +854,7 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--module ltm:nominal",
+                "--modules ltm:nominal,afm:nominal,apm:nominal",
                 "--license ",
                 {
                  "Ref": "licenseKey1"
@@ -876,7 +893,7 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--module ltm:nominal",
+                "--modules ltm:nominal,afm:nominal,apm:nominal",
                 "--license ",
                 {
                  "Ref": "licenseKey1"
@@ -1302,7 +1319,7 @@
                     "group": "root",
                     "mode": "000755",
                     "owner": "root",
-                    "source": "https://raw.githubusercontent.com/mikeoleary/bigipstig/master/bigipstig.sh"
+                    "source": "https://raw.githubusercontent.com/mikeoleary/aws-sca-resources/master/bigipstig.sh"
                 }
             }
         },
@@ -1333,7 +1350,7 @@
                     "group": "root",
                     "mode": "000755",
                     "owner": "root",
-                    "source": "https://github.com/mikeoleary/certificates_PKCS7_v5.5_DoD/raw/master/Certificates_PKCS7_v5.5_DoD.zip"
+                    "source": "https://github.com/mikeoleary/aws-sca-resources/raw/master/Certificates_PKCS7_v5.5_DoD.zip"
                 },
                 "/config/installTrustedCerts.sh": {
                     "content": {
@@ -1352,6 +1369,102 @@
                     "mode": "000755",
                     "owner": "root"
                 }
+            }
+        },
+        "AS3-baseline-routing": {
+            "commands": {
+                "083-apply-AS3-baseline-routing": { 
+                    "test" : "[ -f /config/deployBaselineRouting.sh ]",
+                    "command": { 
+                       "Fn::Join": [  
+                        " ", 
+                        [ 
+                         "nohup /config/waitThenRun.sh",
+                         "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
+                         "--file /config/deployBaselineRouting.sh",
+                         "--output /var/log/deployBaselineRouting.log",
+                         "--log-level silly",
+                         "--wait-for CERTS_DONE",
+                         "--signal AS3_ROUTING_DONE",
+                         "&>> /var/log/cloud/aws/install.log < /dev/null &"
+                        ] 
+                       ] 
+                  }, 
+                  "cwd" : "/config"  
+                  } 
+                  
+            },
+            "files": {
+                "/config/deployBaselineRouting.sh": {
+                    "group": "root",
+                    "mode": "000755",
+                    "owner": "root",
+                    "content": {
+                        "Fn::Join": [
+                            "",
+                            [
+                            "#!/bin/bash\n",
+                            "declarationUrlrouting='",
+                            {
+                            "Ref": "declarationUrlrouting"
+                            },
+                            "'\n",
+                            "VIP1='",
+                            {
+                            "Fn::GetAtt": [
+                            "Bigip1subnet1Az1Interface",
+                            "PrimaryPrivateIpAddress"
+                            ]
+                            },
+                            "'\n",
+                            "VIP2='",
+                            {
+                            "Fn::GetAtt": [
+                            "Bigip2subnet1Az1Interface",
+                            "PrimaryPrivateIpAddress"
+                            ]
+                            },
+                            "'\n",
+                            "JUMPHOSTIP='",
+                            {
+                            "Ref": "pJumpHostPrivateIP"
+                            },
+                            "'\n",
+                            "\n",
+                            "### START DEPLOYMENT OF AS3 DECLARATION FOR MGMT ACCESS\n",
+                            "source /config/cloud/aws/onboard_config_vars\n",
+                            "deployed=\"no\"\n",
+                            "url_regex=\"(http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$\"\n",
+                            "file_loc=\"/config/cloud/as3_config\"\n",
+                            "if [[ $declarationUrlrouting =~ $url_regex ]]; then\n",
+                            "  response_code=$(/usr/bin/curl -sk -w \"%{http_code}\" $declarationUrlrouting -o $file_loc)\n",
+                            "  sed -i 's/ReplaceWithJumpHostIP/'\"$JUMPHOSTIP\"'/g' $file_loc\n",
+                            "  sed -i 's/ReplaceWithVIP1/'\"$VIP1\"'/g' $file_loc\n",
+                            "  if [[ $response_code == 200 ]]; then\n",
+                            "    echo \"AS3 download complete; checking for valid JSON.\"\n",
+                            "    cat $file_loc | jq .class\n",
+                            "    if [[ $? == 0 ]]; then\n",
+                            "      response_code=$(/usr/bin/curl -skvvu ${adminUsername}:XXX -w \"%{http_code}\" -X POST -H \"Content-Type: application/json\" https://localhost:${managementGuiPort}/mgmt/shared/appsvcs/declare -d @$file_loc -o /dev/null)\n",
+                            "      if [[ $response_code == 200 || $response_code == 502 ]]; then\n",
+                            "        echo \"Deployment of custom application succeeded.\"\n",
+                            "        deployed=\"yes\"\n",
+                            "      else\n",
+                            "         echo \"Failed to deploy AS3 declaration; continuing...\"\n",
+                            "      fi\n",
+                            "    else\n",
+                            "      echo \"Custom config was not valid JSON, continuing...\"\n",
+                            "    fi\n",
+                            "  else\n",
+                            "    echo \"Failed to download custom config; continuing...\"\n",
+                            "  fi\n",
+                            "else\n",
+                            "  echo \"Custom config was not a URL, continuing...\"\n",
+                            "fi\n",
+                            "### END DEPLOYMENT OF AS3 DECLARATION FOR MGMT ACCESS"
+                            ]
+                        ]
+                    }
+                }   
             }
         }
        }
@@ -1628,11 +1741,17 @@
      },
      "Bigip2Instance": {
       "DependsOn": "Bigip1Instance",
+       "CreationPolicy" : {
+        "ResourceSignal" : {
+         "Timeout" : "PT15M",
+         "Count"   : "1"
+         }
+        },    
       "Metadata": {
        "AWS::CloudFormation::Init": {
         "configSets" : {
-            "SCCA" : [ "config", "bigipstig", "dodCerts" ],
-            "standard": [ "config" ]
+            "SCCA" : [ "config", "bigipstig", "dodCerts", "signal-complete" ],
+            "standard": [ "config", "signal-complete" ]
           },
         "config": {
          "commands": {
@@ -1784,7 +1903,7 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--module ltm:nominal",
+                "--modules ltm:nominal,afm:nominal,apm:nominal",
                 "--license ",
                 {
                  "Ref": "licenseKey2"
@@ -1823,7 +1942,7 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--module ltm:nominal",
+                "--modules ltm:nominal,afm:nominal,apm:nominal",
                 "--license ",
                 {
                  "Ref": "licenseKey2"
@@ -1913,44 +2032,6 @@
              ]
             ]
            }
-          },
-          "081-apply-stigs": {
-            "test" : "[ -f /config/bigipstig.sh ]",
-            "command": {
-                "Fn::Join": [
-                    " ",
-                    [
-                     "nohup /config/waitThenRun.sh",
-                     "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
-                     "--file /config/bigipstig.sh",
-                     "--output /var/log/bigipstig.log",
-                     "--log-level silly",
-                     "--wait-for CLUSTER_DONE",
-                     "--signal BIGIPSTIG_DONE",
-                     "&>> /var/log/cloud/aws/install.log < /dev/null &"
-                    ]
-                   ]
-            },
-            "cwd" : "/config"
-          }, 
-          "082-install-DoD-Root-CA": { 
-            "test" : "[ -f /config/Certificates_PKCS7_v5.5_DoD.zip -a -f /config/installTrustedCerts.sh ]",
-            "command": { 
-               "Fn::Join": [  
-                " ", 
-                [ 
-                 "nohup /config/waitThenRun.sh",
-                 "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
-                 "--file /config/installTrustedCerts.sh",
-                 "--output /var/log/installTrustedCerts.log",
-                 "--log-level silly",
-                 "--wait-for BIGIPSTIG_DONE",
-                 "--signal CERTS_DONE",
-                 "&>> /var/log/cloud/aws/install.log < /dev/null &"
-                ] 
-               ] 
-          }, 
-          "cwd" : "/config"  
           }
          },
          "files": {
@@ -2240,7 +2321,7 @@
                     "group": "root",
                     "mode": "000755",
                     "owner": "root",
-                    "source": "https://raw.githubusercontent.com/mikeoleary/bigipstig/master/bigipstig.sh"
+                    "source": "https://raw.githubusercontent.com/mikeoleary/aws-sca-resources/master/bigipstig.sh"
                 }
             }
         },
@@ -2271,7 +2352,7 @@
                     "group": "root",
                     "mode": "000755",
                     "owner": "root",
-                    "source": "https://github.com/mikeoleary/certificates_PKCS7_v5.5_DoD/raw/master/Certificates_PKCS7_v5.5_DoD.zip"
+                    "source": "https://github.com/mikeoleary/aws-sca-resources/raw/master/Certificates_PKCS7_v5.5_DoD.zip"
                 },
                 "/config/installTrustedCerts.sh": {
                     "content": {
@@ -2286,6 +2367,55 @@
                                 ] 
                                 ] 
                         },
+                    "group": "root",
+                    "mode": "000755",
+                    "owner": "root"
+                }
+            }
+        },
+        "signal-complete": {
+            "commands": {
+                "010-signal-complete": { 
+                    "test" : "[ -f /config/signal-complete.sh ]",
+                    "command": { 
+                       "Fn::Join": [  
+                        " ", 
+                        [ 
+                         "nohup /config/waitThenRun.sh",
+                         "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
+                         "--file /config/signal-complete.sh",
+                         "--output /var/log/signal-complete.log",
+                         "--log-level silly",
+                         {
+                            "Fn::If":
+                               [
+                                   "SCCA",
+                                   "--wait-for CERTS_DONE",
+                                   "--wait-for PASSWORD_REMOVED"
+                               ]
+                        },
+                         "--signal SIGNAL_RESOURCE_COMPLETE",
+                         "&>> /var/log/cloud/aws/install.log < /dev/null &"
+                        ] 
+                       ] 
+                  }, 
+                  "cwd" : "/config"  
+                }
+            },
+            "files": {
+                "/config/signal-complete.sh": {
+                    "content": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "/opt/aws/apitools/cfn-init/bin/cfn-signal ",
+                                "         --stack ", { "Ref" : "AWS::StackName" },
+                                "         --resource Bigip2Instance ",
+                                "         --region ", { "Ref" : "AWS::Region" }, "\n"
+                            ]
+                        ]
+                    },
                     "group": "root",
                     "mode": "000755",
                     "owner": "root"
@@ -2558,6 +2688,20 @@
          "FromPort": "443",
          "IpProtocol": "tcp",
          "ToPort": "443"
+        },
+        {
+         "CidrIp": {
+            "Ref": "restrictedSrcAddressApp"
+         },
+         "FromPort": "22",
+         "IpProtocol": "tcp",
+         "ToPort": "22"
+        },
+        { 
+        "IpProtocol" : "icmp", 
+        "FromPort" : 8, 
+        "ToPort" : -1, 
+        "CidrIp" : "0.0.0.0/0" 
         }
        ],
        "Tags": [
@@ -2615,6 +2759,12 @@
      "bigipInternalSecurityGroup": {
       "Properties": {
        "GroupDescription": "Allow All from Intra-VPC only",
+       "SecurityGroupIngress": [
+        {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+       ],
        "Tags": [
         {
          "Key": "Application",
@@ -2686,6 +2836,12 @@
          "FromPort": "443",
          "IpProtocol": "tcp",
          "ToPort": "443"
+        },
+        { 
+        "IpProtocol" : "icmp", 
+        "FromPort" : 8, 
+        "ToPort" : -1, 
+        "CidrIp" : "0.0.0.0/0" 
         }
        ],
        "Tags": [
