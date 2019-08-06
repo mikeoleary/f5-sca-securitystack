@@ -854,7 +854,14 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--modules ltm:nominal,afm:nominal,apm:nominal",
+                {
+                    "Fn::If":
+                       [
+                           "Tier1",
+                           "--modules ltm:nominal,afm:nominal",
+                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                        ]
+                },
                 "--license ",
                 {
                  "Ref": "licenseKey1"
@@ -893,7 +900,14 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--modules ltm:nominal,afm:nominal,apm:nominal",
+                {
+                    "Fn::If":
+                       [
+                           "Tier1",
+                           "--modules ltm:nominal,afm:nominal",
+                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                        ]
+                },
                 "--license ",
                 {
                  "Ref": "licenseKey1"
@@ -1949,7 +1963,14 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--modules ltm:nominal,afm:nominal,apm:nominal",
+                {
+                    "Fn::If":
+                       [
+                           "Tier1",
+                           "--modules ltm:nominal,afm:nominal",
+                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                        ]
+                },
                 "--license ",
                 {
                  "Ref": "licenseKey2"
@@ -1988,7 +2009,14 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--modules ltm:nominal,afm:nominal,apm:nominal",
+                {
+                    "Fn::If":
+                       [
+                           "Tier1",
+                           "--modules ltm:nominal,afm:nominal",
+                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                        ]
+                },
                 "--license ",
                 {
                  "Ref": "licenseKey2"
