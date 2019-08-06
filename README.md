@@ -3,6 +3,8 @@
 ## Introduction
 
 This README will provide a baseline introduction into the Secure Cloud Architecture (SCA). Links will be provided for more in-depth explanations.
+
+
 **Under construction**
 
 ## Secure Cloud Architecture
