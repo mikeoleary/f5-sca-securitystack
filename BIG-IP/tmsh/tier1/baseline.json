@@ -1,29 +1,53 @@
 {
-  "files": {
-    "/config/deployBaseline.sh": {
-        "group": "root",
-        "mode": "000755",
-        "owner": "root",
-        "content": {
-            "Fn::Join": [
-                "",
-                [
-                "#!/bin/bash\n",
-                "# bash ./baseline.sh \"tmsh run cli script file ./mgmt.tcl\"",
-                "# bash ./baseline.sh \"tmsh run cli script file ./delete.tcl\"",
-                "### START DEPLOYMENT FOR MGMT ACCESS\n",
-                "command=\"tmsh run cli script file ./mgmt.tcl\"",
-                "if [[ $($command) ]]; then\n",
-                "    echo \"mgmt deployment failed\"\n",
-                "else\n",
-                "   echo \"mgmt deployment successful\"\n",
-                "fi\n",
-                "'\n",
-                "\n",
-                "### END DEPLOYMENT OF AS3 DECLARATION FOR MGMT ACCESS"
-                ]
-            ]
-        }
-    }   
+  "mgmt-baseline": {
+    "commands": {
+        "084-apply-AS3-baseline-routing": { 
+            "test" : "[ -f /config/deployBaseline.sh ]",
+            "command": { 
+               "Fn::Join": [  
+                " ", 
+                [ 
+                 "nohup /config/waitThenRun.sh",
+                 "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
+                 "--file /config/deployBaseline.sh",
+                 "--output /var/log/deployBaseline.log",
+                 "--log-level silly",
+                 "--wait-for CERTS_DONE",
+                 "--signal MGMT_DONE",
+                 "&>> /var/log/cloud/aws/install.log < /dev/null &"
+                ] 
+               ] 
+          }, 
+          "cwd" : "/config"  
+          } 
+          
+    },
+    "files": {
+      "/config/deployBaseline.sh": {
+          "group": "root",
+          "mode": "000755",
+          "owner": "root",
+          "content": {
+              "Fn::Join": [
+                  "",
+                  [
+                  "#!/bin/bash\n",
+                  "# bash ./baseline.sh \"tmsh run cli script file ./mgmt.tcl\"",
+                  "# bash ./baseline.sh \"tmsh run cli script file ./delete.tcl\"",
+                  "### START DEPLOYMENT FOR MGMT ACCESS\n",
+                  "command=\"tmsh run cli script file ./mgmt.tcl\"",
+                  "if [[ $($command) ]]; then\n",
+                  "    echo \"mgmt deployment failed\"\n",
+                  "else\n",
+                  "   echo \"mgmt deployment successful\"\n",
+                  "fi\n",
+                  "'\n",
+                  "\n",
+                  "### END DEPLOYMENT OF AS3 DECLARATION FOR MGMT ACCESS"
+                  ]
+              ]
+          }
+      }   
+    }
   }
 }
