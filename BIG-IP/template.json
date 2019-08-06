@@ -2416,7 +2416,7 @@
                             "Fn::If":
                                [
                                    "SCCA",
-                                   "--wait-for CERTS_DONE",
+                                   "--wait-for BIGIPSTIG_DONE",
                                    "--wait-for PASSWORD_REMOVED"
                                ]
                         },
