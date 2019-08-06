@@ -541,7 +541,7 @@
         "Default": "Tier1"
        },
      "pBaselineCompliance": {
-      "AllowedValues" : ["standard", "SCCA"],
+      "AllowedValues" : ["Enterprise", "SCCA"],
       "ConstraintDescription": "Choose your baseline compliance posture",
       "Description": "Choose your baseline compliance posture",
       "MaxLength": "255",
@@ -702,7 +702,7 @@
        "AWS::CloudFormation::Init": {
         "configSets" : {
             "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing" ],
-            "standard": [ "config", "AS3-baseline-routing" ]
+            "Enterprise": [ "config", "AS3-baseline-routing" ]
           },
         "config": {
          "commands": {
@@ -854,7 +854,14 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--modules ltm:nominal,afm:nominal,apm:nominal",
+                {
+                    "Fn::If":
+                       [
+                           "Tier1",
+                           "--modules ltm:nominal,afm:nominal",
+                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                        ]
+                },
                 "--license ",
                 {
                  "Ref": "licenseKey1"
@@ -893,7 +900,14 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--modules ltm:nominal,afm:nominal,apm:nominal",
+                {
+                    "Fn::If":
+                       [
+                           "Tier1",
+                           "--modules ltm:nominal,afm:nominal",
+                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                        ]
+                },
                 "--license ",
                 {
                  "Ref": "licenseKey1"
@@ -1371,6 +1385,52 @@
                 }
             }
         },
+        "goStandby": {
+            "commands": {
+                "010-goStandby": { 
+                    "test" : "[ -f /config/goStandby.sh ]",
+                    "command": { 
+                       "Fn::Join": [  
+                        " ", 
+                        [ 
+                         "nohup /config/waitThenRun.sh",
+                         "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
+                         "--file /config/goStandby.sh",
+                         "--output /var/log/goStandby.log",
+                         "--log-level silly",
+                         {
+                            "Fn::If":
+                               [
+                                   "SCCA",
+                                   "--wait-for CERTS_DONE",
+                                   "--wait-for PASSWORD_REMOVED"
+                               ]
+                        },
+                         "--signal GO_STANDBY",
+                         "&>> /var/log/cloud/aws/install.log < /dev/null &"
+                        ] 
+                       ] 
+                  }, 
+                  "cwd" : "/config"  
+                  }
+            },
+            "files": {
+                "/config/goStandby.sh": {
+                    "content": {
+                        "Fn::Join": [
+                                "", 
+                                [ 
+                                    "#!/bin/bash\n",
+                                    "tmsh run /sys failover standby"
+                                ] 
+                        ] 
+                    },
+                    "group": "root",
+                    "mode": "000755",
+                    "owner": "root"
+                }
+            }
+        },
         "AS3-baseline-routing": {
             "commands": {
                 "083-apply-AS3-baseline-routing": { 
@@ -1751,7 +1811,7 @@
        "AWS::CloudFormation::Init": {
         "configSets" : {
             "SCCA" : [ "config", "bigipstig", "dodCerts", "signal-complete" ],
-            "standard": [ "config", "signal-complete" ]
+            "Enterprise": [ "config", "signal-complete" ]
           },
         "config": {
          "commands": {
@@ -1903,7 +1963,14 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--modules ltm:nominal,afm:nominal,apm:nominal",
+                {
+                    "Fn::If":
+                       [
+                           "Tier1",
+                           "--modules ltm:nominal,afm:nominal",
+                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                        ]
+                },
                 "--license ",
                 {
                  "Ref": "licenseKey2"
@@ -1942,7 +2009,14 @@
                  "Ref": "timezone"
                 },
                 "--dns ${NAME_SERVER}",
-                "--modules ltm:nominal,afm:nominal,apm:nominal",
+                {
+                    "Fn::If":
+                       [
+                           "Tier1",
+                           "--modules ltm:nominal,afm:nominal",
+                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                        ]
+                },
                 "--license ",
                 {
                  "Ref": "licenseKey2"

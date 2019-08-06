@@ -84,7 +84,7 @@
     },
     "pBaselineCompliance": {
       "AllowedValues": [
-        "standard",
+        "Enterprise",
         "SCCA"
       ],
       "ConstraintDescription": "Choose your baseline compliance posture",
@@ -134,7 +134,7 @@
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-vdss-stack-singleAZ.template",
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-vdss-stack-singleAZ.json",
             {
               "S3Region": {
                 "Fn::If": [
