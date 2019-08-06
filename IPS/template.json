@@ -31,7 +31,7 @@
     "Mappings": {
       "AWSRegionAMIEC2" : {
         "us-east-1"        : {"Ubuntu16" : "ami-d15a75c7"},
-        "us-east-2"        : {"ubuntu16" : "ami-8b92b4ee"},
+        "us-east-2"        : {"Ubuntu16" : "ami-8b92b4ee"},
         "us-west-2"        : {"Ubuntu16" : "ami-746aba14"},
         "us-west-1"        : {"Ubuntu16" : "ami-a9a8e4c9"},
         "eu-west-1"        : {"Ubuntu16" : "ami-844e0bf7"},
