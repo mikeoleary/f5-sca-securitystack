@@ -701,8 +701,8 @@
       "Metadata": {
        "AWS::CloudFormation::Init": {
         "configSets" : {
-            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing" ],
-            "Enterprise": [ "config", "AS3-baseline-routing" ]
+            "SCCA" : [ "config", "bigipstig", "dodCerts", "goStandby", "AS3-baseline-routing" ],
+            "Enterprise": [ "config", "goStandby", "AS3-baseline-routing" ]
           },
         "config": {
          "commands": {
