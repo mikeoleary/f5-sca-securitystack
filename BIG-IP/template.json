@@ -1810,7 +1810,7 @@
       "Metadata": {
        "AWS::CloudFormation::Init": {
         "configSets" : {
-            "SCCA" : [ "config", "bigipstig", "dodCerts", "signal-complete" ],
+            "SCCA" : [ "config", "bigipstig", "signal-complete" ],
             "Enterprise": [ "config", "signal-complete" ]
           },
         "config": {
@@ -2396,54 +2396,6 @@
                     "mode": "000755",
                     "owner": "root",
                     "source": "https://raw.githubusercontent.com/mikeoleary/aws-sca-resources/master/bigipstig.sh"
-                }
-            }
-        },
-        "dodCerts": {
-            "commands": {
-                  "082-install-DoD-Root-CA": { 
-                    "test" : "[ -f /config/Certificates_PKCS7_v5.5_DoD.zip -a -f /config/installTrustedCerts.sh ]",
-                    "command": { 
-                       "Fn::Join": [  
-                        " ", 
-                        [ 
-                         "nohup /config/waitThenRun.sh",
-                         "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
-                         "--file /config/installTrustedCerts.sh",
-                         "--output /var/log/installTrustedCerts.log",
-                         "--log-level silly",
-                         "--wait-for BIGIPSTIG_DONE",
-                         "--signal CERTS_DONE",
-                         "&>> /var/log/cloud/aws/install.log < /dev/null &"
-                        ] 
-                       ] 
-                  }, 
-                  "cwd" : "/config"  
-                  }
-            },
-            "files":{
-                "/config/Certificates_PKCS7_v5.5_DoD.zip": {
-                    "group": "root",
-                    "mode": "000755",
-                    "owner": "root",
-                    "source": "https://github.com/mikeoleary/aws-sca-resources/raw/master/Certificates_PKCS7_v5.5_DoD.zip"
-                },
-                "/config/installTrustedCerts.sh": {
-                    "content": {
-                        "Fn::Join": [
-                                " ", 
-                                [ 
-                                "unzip Certificates_PKCS7_v5.5_DoD.zip", 
-                                "&& openssl pkcs7 -print_certs", 
-                                "-in ./Certificates_PKCS7_v5.5_DoD/Certificates_PKCS7_v5.5_DoD.pem.p7b", 
-                                "-out DoD_Root_CA.cer", 
-                                "&& tmsh install sys crypto cert DODRoots from-local-file DoD_Root_CA.cer" 
-                                ] 
-                                ] 
-                        },
-                    "group": "root",
-                    "mode": "000755",
-                    "owner": "root"
                 }
             }
         },
