@@ -1,3 +1,13 @@
+# outline
+  - create script files with variables
+    - mgmt.tcl
+    - delete.tcl
+  - run scripts
+    - bash ./baseline.sh "tmsh run cli script file ./mgmt.tcl"
+    - bash ./baseline.sh "tmsh run cli script file ./delete.tcl"
+
+
+
 proc script::run {} {
   # run me: tmsh run cli script file ./mgmt.tcl
   # create transaction
