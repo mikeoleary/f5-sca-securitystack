@@ -4,7 +4,7 @@
     - delete.tcl
   - run scripts
     - bash ./baseline.sh "tmsh run cli script file ./mgmt.tcl"
-    - bash ./baseline.sh "tmsh run cli script file ./delete.tcl"
+    - bash ./delete.sh "tmsh run cli script file ./delete.tcl"
 
 
 

@@ -1,0 +1,29 @@
+{
+  "files": {
+    "/config/deleteBaseline.sh": {
+        "group": "root",
+        "mode": "000755",
+        "owner": "root",
+        "content": {
+            "Fn::Join": [
+                "",
+                [
+                "#!/bin/bash\n",
+                "# bash ./baseline.sh \"tmsh run cli script file ./mgmt.tcl\"",
+                "# bash ./baseline.sh \"tmsh run cli script file ./delete.tcl\"",
+                "### START DEPLOYMENT FOR MGMT ACCESS\n",
+                "command=\"tmsh run cli script file ./delete.tcl\"",
+                "if [[ $($command) ]]; then\n",
+                "    echo \"mgmt deployment failed\"\n",
+                "else\n",
+                "   echo \"mgmt deployment successful\"\n",
+                "fi\n",
+                "'\n",
+                "\n",
+                "### END DEPLOYMENT OF AS3 DECLARATION FOR MGMT ACCESS"
+                ]
+            ]
+        }
+    }   
+  }
+}

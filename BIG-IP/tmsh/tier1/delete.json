@@ -1,6 +1,6 @@
 {
   "files": {
-    "/config/deleteBaseline.sh": {
+    "/config/delete.tcl": {
         "group": "root",
         "mode": "000755",
         "owner": "root",
@@ -9,18 +9,39 @@
                 "",
                 [
                 "#!/bin/bash\n",
-                "# bash ./baseline.sh \"tmsh run cli script file ./mgmt.tcl\"",
-                "# bash ./baseline.sh \"tmsh run cli script file ./delete.tcl\"",
-                "### START DEPLOYMENT FOR MGMT ACCESS\n",
-                "command=\"tmsh run cli script file ./delete.tcl\"",
-                "if [[ $($command) ]]; then\n",
-                "    echo \"mgmt deployment failed\"\n",
-                "else\n",
-                "   echo \"mgmt deployment successful\"\n",
-                "fi\n",
+                "declarationUrlrouting='",
+                {
+                "Ref": "declarationUrlrouting"
+                },
+                "'\n",
+                "VIP1='",
+                {
+                "Fn::GetAtt": [
+                "Bigip1subnet1Az1Interface",
+                "PrimaryPrivateIpAddress"
+                ]
+                },
+                "'\n",
+                "VIP2='",
+                {
+                "Fn::GetAtt": [
+                "Bigip2subnet1Az1Interface",
+                "PrimaryPrivateIpAddress"
+                ]
+                },
+                "'\n",
+                "JUMPHOSTIP='",
+                {
+                "Ref": "pJumpHostPrivateIP"
+                },
                 "'\n",
                 "\n",
-                "### END DEPLOYMENT OF AS3 DECLARATION FOR MGMT ACCESS"
+                "### FILE CREATION FOR MGMT ACCESS\n",
+                "file_loc=\"./delete.tcl\"\n",
+                "  sed -i 's/ReplaceWithJumpHostIP/'\"$JUMPHOSTIP\"'/g' $file_loc\n",
+                "  sed -i 's/ReplaceWithVIP1/'\"$VIP1\"'/g' $file_loc\n",
+                "\n",
+                "### END DEPLOYMENT OF FILE CREATION FOR MGMT ACCESS"
                 ]
             ]
         }
