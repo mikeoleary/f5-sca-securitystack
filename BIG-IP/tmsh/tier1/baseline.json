@@ -1,7 +1,7 @@
 {
   "mgmt-baseline": {
     "commands": {
-        "084-apply-AS3-baseline-routing": { 
+        "084-apply-mgmt-baseline": { 
             "test" : "[ -f /config/deployBaseline.sh ]",
             "command": { 
                "Fn::Join": [  
@@ -23,6 +23,98 @@
           
     },
     "files": {
+        "/config/mgmt.tcl": {
+          "group": "root",
+          "mode": "000755",
+          "owner": "root",
+          "content": {
+              "Fn::Join": [
+                  "",
+                  [
+                  "#!/bin/bash\n",
+                  "declarationUrlrouting='",
+                  {
+                  "Ref": "declarationUrlrouting"
+                  },
+                  "'\n",
+                  "VIP1='",
+                  {
+                  "Fn::GetAtt": [
+                  "Bigip1subnet1Az1Interface",
+                  "PrimaryPrivateIpAddress"
+                  ]
+                  },
+                  "'\n",
+                  "VIP2='",
+                  {
+                  "Fn::GetAtt": [
+                  "Bigip2subnet1Az1Interface",
+                  "PrimaryPrivateIpAddress"
+                  ]
+                  },
+                  "'\n",
+                  "JUMPHOSTIP='",
+                  {
+                  "Ref": "pJumpHostPrivateIP"
+                  },
+                  "'\n",
+                  "\n",
+                  "### FILE CREATION FOR MGMT ACCESS\n",
+                  "file_loc=\"./mgmt.tcl\"\n",
+                  "  sed -i 's/ReplaceWithJumpHostIP/'\"$JUMPHOSTIP\"'/g' $file_loc\n",
+                  "  sed -i 's/ReplaceWithVIP1/'\"$VIP1\"'/g' $file_loc\n",
+                  "\n",
+                  "### END DEPLOYMENT OF FILE CREATION FOR MGMT ACCESS"
+                  ]
+              ]
+          }
+      },  
+      "/config/delete.tcl": {
+          "group": "root",
+          "mode": "000755",
+          "owner": "root",
+          "content": {
+              "Fn::Join": [
+                  "",
+                  [
+                  "#!/bin/bash\n",
+                  "declarationUrlrouting='",
+                  {
+                  "Ref": "declarationUrlrouting"
+                  },
+                  "'\n",
+                  "VIP1='",
+                  {
+                  "Fn::GetAtt": [
+                  "Bigip1subnet1Az1Interface",
+                  "PrimaryPrivateIpAddress"
+                  ]
+                  },
+                  "'\n",
+                  "VIP2='",
+                  {
+                  "Fn::GetAtt": [
+                  "Bigip2subnet1Az1Interface",
+                  "PrimaryPrivateIpAddress"
+                  ]
+                  },
+                  "'\n",
+                  "JUMPHOSTIP='",
+                  {
+                  "Ref": "pJumpHostPrivateIP"
+                  },
+                  "'\n",
+                  "\n",
+                  "### FILE CREATION FOR MGMT ACCESS\n",
+                  "file_loc=\"./delete.tcl\"\n",
+                  "  sed -i 's/ReplaceWithJumpHostIP/'\"$JUMPHOSTIP\"'/g' $file_loc\n",
+                  "  sed -i 's/ReplaceWithVIP1/'\"$VIP1\"'/g' $file_loc\n",
+                  "\n",
+                  "### END DEPLOYMENT OF FILE CREATION FOR MGMT ACCESS"
+                  ]
+              ]
+          }
+      },
       "/config/deployBaseline.sh": {
           "group": "root",
           "mode": "000755",
