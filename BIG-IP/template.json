@@ -541,7 +541,7 @@
         "Default": "Tier1"
        },
      "pBaselineCompliance": {
-      "AllowedValues" : ["standard", "SCCA"],
+      "AllowedValues" : ["Enterprise", "SCCA"],
       "ConstraintDescription": "Choose your baseline compliance posture",
       "Description": "Choose your baseline compliance posture",
       "MaxLength": "255",
@@ -701,8 +701,8 @@
       "Metadata": {
        "AWS::CloudFormation::Init": {
         "configSets" : {
-            "SCCA" : [ "config", "bigipstig", "dodCerts", "goStandby", "AS3-baseline-routing" ],
-            "standard": [ "config", "goStandby", "AS3-baseline-routing" ]
+            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing" ],
+            "Enterprise": [ "config", "AS3-baseline-routing" ]
           },
         "config": {
          "commands": {
@@ -1797,7 +1797,7 @@
        "AWS::CloudFormation::Init": {
         "configSets" : {
             "SCCA" : [ "config", "bigipstig", "dodCerts", "signal-complete" ],
-            "standard": [ "config", "signal-complete" ]
+            "Enterprise": [ "config", "signal-complete" ]
           },
         "config": {
          "commands": {
