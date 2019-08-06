@@ -83,7 +83,7 @@
         "Type": "String"
        },
     "pBaselineCompliance": {
-        "AllowedValues" : ["standard", "SCCA"],
+        "AllowedValues" : ["Enterprise", "SCCA"],
         "ConstraintDescription": "Choose your baseline compliance posture",
         "Description": "Choose your baseline compliance posture",
         "MaxLength": "255",
