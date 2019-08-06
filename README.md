@@ -41,7 +41,7 @@ The Secure Cloud Architecture (SCA) provides a 3-Tier architecture. This archite
 4. DMZ #2 
 5. "Internal" 
 
-**Below is an image of the architecture**
+**Below is an image of the architecture:**
 
 
 ![Image of 3-Tier Architecture](images/SCA.jpg)
