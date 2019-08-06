@@ -1,0 +1,12 @@
+if [ -z ${licenseKey1} ]; then echo "licenseKey1 is unset" && exit 1; fi
+if [ -z ${licenseKey2} ]; then echo "licenseKey2 is unset"  && exit 1; fi
+if [ -z ${licenseKey3} ]; then echo "licenseKey3 is unset"  && exit 1; fi
+if [ -z ${licenseKey4} ]; then echo "licenseKey4 is unset"  && exit 1; fi
+
+aws cloudformation create-stack \
+--stack-name cody-sca-test \
+--template-body file://./aws-quickstart-scca-main-same-net.json \
+--disable-rollback \
+--capabilities CAPABILITY_IAM \
+--parameters ParameterKey=licenseKey1,ParameterValue=$licenseKey1  ParameterKey=licenseKey2,ParameterValue=$licenseKey2 ParameterKey=licenseKey3,ParameterValue=$licenseKey3 ParameterKey=licenseKey4,ParameterValue=$licenseKey4 ParameterKey=pBaselineCompliance,ParameterValue="Enterprise" ParameterKey=pQuickstartS3KeyPrefix,ParameterValue="sca-cody" ParameterKey=sshKey,ParameterValue="cody-key" 
+
