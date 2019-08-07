@@ -232,7 +232,7 @@
                 "aws:cdk:path": "SccaAppStack/rAppSubnetPeer"
             }
         },
-        "rAppPeerRouteTableAssociation": {
+        "rAppSubnetPeerRouteTableAssociation": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "RouteTableId": {
@@ -246,7 +246,7 @@
                 "aws:cdk:path": "SccaAppStack/rAppMainRouteTableAssociation"
             }
         },
-        "rTransitGatewayAttachement": {
+        "rAppTransitGatewayAttachement": {
             "Type": "AWS::EC2::TransitGatewayAttachment",
             "Properties": {
                 "SubnetIds": [
@@ -287,11 +287,11 @@
                 "aws:cdk:path": "SccaAppStack/rTransitGatewayAttachement"
             }
         },
-        "rTransitGatewayRouteTableAssociation": {
+        "rAppTransitGatewayRouteTableAssociation": {
             "Type": "AWS::EC2::TransitGatewayRouteTableAssociation",
             "Properties": {
                 "TransitGatewayAttachmentId": {
-                    "Ref": "rTransitGatewayAttachement"
+                    "Ref": "rAppTransitGatewayAttachement"
                 },
                 "TransitGatewayRouteTableId": {
                     "Fn::ImportValue": {
@@ -311,11 +311,11 @@
                 "aws:cdk:path": "SccaAppStack/rTransitGatewayRouteTableAssociation"
             }
         },
-        "rTransitGatewayRouteTablePropagation": {
+        "rAppTransitGatewayRouteTablePropagation": {
             "Type": "AWS::EC2::TransitGatewayRouteTablePropagation",
             "Properties": {
                 "TransitGatewayAttachmentId": {
-                    "Ref": "rTransitGatewayAttachement"
+                    "Ref": "rAppTransitGatewayAttachement"
                 },
                 "TransitGatewayRouteTableId": {
                     "Fn::ImportValue": {
@@ -355,7 +355,7 @@
                     "Ref": "pAppVpcCidr"
                 },
                 "TransitGatewayAttachmentId": {
-                    "Ref": "rTransitGatewayAttachement"
+                    "Ref": "rAppTransitGatewayAttachement"
                 }
             },
             "Metadata": {

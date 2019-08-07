@@ -287,11 +287,11 @@
                 "aws:cdk:path": "SccaFargateStack/rTransitGatewayAttachement"
             }
         },
-        "rTransitGatewayRouteTableAssociation": {
+        "rFargateTransitGatewayRouteTableAssociation": {
             "Type": "AWS::EC2::TransitGatewayRouteTableAssociation",
             "Properties": {
                 "TransitGatewayAttachmentId": {
-                    "Ref": "rTransitGatewayAttachement"
+                    "Ref": "rFargateTransitGatewayAttachement"
                 },
                 "TransitGatewayRouteTableId": {
                     "Fn::ImportValue": {
@@ -311,11 +311,11 @@
                 "aws:cdk:path": "SccaFargateStack/rTransitGatewayRouteTableAssociation"
             }
         },
-        "rTransitGatewayRouteTablePropagation": {
+        "rFargateTransitGatewayRouteTablePropagation": {
             "Type": "AWS::EC2::TransitGatewayRouteTablePropagation",
             "Properties": {
                 "TransitGatewayAttachmentId": {
-                    "Ref": "rTransitGatewayAttachement"
+                    "Ref": "rFargateTransitGatewayAttachement"
                 },
                 "TransitGatewayRouteTableId": {
                     "Fn::ImportValue": {
@@ -355,7 +355,7 @@
                     "Ref": "pFargateVpcCidr"
                 },
                 "TransitGatewayAttachmentId": {
-                    "Ref": "rTransitGatewayAttachement"
+                    "Ref": "rFargateTransitGatewayAttachement"
                 }
             },
             "Metadata": {
