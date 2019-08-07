@@ -1,7 +1,14 @@
 # outline
-  - create script files with variables
+  - create script files 
+    - deployBaseline.sh
+  - copy files 
     - mgmt.tcl
     - delete.tcl
+  - replace vars
+    - sed on copied files
+      - replace
+        - ReplaceWithJumpHostIP
+        - ReplaceWithVIP1
   - run scripts
     - bash ./baseline.sh "tmsh run cli script file ./mgmt.tcl"
     - bash ./delete.sh "tmsh run cli script file ./delete.tcl"
