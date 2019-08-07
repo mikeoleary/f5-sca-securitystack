@@ -239,7 +239,7 @@
                     "Ref": "rFargateMainRouteTable"
                 },
                 "SubnetId": {
-                    "Ref": "FargateSubnetPeer"
+                    "Ref": "rFargateSubnetPeer"
                 }
             },
             "Metadata": {
