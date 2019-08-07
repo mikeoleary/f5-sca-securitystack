@@ -41,22 +41,22 @@ The Secure Cloud Architecture (SCA) provides a 3-Tier architecture. This archite
 4. DMZ #2 
 5. "Internal" 
 
-**Below is an image of the architecture:**
+**Below is an image of the architecture:** <br> <br> 
 
 
 ![Image of 3-Tier Architecture](images/SCA.jpg)
 
-
+<br> 
 
 
 Tier 1 and Tier 3 are F5 BIG-IP devices (HA via API), while Tier 2 IPS is a Ubuntu box with routing enabled. The reason of this is to allow flexibility in Tier 2 so that the customer is not locked into a F5 device. 
 
-There is a root Cloud Formation Template (CFT) which runs many child CFT's.
+There is a root Cloud Formation Template (CFT) which runs many child CFT's. <br> 
 
 
 
 ![Image of CFTs](images/CFT.jpg)
-
+<br>
 
 
 1. The TGW (transit gateway) and VPC (virtual private cloud) are deployed.
@@ -83,7 +83,7 @@ There is a root Cloud Formation Template (CFT) which runs many child CFT's.
 7. You should now see the following page: <br><br>
 ![install_3](images/install_3.jpg) <br><br>
 8. The 'Stack name' can be anything you choose. The stack name can include letters (A-Z and a-z), numbers (0-9), and dashes (-).
-9. Fill in the appropriate information for the template parameters. For more information regarding the template parameters, see below. When you are finished with the template parameters, click 'Next'. 
+9. Fill in the appropriate information for the template parameters. For more information regarding the template parameters, [see below](#template-parameters). When you are finished with the template parameters, click 'Next'. 
 10. You should now see the following page: <br><br>
 ![install_4](images/install_4.jpg) <br><br>
 11. Under 'Advanced Options', expand the 'Stack creation options' and click 'Disabled' for 'Rollback on failure'. Then, click 'Next'. <br><br>
