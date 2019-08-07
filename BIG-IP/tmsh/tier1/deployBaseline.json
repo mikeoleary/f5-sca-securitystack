@@ -49,6 +49,11 @@
               "create ltm virtual /'${partition}'/jumphost_mgmt_ssh {  description jumphost_mgmt_ssh destination /'${partition}'/'${virtualAddress}':ssh ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_ssh_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
               "submit cli transaction' | tmsh -q\n",
               "\n",
+              "# save config\n",
+              "echo  -e 'create cli transaction;\n",
+              "save sys config partitions all;\n",
+              "submit cli transaction' | tmsh -q\n",
+              "\n",
               "### END DEPLOYMENT OF FILE CREATION FOR MGMT ACCESS"
               ]
           ]
