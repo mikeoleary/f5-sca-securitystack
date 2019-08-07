@@ -136,4 +136,4 @@ Individuals or business entities who contribute to this project must have comple
 
 
 **F5 Networks** <br>
-Documentation written by ***Saad Khalid*** and slightly stolen from Michael Coleman. Edited by *Majid Zarkesh*. 
+Documentation written by Saad Khalid and slightly stolen from Michael Coleman. Edited by Majid Zarkesh. 
