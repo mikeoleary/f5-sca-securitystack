@@ -46,7 +46,7 @@
                 "aws:cdk:path": "SccaFargateStack/rFargateVpc"
             }
         },
-        "rAppMainRouteTable": {
+        "rFargateMainRouteTable": {
             "Type": "AWS::EC2::RouteTable",
             "Properties": {
                 "VpcId": {
@@ -114,7 +114,7 @@
                 "aws:cdk:path": "SccaFargateStack/rFargateSubnetA"
             }
         },
-        "rVdssSubnetARouteTableAssociation": {
+        "rFargateSubnetARouteTableAssociation": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "RouteTableId": {
@@ -173,7 +173,7 @@
                 "aws:cdk:path": "SccaAppStack/rFargateSubnetB"
             }
         },
-        "rVdssSubnetBRouteTableAssociation": {
+        "rFargateSubnetBRouteTableAssociation": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "RouteTableId": {
@@ -232,7 +232,7 @@
                 "aws:cdk:path": "SccaFargateStack/rFargateSubnetPeer"
             }
         },
-        "rVdssSubnetPeerRouteTableAssociation": {
+        "rFargateSubnetPeerRouteTableAssociation": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
                 "RouteTableId": {
@@ -246,7 +246,7 @@
                 "aws:cdk:path": "SccaFargateStack/rAppMainRouteTableAssociation"
             }
         },
-        "rTransitGatewayAttachement": {
+        "rFargateTransitGatewayAttachement": {
             "Type": "AWS::EC2::TransitGatewayAttachment",
             "Properties": {
                 "SubnetIds": [

@@ -229,7 +229,7 @@
                 ]
             },
             "Metadata": {
-                "aws:cdk:path": "SccaAppStack/rAppSubnetB"
+                "aws:cdk:path": "SccaAppStack/rAppSubnetPeer"
             }
         },
         "rAppPeerRouteTableAssociation": {
