@@ -137,7 +137,7 @@
                         {
                             "Fn::Cidr": [
                                 {
-                                    "Ref": "pAppFargateCidr"
+                                    "Ref": "pFargateVpcCidr"
                                 },
                                 16,
                                 "8"
@@ -489,7 +489,7 @@
         },
         "PeerSubneAtId": {
             "Value": {
-                "Ref": "rAppFargaterSubnet"
+                "Ref": "rAppFargateSubnet"
             },
             "Export": {
                 "Name": {
