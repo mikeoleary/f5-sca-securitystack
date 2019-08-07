@@ -382,10 +382,10 @@
                 }
             }
         },
-        "FargateSubnetIpRange": {
+        "FargateSubnetPeerIpRange": {
             "Value": {
                 "Fn::Select": [
-                    5,
+                    4,
                     {
                         "Fn::Cidr": [
                             {
@@ -489,7 +489,7 @@
         },
         "FargateSubnetPeertId": {
             "Value": {
-                "Ref": "rAppFargateSubnet"
+                "Ref": "rFargateSubnetPeer"
             },
             "Export": {
                 "Name": {
