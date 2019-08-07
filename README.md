@@ -1,10 +1,10 @@
 # f5-sca-securitystack
 
-***Under construction***
+This README will provide a baseline introduction into the Secure Cloud Architecture (SCA). Links will be provided for more in-depth explanations.
 
 ## Contents
 - [Introduction](#introduction)
-- [What is SCA?](#secure-cloud-architecture)
+- [What is Secure Cloud Architecture (SCA)?](#secure-cloud-architecture)
 - [Design Principles](#design-principles)
 - [Business Outcomes](#business-outcomes)
 - [What is included in this template?](#What-is-included-in-this-template)
@@ -15,12 +15,22 @@
 
 ## Introduction
 
-This README will provide a baseline introduction into the Secure Cloud Architecture (SCA). Links will be provided for more in-depth explanations.
+The biggest challenge in cloud computing today is the security and privacy problems caused by its multi-tenancy nature and the outsourcing of infrastructure. Enterprises are rapidly adopting cloud services for their businesses and measures need to be developed so that organizations can be assured of security in their businesses, and can choose a suitable vendor for their computing needs. 
+
+Cloud computing relies on the internet as a medium for users to access the required services at any time on pay-per-use model. However, this technology is still in its initial stages of development and suffers from threats & vulnerabilities that prevents users from trusting it. Various malevolent activities from malicious users have threatened this technology such as data misuse and illegitimate access control. The occurrence of these threats may result in damaging or unauthorized access of critical & confidential data of users. 
+
 
 
 ## Secure Cloud Architecture
+ 
+The purpose of Secure Cloud Architecture (SCA) is to provide a barrier of protection between your mission-critical apps & sensitive data and the Cloud Service Provider. Even when information resides in a Cloud Service Provider (CSP), there must be requirements to protect your information. SCA focuses on delivering a concept to migrate to the cloud with security as a priority, not an after thought.
 
-Focusing on delivering a concept to migrate to the cloud with security as a priority, not an after thought
+This project originated because of the Department of Defense (DoD) requirements to protect the Defense Information System Networks (DISN) and DoD Information Networks (DoDIN), even when living in a Cloud Service Provider (CSP). Per the SCCA Functional Requirements Document, the purpose of SCCA is to provide a barrier of protection between the DISN and commercial cloud services used by the DoD.
+
+“It specifically addresses attacks originating from mission applications that reside within the Cloud Service Environment (CSE) upon both the DISN infrastructure and neighboring tenants in a multi-tenant environment. It provides a consistent CSP independent level of security that enables the use of commercially available Cloud Service Offerings (CSO) for hosting DoD mission applications operating at all DoD Information System Impact Levels (i.e. 2, 4, 5, & 6).” 
+https://iasecontent.disa.mil/stigs/pdf/SCCA_FRD_v2-9.pdf
+
+
 
 ## Design principles
 
@@ -28,7 +38,9 @@ Security is built-in, …
 
 ## Business Outcomes
 
----stuff here---
+The Application Economy is not driven by humans or physical assets. It is driven by the ability to scale and secure digital services, such as your applications. To thrive in the Application Economy, organizations need to manage, secure, and optimize their applications. 
+ 
+Secure cloud architecture (SCA) for organizations can strengthen the security of your applications and sensitive data, thus minimizing enterprise risks. 
 
 ## What is included in this template? 
 
