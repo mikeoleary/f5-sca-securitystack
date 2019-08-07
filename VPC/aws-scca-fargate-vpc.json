@@ -196,7 +196,7 @@
                         {
                             "Fn::Cidr": [
                                 {
-                                    "Ref": "FargateVpcCidr"
+                                    "Ref": "pFargateVpcCidr"
                                 },
                                 16,
                                 "8"
