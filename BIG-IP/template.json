@@ -319,6 +319,9 @@
       "Description": "IP address of the management port on BIG-IP",
       "Value": {
        "Ref": "Bigip1ManagementEipAddress"
+      },
+      "Export" : {
+        "Name" : {"Fn::Sub": "${AWS::StackName}-Bigip1ManagementEipAddress" }
       }
      },
      "Bigip1ManagementInterface": {
@@ -434,6 +437,9 @@
       "Description": "IP address of the management port on BIG-IP",
       "Value": {
        "Ref": "Bigip2ManagementEipAddress"
+      },
+      "Export" : {
+        "Name" : {"Fn::Sub": "${AWS::StackName}-Bigip2ManagementEipAddress" }
       }
      },
      "Bigip2ManagementInterface": {
