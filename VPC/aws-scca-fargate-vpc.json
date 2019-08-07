@@ -382,7 +382,7 @@
                 }
             }
         },
-        "PeerSubnetIpRange": {
+        "FargateSubnetIpRange": {
             "Value": {
                 "Fn::Select": [
                     5,
@@ -411,7 +411,7 @@
                 }
             }
         },
-        "SubnetAIpRange": {
+        "FargateSubnetAIpRange": {
             "Value": {
                 "Fn::Select": [
                     0,
@@ -440,7 +440,7 @@
                 }
             }
         },
-        "SubnetBIpRange": {
+        "FargateSubnetBIpRange": {
             "Value": {
                 "Fn::Select": [
                     2,
@@ -469,7 +469,7 @@
                 }
             }
         },
-        "AppVpcId": {
+        "FargateVpcId": {
             "Value": {
                 "Ref": "rFargateVpc"
             },
@@ -487,7 +487,7 @@
                 }
             }
         },
-        "PeerSubneAtId": {
+        "FargateSubnetPeertId": {
             "Value": {
                 "Ref": "rAppFargateSubnet"
             },
@@ -505,7 +505,7 @@
                 }
             }
         },
-        "AppSubnetAtId": {
+        "FargateSubnetAtId": {
             "Value": {
                 "Ref": "rFargateSubnetA"
             },
@@ -523,7 +523,7 @@
                 }
             }
         },
-        "AppSubnetBtId": {
+        "FargateSubnetBtId": {
             "Value": {
                 "Ref": "rFargateSubnetB"
             },
@@ -541,7 +541,7 @@
                 }
             }
         },
-        "AppMainRouteTable": {
+        "FargateMainRouteTable": {
             "Value": {
                 "Ref": "rFargateMainRouteTable"
             },

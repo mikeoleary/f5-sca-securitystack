@@ -487,9 +487,9 @@
                 }
             }
         },
-        "AppPeerSubneAtId": {
+        "AppSubnetPeertId": {
             "Value": {
-                "Ref": "rAppPeerSubnet"
+                "Ref": "rAppSubnetPeer"
             },
             "Export": {
                 "Name": {
@@ -499,7 +499,7 @@
                             {
                                 "Ref": "AWS::StackName"
                             },
-                            "-AppPeerSubnetID"
+                            "-AppSubnetPeerID"
                         ]
                     ]
                 }
