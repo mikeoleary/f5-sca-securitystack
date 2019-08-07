@@ -91,7 +91,7 @@ There is a root Cloud Formation Template (CFT) which runs many child CFT's. <br>
 12. You will now be on the Review page. Go ahead and review all the details to ensure it is all correct. At the very bottom of this page, under 'Capabilities' you must check the required boxes: <br><br>
 ![install_6](images/install_6.jpg) <br><br>
 13. Lastly, go ahead and click 'Create stack'. 
-
+<br><br>
 
 ## Template Parameters
 
@@ -101,11 +101,11 @@ There is a root Cloud Formation Template (CFT) which runs many child CFT's. <br>
 | licenseKey2 | Yes | BIG-IP License #2 BYOL |
 | licenseKey3 | Yes | BIG-IP License #3 BYOL |
 | licenseKey4 | Yes | BIG-IP License #4 BYOL |
-| pBaselineCompliance | Yes | Choose your baseline compliance posture. 'Enterprise' consists of standard architecture. 'SCCA' consists of some extra layers of security. |
+| pBaselineCompliance | Yes | Choose your baseline compliance posture. <br>'Enterprise' consists of standard architecture. <br>'SCCA' consists of some extra layers of security. |
 | pProject | No | Project name to use for tagging. |
-| pQuickstartS3BucketName | Yes | S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-). <br> Default is 'f5-sca-securitystack'. |
-| pQuickstartS3KeyPrefix | Yes | Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). <br> Default is 'master'. |
-| pVdssVpcCidr | Yes | CIDR Block for the VDSS VPC. <br> Default is '10.0.0.0/16'. |
+| pQuickstartS3BucketName | Yes | S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-). <br><br> Default is 'f5-sca-securitystack'. |
+| pQuickstartS3KeyPrefix | Yes | Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). <br><br> Default is 'master'. |
+| pVdssVpcCidr | Yes | CIDR Block for the VDSS VPC. <br><br> Default is '10.0.0.0/16'. |
 
 
 
