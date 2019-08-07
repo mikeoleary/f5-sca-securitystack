@@ -382,7 +382,7 @@
                 }
             }
         },
-        "AppPeerSubnetIpRange": {
+        "AppSubnetPeerIpRange": {
             "Value": {
                 "Fn::Select": [
                     4,
