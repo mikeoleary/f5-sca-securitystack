@@ -212,7 +212,7 @@
                 "Outputs.StackName"
               ]
             },
-            "pVdssVpcCidr": {
+            "pAppVpcCidr": {
               "Ref": "pAppVpcCidr"
             }
           },
@@ -253,7 +253,7 @@
                 "Outputs.StackName"
               ]
             },
-            "pVdssVpcCidr": {
+            "pFargateVpcCidr": {
               "Ref": "pFargateVpcCidr"
             }
           },
