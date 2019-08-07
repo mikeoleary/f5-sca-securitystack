@@ -76,19 +76,19 @@ There is a root Cloud Formation Template (CFT) which runs many child CFT's.
 2. Go to 'Services' -> 'CloudFormation'.
 3. Click 'Create Stack' under the 'Stacks' column.
 4. Under 'Prerequisite', choose 'Template is ready'. <br> <br>
-![install_1](images/install_1.jpg) <br>
+![install_1](images/install_1.jpg) <br><br>
 5. Under the Specify template, for 'Template source' choose 'Upload a template file'.<br><br>
-![install_2](images/install_2.jpg) <br>
+![install_2](images/install_2.jpg) <br><br>
 6. Click 'choose file' and find the appropriate file on your local machine, then click next.
 7. You should now see the following page: <br><br>
-![install_3](images/install_3.jpg) <br>
+![install_3](images/install_3.jpg) <br><br>
 8. The 'Stack name' can be anything you choose. The stack name can include letters (A-Z and a-z), numbers (0-9), and dashes (-).
 9. Fill in the appropriate information for the template parameters. For more information regarding the template parameters, see below. When you are finished with the template parameters, click 'Next'. 
 10. You should now see the following page: <br><br>
-![install_4](images/install_4.jpg) <br>
+![install_4](images/install_4.jpg) <br><br>
 11. Under 'Advanced Options', expand the 'Stack creation options' and click 'Disabled' for 'Rollback on failure'. Then, click 'Next'. <br><br>
-![install_5](images/install_5.jpg) <br>
-12. You will now be on the Review page. Go ahead and review all the details to ensure it is all correct. At the very bottom of this page, under 'Capabilities' you must check the required boxes: <br>
+![install_5](images/install_5.jpg) <br><br>
+12. You will now be on the Review page. Go ahead and review all the details to ensure it is all correct. At the very bottom of this page, under 'Capabilities' you must check the required boxes: <br><br>
 ![install_6](images/install_6.jpg) <br><br>
 13. Lastly, go ahead and click 'Create stack'. 
 
