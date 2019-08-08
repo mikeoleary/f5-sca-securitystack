@@ -361,7 +361,7 @@
             "Metadata": {
                 "aws:cdk:path": "SccaAppStack/rMainTransitGatewayRouteVdss"
             }
-        }
+        },
         "rAppDefaultRoute" : {
             "Type" : "AWS::EC2::Route",
             "Properties" : {
