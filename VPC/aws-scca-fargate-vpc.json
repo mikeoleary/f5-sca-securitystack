@@ -365,22 +365,21 @@
     },
     "rFargateDefaultRoute" : {
         "Type" : "AWS::EC2::Route",
-        "DependsOn" : "rFargateTransitGatewayAttachement",
         "Properties" : {
            "RouteTableId" : { "Ref" : "rFargateMainRouteTable" },
            "DestinationCidrBlock" : "0.0.0.0/0",
            "TransitGatewayId" : {  
                "Fn::ImportValue": {
-                "Fn::Join": [
-                   "",
-                    [
-                      {
-                        "Ref": "pTransitGatewayStackName"
-                      },
-                        "-SccaTgwId"
+                  "Fn::Join": [
+                      "",
+                       [
+                         {
+                          "Ref": "pTransitGatewayStackName"
+                         },
+                          "-SccaTgwId"
+                        ]
                     ]
-                ]
-               }
+                }
             }
         }
     },    
