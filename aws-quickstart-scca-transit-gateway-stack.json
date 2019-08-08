@@ -1,63 +1,63 @@
 {
-  "Resources": {
-    "rSccaTgw": {
-      "Type": "AWS::EC2::TransitGateway",
-      "Properties": {
-        "DefaultRouteTableAssociation": "disable",
-        "DefaultRouteTablePropagation": "disable",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "scca-tgw"
-          }
-        ]
+    "Resources": {
+      "rSccaTgw": {
+        "Type": "AWS::EC2::TransitGateway",
+        "Properties": {
+          "DefaultRouteTableAssociation": "disable",
+          "DefaultRouteTablePropagation": "disable",
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "scca-tgw"
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaTgwStack/rSccaTgw"
+        }
       },
-      "Metadata": {
-        "aws:cdk:path": "sccaTgwStack/rSccaTgw"
+      "rSccaMainTgwRouteTable": {
+        "Type": "AWS::EC2::TransitGatewayRouteTable",
+        "Properties": {
+          "TransitGatewayId": {
+            "Ref": "rSccaTgw"
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "scca-main-tgw-rt"
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaTgwStack/rSccaMainTgwRouteTable"
+        }
       }
     },
-    "rSccaVdssTgwRouteTable": {
-      "Type": "AWS::EC2::TransitGatewayRouteTable",
-      "Properties": {
-        "TransitGatewayId": {
+    "Outputs": {
+      "StackName": {
+          "Value": {
+              "Ref": "AWS::StackName"
+          },
+          "Export": {
+            "Name" : {"Fn::Sub": "${AWS::StackName}-StackName" }
+          }
+      },
+      "SccaTgwId": {
+        "Value": {
           "Ref": "rSccaTgw"
         },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "scca-vdss-tgw-rt"
-          }
-        ]
+        "Export": {
+          "Name" : {"Fn::Sub": "${AWS::StackName}-SccaTgwId" }
+        }
       },
-      "Metadata": {
-        "aws:cdk:path": "sccaTgwStack/rSccaVdssTgwRouteTable"
-      }
-    }
-  },
-  "Outputs": {
-    "StackName": {
+      "SccaMainTgwRouteTableId": {
         "Value": {
-            "Ref": "AWS::StackName"
+          "Ref": "rSccaMainTgwRouteTable"
         },
         "Export": {
-          "Name" : {"Fn::Sub": "${AWS::StackName}-StackName" }
+          "Name" : {"Fn::Sub": "${AWS::StackName}-SccaMainTgwRouteTableId" }
         }
-    },
-    "SccaTgwId": {
-      "Value": {
-        "Ref": "rSccaTgw"
-      },
-      "Export": {
-        "Name" : {"Fn::Sub": "${AWS::StackName}-SccaTgwId" }
-      }
-    },
-    "SccaVdssTgwRouteTableId": {
-      "Value": {
-        "Ref": "rSccaVdssTgwRouteTable"
-      },
-      "Export": {
-        "Name" : {"Fn::Sub": "${AWS::StackName}-SccaVdssTgwRouteTableId" }
       }
     }
   }
-}
