@@ -233,10 +233,14 @@
     "Properties" : {
       "ServiceToken": { "Fn::GetAtt" : ["LambdaGetActiveDevice", "Arn"] },
       "mgmt_ip1" : {
+        "Fn::ImportValue": {
         "Fn::Sub": "${pBigIPStackNameTier1}-Bigip1ManagementEipAddress" 
+        }
         },
       "mgmt_ip2" : {
+        "Fn::ImportValue": {
         "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2ManagementEipAddress" 
+        }
         },
       "bucket" : {
         "Fn::ImportValue": {
