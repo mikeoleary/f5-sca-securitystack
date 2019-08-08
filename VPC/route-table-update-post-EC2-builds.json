@@ -369,7 +369,7 @@
                     "    else:",
                     "     raise Exception('Failed to determine the ACTIVE device in cluster')",
                     "",
-                    "    print(activeDevice)",
+                    "    print(responseData)",
                     "",
                     "    cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)",
                     "",
