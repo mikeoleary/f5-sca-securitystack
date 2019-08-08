@@ -591,7 +591,7 @@
             "Properties": {
                 "SubnetIds": [
                     {
-                        "Ref": "rVdssOutsideSubnet"
+                        "Ref": "rVdssInsideSubnet"
                     }
                 ],
                 "TransitGatewayId": {
@@ -779,57 +779,68 @@
                 "aws:cdk:path": "SccaVdssStack/rVdssTransitGatewayRouteVdss"
             }
         },
-        "rVdmsTransitGatewayRouteDefault": {
-            "Type": "AWS::EC2::TransitGatewayRoute",
-            "Properties": {
-                "TransitGatewayRouteTableId": {
-                    "Fn::ImportValue": {
-                        "Fn::Join": [
-                            "",
-                            [
-                                {
-                                    "Ref": "pTransitGatewayStackName"
-                                },
-                                "-SccaVdmsTgwRouteTableId"
-                            ]
-                        ]
-                    }
-                },
-                "DestinationCidrBlock": "0.0.0.0/0",
-                "TransitGatewayAttachmentId": {
-                    "Ref": "rTransitGatewayAttachement"
-                }
-            },
-            "Metadata": {
-                "aws:cdk:path": "SccaVdssStack/rVdmsTransitGatewayRouteDefault"
-            }
+        "rInternalRoute10" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rTransitGatewayAttachement",
+            "Properties" : {
+              "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
+              "DestinationCidrBlock" : "10.0.0.0/8",
+              "TransitGatewayId": {
+               "Fn::ImportValue": {
+                   "Fn::Join": [
+                     "",
+                     [
+                         {
+                             "Ref": "pTransitGatewayStackName"
+                         },
+                         "-SccaTgwId"
+                     ]
+                   ]
+                 }
+             }
+         }
         },
-        "rVdmsTransitGatewayRouteVdss": {
-            "Type": "AWS::EC2::TransitGatewayRoute",
-            "Properties": {
-                "TransitGatewayRouteTableId": {
-                    "Fn::ImportValue": {
-                        "Fn::Join": [
-                            "",
-                            [
-                                {
-                                    "Ref": "pTransitGatewayStackName"
-                                },
-                                "-SccaVdmsTgwRouteTableId"
-                            ]
-                        ]
-                    }
-                },
-                "DestinationCidrBlock": {
-                    "Ref": "pVdssVpcCidr"
-                },
-                "TransitGatewayAttachmentId": {
-                    "Ref": "rTransitGatewayAttachement"
-                }
-            },
-            "Metadata": {
-                "aws:cdk:path": "SccaVdssStack/rVdmsTransitGatewayRouteVdss"
-            }
+        "rInternalRoute172" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rTransitGatewayAttachement",
+            "Properties" : {
+              "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
+              "DestinationCidrBlock" : "172.16.0.0/12",
+              "TransitGatewayId": {
+               "Fn::ImportValue": {
+                   "Fn::Join": [
+                     "",
+                     [
+                         {
+                             "Ref": "pTransitGatewayStackName"
+                         },
+                         "-SccaTgwId"
+                     ]
+                   ]
+                 }
+             }
+         }
+        },
+        "rInternalRoute192" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rTransitGatewayAttachement",
+            "Properties" : {
+              "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
+              "DestinationCidrBlock" : "192.168.0.0/16",
+              "TransitGatewayId": {
+               "Fn::ImportValue": {
+                   "Fn::Join": [
+                     "",
+                     [
+                         {
+                             "Ref": "pTransitGatewayStackName"
+                         },
+                         "-SccaTgwId"
+                     ]
+                   ]
+                 }
+             }
+         }
         }
     },
     "Outputs": {
