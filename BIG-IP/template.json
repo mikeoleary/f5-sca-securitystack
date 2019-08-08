@@ -1071,6 +1071,7 @@
               "\"tmsh modify cm device ${HOSTNAME} unicast-address { { effective-ip ${INTIP} effective-port 1026 ip ${INTIP} } }\"\n",
               "\"tmsh load sys application template /config/cloud/aws/f5.service_discovery.tmpl\"\n",
               "\"tmsh load sys application template /config/cloud/aws/f5.cloud_logger.v1.0.0.tmpl\"\n",
+              "\"tmsh load sys application template /config/cloud/aws/f5.aws_advanced_ha.v1.4.0rc3.tmpl\"\n",
               "\"tmsh save /sys config\")\n",
               "for CMD in \"${tmsh[@]}\"\n",
               "do\n",
@@ -2185,6 +2186,12 @@
            "mode": "000755",
            "owner": "root"
           },
+          "/config/cloud/aws/f5.aws_advanced_ha.v1.4.0rc3.tmpl": {
+            "group": "root",
+            "mode": "000755",
+            "owner": "root",
+            "source": "https://raw.githubusercontent.com/F5Networks/f5-aws-cloudformation/v3.1.0/iApps/f5.aws_advanced_ha.v1.4.0rc3.tmpl"
+           },
           "/config/cloud/aws/f5.cloud_logger.v1.0.0.tmpl": {
            "group": "root",
            "mode": "000755",
