@@ -16,23 +16,6 @@
         "aws:cdk:path": "sccaTgwStack/rSccaTgw"
       }
     },
-    "rSccaMainTgwRouteTable": {
-      "Type": "AWS::EC2::TransitGatewayRouteTable",
-      "Properties": {
-        "TransitGatewayId": {
-          "Ref": "rSccaTgw"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "scca-main-tgw-rt"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "sccaTgwStack/rSccaMainTgwRouteTable"
-      }
-    },
     "rSccaVdssTgwRouteTable": {
       "Type": "AWS::EC2::TransitGatewayRouteTable",
       "Properties": {
@@ -48,23 +31,6 @@
       },
       "Metadata": {
         "aws:cdk:path": "sccaTgwStack/rSccaVdssTgwRouteTable"
-      }
-    },
-    "rSccaVdmsTgwRouteTable": {
-      "Type": "AWS::EC2::TransitGatewayRouteTable",
-      "Properties": {
-        "TransitGatewayId": {
-          "Ref": "rSccaTgw"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": "scca-vdms-tgw-rt"
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "sccaTgwStack/rSccaVdmsTgwRouteTable"
       }
     }
   },
@@ -85,28 +51,12 @@
         "Name" : {"Fn::Sub": "${AWS::StackName}-SccaTgwId" }
       }
     },
-    "SccaMainTgwRouteTableId": {
-      "Value": {
-        "Ref": "rSccaMainTgwRouteTable"
-      },
-      "Export": {
-        "Name" : {"Fn::Sub": "${AWS::StackName}-SccaMainTgwRouteTableId" }
-      }
-    },
     "SccaVdssTgwRouteTableId": {
       "Value": {
         "Ref": "rSccaVdssTgwRouteTable"
       },
       "Export": {
         "Name" : {"Fn::Sub": "${AWS::StackName}-SccaVdssTgwRouteTableId" }
-      }
-    },
-    "SccaVdmsTgwRouteTableId": {
-      "Value": {
-        "Ref": "rSccaVdmsTgwRouteTable"
-      },
-      "Export": {
-        "Name" : {"Fn::Sub": "${AWS::StackName}-SccaVdmsTgwRouteTableId" }
       }
     }
   }
