@@ -781,6 +781,7 @@
         },
         "rInternaltRoute10" : {
             "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rTransitGatewayAttachement",
             "Properties" : {
               "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
               "DestinationCidrBlock" : "10.0.0.0/8",
@@ -801,6 +802,7 @@
         },
         "rInternaltRoute172" : {
             "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rTransitGatewayAttachement",
             "Properties" : {
               "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
               "DestinationCidrBlock" : "172.16.0.0/12",
@@ -821,6 +823,7 @@
         },
         "rInternaltRoute192" : {
             "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rTransitGatewayAttachement",
             "Properties" : {
               "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
               "DestinationCidrBlock" : "192.168.0.0/16",
