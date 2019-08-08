@@ -368,20 +368,19 @@
         "Properties" : {
            "RouteTableId" : { "Ref" : "rFargateMainRouteTable" },
            "DestinationCidrBlock" : "0.0.0.0/0",
-           "TransitGatewayId" : {  
-               "Fn::ImportValue": {
-                  "Fn::Join": [
-                      "",
-                       [
-                         {
-                          "Ref": "pTransitGatewayStackName"
-                         },
-                          "-SccaTgwId"
-                        ]
+           "TransitGatewayId": {
+            "Fn::ImportValue": {
+                "Fn::Join": [
+                    "",
+                    [
+                        {
+                            "Ref": "pTransitGatewayStackName"
+                        },
+                        "-SccaTgwId"
                     ]
-                }
+                ]
             }
-        }
+        },
     },    
     "Outputs": {
         "StackName": {
