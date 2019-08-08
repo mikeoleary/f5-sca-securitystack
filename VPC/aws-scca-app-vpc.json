@@ -301,7 +301,7 @@
                                 {
                                     "Ref": "pTransitGatewayStackName"
                                 },
-                                "-SccaVdssTgwRouteTableId"
+                                "-SccaMainTgwRouteTableId"
                             ]
                         ]
                     }
@@ -335,7 +335,7 @@
                 "aws:cdk:path": "SccaAppStack/rTransitGatewayRouteTablePropagation"
             }
         },
-        "rMainTransitGatewayRouteApp": {
+        "rAppTransitGatewayRouteApp": {
             "Type": "AWS::EC2::TransitGatewayRoute",
             "Properties": {
                 "TransitGatewayRouteTableId": {
