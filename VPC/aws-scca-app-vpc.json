@@ -362,26 +362,27 @@
                 "aws:cdk:path": "SccaAppStack/rMainTransitGatewayRouteVdss"
             }
         }
-    },
-    "rAppDefaultRoute" : {
-        "Type" : "AWS::EC2::Route",
-        "Properties" : {
-           "RouteTableId" : { "Ref" : "rAppMainRouteTable" },
-           "DestinationCidrBlock" : "0.0.0.0/0",
-           "TransitGatewayId": {
-            "Fn::ImportValue": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "pTransitGatewayStackName"
-                        },
-                        "-SccaTgwId"
-                    ]
-                ]
-            }
-        },
-    },    
+        "rAppDefaultRoute" : {
+            "Type" : "AWS::EC2::Route",
+            "Properties" : {
+              "RouteTableId" : { "Ref" : "rAppMainRouteTable" },
+              "DestinationCidrBlock" : "0.0.0.0/0",
+              "TransitGatewayId": {
+               "Fn::ImportValue": {
+                   "Fn::Join": [
+                     "",
+                     [
+                         {
+                             "Ref": "pTransitGatewayStackName"
+                         },
+                         "-SccaTgwId"
+                     ]
+                   ]
+                 }
+             }
+         }
+        }
+    }, 
     "Outputs": {
         "StackName": {
             "Value": {
@@ -578,5 +579,5 @@
                 }
             }
         }
-    }
+    },
 }

@@ -361,27 +361,28 @@
             "Metadata": {
                 "aws:cdk:path": "SccaFargateStack/rMainTransitGatewayRouteVdss"
             }
-        }
-    },
-    "rFargateDefaultRoute" : {
-        "Type" : "AWS::EC2::Route",
-        "Properties" : {
-           "RouteTableId" : { "Ref" : "rFargateMainRouteTable" },
-           "DestinationCidrBlock" : "0.0.0.0/0",
-           "TransitGatewayId": {
-            "Fn::ImportValue": {
-                "Fn::Join": [
-                    "",
-                    [
-                        {
-                            "Ref": "pTransitGatewayStackName"
-                        },
-                        "-SccaTgwId"
-                    ]
-                ]
-            }
         },
-    },    
+        "FargateDefaultRoute" : {
+            "Type" : "AWS::EC2::Route",
+            "Properties" : {
+              "RouteTableId" : { "Ref" : "rFargateMainRouteTable" },
+              "DestinationCidrBlock" : "0.0.0.0/0",
+              "TransitGatewayId": {
+               "Fn::ImportValue": {
+                   "Fn::Join": [
+                     "",
+                     [
+                         {
+                             "Ref": "pTransitGatewayStackName"
+                         },
+                         "-SccaTgwId"
+                     ]
+                   ]
+                 }
+            }
+        }
+      }
+    },
     "Outputs": {
         "StackName": {
             "Value": {
