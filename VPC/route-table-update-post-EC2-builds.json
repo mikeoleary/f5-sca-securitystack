@@ -180,22 +180,6 @@
         ]
         }
     },
-  "CustomUpdateRoute1" : {
-    "Type": "Custom::ReplaceRoute",
-    "Version" : "1.0",
-    "Properties" : {
-      "ServiceToken": { "Fn::GetAtt" : ["LambdaReplaceRoute", "Arn"] },
-      "dest_cidr_block" : "0.0.0.0/0",
-      "interface_id" : {
-        "Fn::ImportValue": {
-         "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2InternalInterface" }
-         },
-      "routetable_id" : {
-        "Fn::ImportValue": {
-         "Fn::Sub": "${pVpcStackName}-VdssDmz1SubnetRouteTable" }
-         }
-    }
-  },
   "CustomUpdateRoute2" : {
     "Type": "Custom::ReplaceRoute",
     "Version" : "1.0",
