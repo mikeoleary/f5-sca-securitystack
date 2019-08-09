@@ -254,10 +254,14 @@
     "Properties" : {
       "ServiceToken": { "Fn::GetAtt" : ["LambdaGetActiveDevice", "Arn"] },
       "mgmt_ip1" : {
+        "Fn::ImportValue": {
         "Fn::Sub": "${pBigIPStackNameTier2}-Bigip1ManagementEipAddress" 
+        }
         },
       "mgmt_ip2" : {
+        "Fn::ImportValue": {
         "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2ManagementEipAddress" 
+        }
         },
       "bucket" : {
         "Fn::ImportValue": {
@@ -363,9 +367,9 @@
                     "    print(status2)",
                     "",
                     "    if status1=='ACTIVE':",
-                    "        responseData='{\"ActiveDevice\": \"Bigip1\"}'",
+                    "        responseData={\"ActiveDevice\": \"Bigip1\"}",
                     "    elif status2=='ACTIVE':",
-                    "        responseData='{\"ActiveDevice\": \"Bigip2\"}'",
+                    "        responseData={\"ActiveDevice\": \"Bigip2\"}",
                     "    else:",
                     "     raise Exception('Failed to determine the ACTIVE device in cluster')",
                     "",
