@@ -114,21 +114,6 @@
         }
         }
     },
-    "rTier2OutboundRoute1": {
-        "Type": "AWS::EC2::Route",
-        "Properties": {
-          "RouteTableId": {
-            "Fn::ImportValue": {
-                "Fn::Sub": "${pVpcStackName}-VdssInternalRouteTable"
-            }
-            },
-           "DestinationCidrBlock": "0.0.0.0/0",
-           "NetworkInterfaceId": {
-           "Fn::ImportValue": {
-            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2InternalInterface" }
-            }
-           }
-        },
     "rTier2InboundRoute1": {
         "Type": "AWS::EC2::Route",
         "Properties": {
@@ -245,7 +230,20 @@
       "bucket" : {
         "Fn::ImportValue": {
          "Fn::Sub": "${pBigIPStackNameTier1}-S3BucketName" }
-         }
+         },
+         "dest_cidr_block" : "0.0.0.0/0",
+         "interface_id1" : {
+           "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier1}-Bigip1InternalInterface" }
+            },
+        "interface_id2" : {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2InternalInterface" }
+            },
+         "routetable_id" : {
+           "Fn::ImportValue": {
+            "Fn::Sub": "${pVpcStackName}-VdssDmz1SubnetRouteTable" }
+            }
     }
    },
    "GetActiveDeviceTier2" : {
@@ -266,7 +264,20 @@
       "bucket" : {
         "Fn::ImportValue": {
          "Fn::Sub": "${pBigIPStackNameTier2}-S3BucketName" }
-         }
+         },
+         "dest_cidr_block" : "0.0.0.0/0",
+         "interface_id1" : {
+           "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip1InternalInterface" }
+            },
+        "interface_id2" : {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2InternalInterface" }
+            },
+         "routetable_id" : {
+           "Fn::ImportValue": {
+            "Fn::Sub": "${pVpcStackName}-VdssInternalRouteTable" }
+            }
     }
    },
     "LambdaReplaceRoute": {
@@ -333,12 +344,18 @@
                     "logger = logging.getLogger()",
                     "logger.setLevel(logging.INFO)",
                     "s3 = boto3.client('s3')",
+                    "ec2 = boto3.resource('ec2')",
+                    "client = boto3.client('ec2')",
                     "",
                     "def lambda_handler(event, context):",
                     "  try:",
                     "   if event['RequestType'] == 'Create':",
                     "    #set initial variables",
                     "    logger.info('got event {}'.format(event))",
+                    "    dest_cidr_block = event['ResourceProperties'].get('dest_cidr_block')",
+                    "    interface_id1 = event['ResourceProperties'].get('interface_id1')",
+                    "    interface_id2 = event['ResourceProperties'].get('interface_id2')",
+                    "    routetable_id = event['ResourceProperties'].get('routetable_id')",
                     "    mgmt_ip1 = event['ResourceProperties'].get('mgmt_ip1')",
                     "    mgmt_ip2 = event['ResourceProperties'].get('mgmt_ip2')",
                     "    bucket = event['ResourceProperties'].get('bucket')",
@@ -368,14 +385,18 @@
                     "",
                     "    if status1=='ACTIVE':",
                     "        responseData={\"ActiveDevice\": \"Bigip1\"}",
+                    "        interface_id=interface_id1",
                     "    elif status2=='ACTIVE':",
                     "        responseData={\"ActiveDevice\": \"Bigip2\"}",
+                    "        interface_id=interface_id2",
                     "    else:",
                     "     raise Exception('Failed to determine the ACTIVE device in cluster')",
                     "",
-                    "    print(responseData)",
+                    "    response = client.replace_route(DestinationCidrBlock=dest_cidr_block,NetworkInterfaceId=interface_id,RouteTableId=routetable_id)",
                     "",
-                    "    cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)",
+                    "    print(responseData)",
+                    "", 
+                    "    cfnresponse.send(event, context, cfnresponse.SUCCESS, response)",
                     "",
                     "   if event['RequestType'] == 'Delete':",
                     "     responseData = {}",
