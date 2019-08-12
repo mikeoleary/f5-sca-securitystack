@@ -205,6 +205,9 @@
         "pJumpHostPrivateIP": {
             "default": "Private IP address of Jump Host"
         },
+        "pApp1PrivateIP": {
+          "default": "App 1 Private IP address"
+        },
        "pTier": {
         "default": "Tier1 or Tier2. Defines which Tier of the architecture the BIG-IP devices will sit in."
         },
@@ -545,6 +548,11 @@
         "Type": "String",
         "Default": "10.0.4.10"
         },
+      "pApp1PrivateIP": {
+          "ConstraintDescription": "App 1 Private IP address",
+          "Type": "String",
+          "Default": "10.1.0.1"
+          },
       "pTier": {
         "AllowedValues": [
             "Tier1",
@@ -1740,7 +1748,7 @@
                           "'\n",
                           "node1='",
                           {
-                          "Ref": "pJumpHostPrivateIP"
+                          "Ref": "pApp1PrivateIP"
                           },
                           "'\n",
                           "\n",
