@@ -716,8 +716,8 @@
       "Metadata": {
        "AWS::CloudFormation::Init": {
         "configSets" : {
-            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing", "mgmt-baseline" ],
-            "Enterprise": [ "config", "AS3-baseline-routing", "mgmt-baseline" ]
+            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing" ],
+            "Enterprise": [ "config", "AS3-baseline-routing" ]
           },
         "config": {
          "commands": {
@@ -1499,18 +1499,12 @@
                             },
                             "'\n",
                             "VIP1='",
-                            { 
-                              "Fn::Select" : [ 
-                              "0", 
-                              [ { 
-                                "Fn::GetAtt": [
-                                "Bigip1subnet1Az1Interface",
-                                "SecondaryPrivateIpAddresses" 
-                                ] 
-                                } 
-                              ]
-                              ] 
-                              },
+                            {
+                            "Fn::GetAtt": [
+                            "Bigip1subnet1Az1Interface",
+                            "PrimaryPrivateIpAddress"
+                            ]
+                            },
                             "'\n",
                             "VIP2='",
                             {
@@ -1598,18 +1592,12 @@
                           "partition=\"mgmt\"",
                           "\n",
                           "virtualAddress='",
-                          { 
-                            "Fn::Select" : [ 
-                            "0", 
-                            [ { 
-                              "Fn::GetAtt": [
-                              "Bigip1subnet1Az1Interface",
-                              "SecondaryPrivateIpAddresses" 
-                              ] 
-                              } 
-                            ]
-                            ] 
-                            },
+                          {
+                          "Fn::GetAtt": [
+                          "Bigip1subnet1Az1Interface",
+                          "PrimaryPrivateIpAddress"
+                          ]
+                          },
                           "'\n",
                           "virtualAddress2='",
                           {
@@ -1703,7 +1691,7 @@
             }
             }
           },
-          "app1-baseline": {
+          "app1-baseline-tier1": {
             "commands": {
                 "085-apply-app1-baseline": { 
                     "test" : "[ -f /config/appBaseline.sh ]",
