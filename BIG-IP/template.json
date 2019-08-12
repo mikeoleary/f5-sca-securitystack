@@ -1592,12 +1592,7 @@
                           "partition=\"mgmt\"",
                           "\n",
                           "virtualAddress='",
-                          {
-                          "Fn::GetAtt": [
-                          "Bigip1subnet1Az1Interface",
-                          "PrimaryPrivateIpAddress"
-                          ]
-                          },
+                          { "Fn::Select": [ "0", { "Fn::GetAtt": [ "Bigip1subnet1Az1Interface", "SecondaryPrivateIpAddresses" ] } ] },
                           "'\n",
                           "virtualAddress2='",
                           {
@@ -1647,12 +1642,7 @@
                         "partition=\"mgmt\"",
                         "\n",
                         "virtualAddress='",
-                        {
-                        "Fn::GetAtt": [
-                        "Bigip1subnet1Az1Interface",
-                        "PrimaryPrivateIpAddress"
-                        ]
-                        },
+                        { "Fn::Select": [ "0", { "Fn::GetAtt": [ "Bigip1subnet1Az1Interface", "SecondaryPrivateIpAddresses" ] } ] },
                         "'\n",
                         "virtualAddress2='",
                         {
@@ -1704,8 +1694,8 @@
                          "--file /config/deployapp1.sh",
                          "--output /var/log/deployapp1.log",
                          "--log-level silly",
-                         "--wait-for AS3_ROUTING_DONE",
-                         "--signal MGMT_DONE",
+                         "--wait-for MGMT_DONE",
+                         "--signal APP1_DONE",
                          "&>> /var/log/cloud/aws/install.log < /dev/null &"
                         ] 
                        ] 
