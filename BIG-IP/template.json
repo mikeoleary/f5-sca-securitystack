@@ -716,7 +716,7 @@
       "Metadata": {
        "AWS::CloudFormation::Init": {
         "configSets" : {
-            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing" ],
+            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing", "mgmt-baseline", "app1-baseline-tier1" ],
             "Enterprise": [ "config", "AS3-baseline-routing" ]
           },
         "config": {
