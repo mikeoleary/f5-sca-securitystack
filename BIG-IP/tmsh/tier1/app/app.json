@@ -1,117 +1,116 @@
 {
-    "app1-baseline-tier1": {
-        "commands": {
-            "085-apply-app1-baseline": { 
-                "test" : "[ -f /config/appBaseline.sh ]",
-                "command": { 
-                   "Fn::Join": [  
-                    " ", 
-                    [ 
-                     "nohup /config/waitThenRun.sh",
-                     "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
-                     "--file /config/deployapp1.sh",
-                     "--output /var/log/deployapp1.log",
-                     "--log-level silly",
-                     "--wait-for MGMT_DONE",
-                     "--signal APP1_DONE",
-                     "&>> /var/log/cloud/aws/install.log < /dev/null &"
-                    ] 
-                   ] 
-              }, 
-              "cwd" : "/config"  
-              } 
-              
-        },
-        "files": {
-            "/config/owasp-auto-tune.xml": {
-              "group": "root",
-              "mode": "000755",
-              "owner": "root",
-              "source": "https://raw.githubusercontent.com/f5devcentral/f5-asm-policy-templates/master/owasp_ready_template/owasp-auto-tune-v1.1.xml"
-            },
-            "/config/deployapp1.sh": {
-              "group": "root",
-              "mode": "000755",
-              "owner": "root",
-              "content": {
-                  "Fn::Join": [
-                      "",
-                      [
-                      "#!/bin/bash\n",
-                      "partition=\"app1\"",
-                      "\n",
-                      "virtualAddress='",
-                      {
-                      "Fn::GetAtt": [
-                      "Bigip1subnet1Az1Interface",
-                      "PrimaryPrivateIpAddress"
-                      ]
-                      },
-                      "'\n",
-                      "virtualAddress2='",
-                      {
-                      "Fn::GetAtt": [
-                      "Bigip2subnet1Az1Interface",
-                      "PrimaryPrivateIpAddress"
-                      ]
-                      },
-                      "'\n",
-                      "node1='",
-                      {
-                      "Ref": "pJumpHostPrivateIP"
-                      },
-                      "'\n",
-                      "\n",
-                      "asmPolicy=\"app1\"\n",
-                      "asmFile=\"/config/owasp-auto-tune.xml\"\n",
-                      "### FILE CREATION FOR APP ACCESS\n",
-                      "#partition\n",
-                      "echo  -e 'create cli transaction;\n",
-                      "create auth partition '${partition}' { };\n",
-                      "submit cli transaction' | tmsh -q\n",
-                      "\n",
-                      "# asm policy\n",
-                      "echo  -e 'create cli transaction;\n",
-                      "cd /'${partition}';\n",
-                      "load asm policy file '${asmFile}'\n",
-                      "submit cli transaction' | tmsh -q\n",
-                      "\n",
-                      "# traffic policy\n",
-                      "echo  -e 'create cli transaction;\n",
-                      "cd /'${partition}';\n",
-                      "create ltm policy /'${partition}'/Drafts/app1_asm_policy_https controls add { asm } rules add { default { actions add { 1 { asm enable policy /Common/owasp-auto-tune} } ordinal 1 } } strategy /Common/first-match;\n", 
-                      "submit cli transaction' | tmsh -q\n",
-                      "\n",
-                      "# publish traffic policy\n",
-                      "echo  -e 'create cli transaction;\n",
-                      "cd /'${partition}';\n",
-                      "publish ltm policy /'${partition}'/Drafts/app1_asm_policy_https;\n",
-                      "submit cli transaction' | tmsh -q\n",
-                      "\n",
-                      "#virtual servers\n",
-                      "echo  -e 'create cli transaction;\n",
-                      "cd /'${partition}';\n",
-                      "create ltm node /'${partition}'/'${node1}' { address '${node1}' };\n",
-                      "create ltm virtual /'${partition}'/app1_http { description app1_http destination /'${partition}'/'${virtualAddress}':http ip-protocol tcp mask 255.255.255.255 persist none profiles replace-all-with { /Common/f5-tcp-progressive {} http } rules { /Common/_sys_https_redirect } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
-                      "create ltm pool /'${partition}'/app1_https_pool { members replace-all-with { /'${partition}'/'${node1}':https { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open } };\n",
-                      "create ltm virtual /'${partition}'/app1_https {  description app1_https destination /'${partition}'/'${virtualAddress}':https ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/cookie { default yes } } pool /'${partition}'/app1_https_pool security-log-profiles add { \"Log all requests\" } profiles replace-all-with { /Common/f5-tcp-progressive { } http websecurity } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled }\n",
-                      "submit cli transaction' | tmsh -q\n",
-                      "\n",
-                      "# add asm and logging\n",
-                      "echo  -e 'create cli transaction;\n",
-                      "modify ltm virtual /'${partition}'/app1_https policies add { /'${partition}'/app1_asm_policy_https} security-log-profiles add { \"Log all requests\" }\n",
-                      "submit cli transaction' | tmsh -q\n",
-                      "\n",
-                      "# save config\n",
-                      "echo  -e 'create cli transaction;\n",
-                      "save sys config partitions all;\n",
-                      "submit cli transaction' | tmsh -q\n",
-                      "\n",
-                      "### END DEPLOYMENT OF FILE CREATION FOR APP ACCESS"
-                      ]
-                  ]
-              }
-          }
+"app1-baseline-tier1": {
+  "commands": {
+      "085-apply-app1-baseline": { 
+          "test" : "[ -f /config/appBaseline.sh ]",
+          "command": { 
+             "Fn::Join": [  
+              " ", 
+              [ 
+               "nohup /config/waitThenRun.sh",
+               "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
+               "--file /config/deployapp1.sh",
+               "--output /var/log/deployapp1.log",
+               "--log-level silly",
+               "--wait-for AS3_ROUTING_DONE",
+               "--signal MGMT_DONE",
+               "&>> /var/log/cloud/aws/install.log < /dev/null &"
+              ] 
+             ] 
+        }, 
+        "cwd" : "/config"  
+        } 
+        
+  },
+  "files": {
+      "/config/owasp-auto-tune.xml": {
+        "group": "root",
+        "mode": "000755",
+        "owner": "root",
+        "source": "https://raw.githubusercontent.com/f5devcentral/f5-asm-policy-templates/master/owasp_ready_template/owasp-auto-tune-v1.1.xml"
+      },
+      "/config/deployapp1.sh": {
+        "group": "root",
+        "mode": "000755",
+        "owner": "root",
+        "content": {
+            "Fn::Join": [
+                "",
+                [
+                "#!/bin/bash\n",
+                "partition=\"app1\"",
+                "\n",
+                "virtualAddress='",
+                {
+                "Fn::GetAtt": [
+                "Bigip1subnet1Az1Interface",
+                "PrimaryPrivateIpAddress"
+                ]
+                },
+                "'\n",
+                "virtualAddress2='",
+                {
+                "Fn::GetAtt": [
+                "Bigip2subnet1Az1Interface",
+                "PrimaryPrivateIpAddress"
+                ]
+                },
+                "'\n",
+                "node1='",
+                {
+                "Ref": "pJumpHostPrivateIP"
+                },
+                "'\n",
+                "\n",
+                "asmPolicy=\"app1\"\n",
+                "asmFile=\"/config/owasp-auto-tune.xml\"\n",
+                "### FILE CREATION FOR APP ACCESS\n",
+                "#partition\n",
+                "echo  -e 'create cli transaction;\n",
+                "create auth partition '${partition}' { };\n",
+                "submit cli transaction' | tmsh -q\n",
+                "\n",
+                "# asm policy\n",
+                "echo  -e 'create cli transaction;\n",
+                "cd /'${partition}';\n",
+                "load asm policy file '${asmFile}'\n",
+                "submit cli transaction' | tmsh -q\n",
+                "\n",
+                "# traffic policy\n",
+                "echo  -e 'create cli transaction;\n",
+                "cd /'${partition}';\n",
+                "create ltm policy /'${partition}'/Drafts/app1_asm_policy_https controls add { asm } rules add { default { actions add { 1 { asm enable policy /Common/owasp-auto-tune} } ordinal 1 } } strategy /Common/first-match; submit cli transaction' | tmsh -q\n",
+                "echo  -e 'create cli transaction;\n",
+                "\n",
+                "# publish traffic policy\n",
+                "echo  -e 'create cli transaction;\n",
+                "cd /'${partition}';\n",
+                "publish ltm policy /'${partition}'/Drafts/app1_asm_policy_https;\n",
+                "submit cli transaction' | tmsh -q\n",
+                "#virtual servers\n",
+                "echo  -e 'create cli transaction;\n",
+                "cd /'${partition}';\n",
+                "create ltm node /'${partition}'/'${node1}' { address '${node1}' };\n",
+                "create ltm virtual /'${partition}'/app1_http { description app1_http destination /'${partition}'/'${virtualAddress}':http ip-protocol tcp mask 255.255.255.255 persist none profiles replace-all-with { /Common/f5-tcp-progressive {} http } rules { /Common/_sys_https_redirect } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
+                "create ltm pool /'${partition}'/app1_https_pool { members replace-all-with { /'${partition}'/'${node1}':https { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open } };\n",
+                "create ltm virtual /'${partition}'/app1_https {  description app1_https destination /'${partition}'/'${virtualAddress}':https ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/cookie { default yes } } pool /'${partition}'/app1_https_pool security-log-profiles add { \"Log all requests\" } profiles replace-all-with { /Common/f5-tcp-progressive { } http websecurity } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled }\n",
+                "submit cli transaction' | tmsh -q\n",
+                "\n",
+                "# add asm and logging\n",
+                "echo  -e 'create cli transaction;\n",
+                "modify ltm virtual /'${partition}'/app1_https policies add { /'${partition}'/app1_asm_policy_https} security-log-profiles add { \"Log all requests\" }\n",
+                "submit cli transaction' | tmsh -q\n",
+                "\n",
+                "# save config\n",
+                "echo  -e 'create cli transaction;\n",
+                "save sys config partitions all;\n",
+                "submit cli transaction' | tmsh -q\n",
+                "\n",
+                "### END DEPLOYMENT OF FILE CREATION FOR APP ACCESS"
+                ]
+            ]
         }
-      }
+    }
+  }
+}
 }
