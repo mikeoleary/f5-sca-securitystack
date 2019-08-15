@@ -1458,7 +1458,14 @@
                          "--file /config/deployBaselineRouting.sh",
                          "--output /var/log/deployBaselineRouting.log",
                          "--log-level silly",
-                         "--wait-for CERTS_DONE",
+                         {
+                            "Fn::If":
+                               [
+                                   "SCCA",
+                                   "--wait-for CERTS_DONE",
+                                   "--wait-for PASSWORD_REMOVED"
+                               ]
+                        },
                          "--signal AS3_ROUTING_DONE",
                          "&>> /var/log/cloud/aws/install.log < /dev/null &"
                         ] 
