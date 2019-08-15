@@ -196,14 +196,6 @@
          "declarationUrl",
          "declarationUrlrouting"
         ]
-       },
-       {
-        "Label": {
-         "default": "VIRTUAL SERVER STACK ID"
-        },
-        "Parameters": [
-         "pBigIPStackNameTier2"
-        ]
        }
       ],
       "ParameterLabels": {
@@ -728,7 +720,7 @@
      },
      "pTier2AppNode": {
         "Fn::ImportValue": {
-            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip1VipPrivateIp" }
+            "Fn::Sub": "${pBigIPStackNameTier3}-Bigip1VipPrivateIp" }
      }
     },
     "Resources": {
