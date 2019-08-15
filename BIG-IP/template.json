@@ -25,6 +25,10 @@
     },
     "SCCA": {
        "Fn::Equals" : [{"Ref" : "pBaselineCompliance"}, "SCCA"]
+     },
+     "pTier2Node": {
+        "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2InternalInterface" }
      }
     },
     "Description": "Template v4.2.0: AWS CloudFormation Template for creating a Same-AZ cluster of 3NIC BIG-IPs in an existing VPC **WARNING** This template creates Amazon EC2 Instances. You will be billed for the AWS resources used if you create a stack from this template.",
@@ -195,6 +199,14 @@
         "Parameters": [
          "declarationUrl",
          "declarationUrlrouting"
+        ]
+       },
+       {
+        "Label": {
+         "default": "VIRTUAL SERVER STACK ID"
+        },
+        "Parameters": [
+         "pBigIPStackNameTier2"
         ]
        }
       ],
@@ -1750,7 +1762,7 @@
                         "'\n",
                         "node1='",
                         {
-                        "Ref": "pJumpHostPrivateIP"
+                        "Ref": "pTier2Node"
                         },
                         "'\n",
                         "\n",

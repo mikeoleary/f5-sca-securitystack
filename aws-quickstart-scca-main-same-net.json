@@ -454,6 +454,12 @@
                 }
               }
             ]
+          },
+          "pBigIPStackNameTier2": {
+            "Fn::GetAtt": [
+              "F5BIGIP2",
+              "Outputs.StackName"
+            ]
           }
         },
         "Tags": [
