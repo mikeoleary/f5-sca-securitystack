@@ -1749,7 +1749,9 @@
                         },
                         "'\n",
                         "node1='",
-                        {"Fn::ImportValue" : {"Fn::Sub": "${pBigIPStackNameTier3}-Bigip1VipPrivateIp" }},
+                        {
+                            "ref": "pApp1PrivateIP"
+                        },
                         "'\n",
                         "\n",
                         "# afm policy\n",
