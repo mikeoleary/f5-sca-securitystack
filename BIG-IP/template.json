@@ -25,10 +25,6 @@
     },
     "SCCA": {
        "Fn::Equals" : [{"Ref" : "pBaselineCompliance"}, "SCCA"]
-     },
-     "pTier2Node": {
-        "Fn::ImportValue": {
-            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip2InternalInterface" }
      }
     },
     "Description": "Template v4.2.0: AWS CloudFormation Template for creating a Same-AZ cluster of 3NIC BIG-IPs in an existing VPC **WARNING** This template creates Amazon EC2 Instances. You will be billed for the AWS resources used if you create a stack from this template.",
@@ -729,6 +725,10 @@
       "Default": "UTC",
       "Description": "Olson timezone string. Acceptable values can be found from /usr/share/zoneinfo directory located on BIG-IP. Also, see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones referencing the TZ* column for Olsen timezone examples.",
       "Type": "String"
+     },
+     "pTier2AppNode": {
+        "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier2}-Bigip1VipPrivateIp" }
      }
     },
     "Resources": {
@@ -1762,7 +1762,7 @@
                         "'\n",
                         "node1='",
                         {
-                        "Ref": "pTier2Node"
+                        "Ref": "pTier2AppNode"
                         },
                         "'\n",
                         "\n",
