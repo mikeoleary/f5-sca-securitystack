@@ -1,5 +1,6 @@
+if [ -f "./load-keys.sh" ]; then source "./load-keys.sh"; fi
 if [ -z ${stackName} ]; then echo "stackName is unset" && exit 1; fi
-if [ -z ${sshKeyName} ]; then echo "stackName is unset" && exit 1; fi
+if [ -z ${sshKeyName} ]; then echo "sshKeyName is unset" && exit 1; fi
 if [ -z ${licenseKey1} ]; then echo "licenseKey1 is unset" && exit 1; fi
 if [ -z ${licenseKey2} ]; then echo "licenseKey2 is unset"  && exit 1; fi
 if [ -z ${licenseKey3} ]; then echo "licenseKey3 is unset"  && exit 1; fi
