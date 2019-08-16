@@ -34,7 +34,7 @@
             "owner": "root",
             "content": { 
             "Fn::if": [
-                "Tier1",
+                "tp_Tier1",
             {"Fn::Join": [  
                 "", 
                 [ 
@@ -43,23 +43,17 @@
                 "\n",
                 "virtualAddress='",
                 {
-                "Fn::GetAtt": [
-                "Bigip1subnet1Az1Interface",
-                "PrimaryPrivateIpAddress"
-                ]
+                "Fn::Ref": "tp_vip"
                 },
                 "'\n",
                 "virtualAddress2='",
                 {
-                "Fn::GetAtt": [
-                "Bigip2subnet1Az1Interface",
-                "PrimaryPrivateIpAddress"
-                ]
+                    "Fn::Ref": "tp_vip"
                 },
                 "'\n",
                 "node1='",
                 {
-                "Ref": "pJumpHostPrivateIP"
+                    "Fn::Ref": "tp_node"
                 },
                 "'\n",
                 "\n",
@@ -112,23 +106,17 @@
                     "\n",
                     "virtualAddress='",
                     {
-                    "Fn::GetAtt": [
-                    "Bigip1subnet1Az1Interface",
-                    "PrimaryPrivateIpAddress"
-                    ]
+                    "Fn::Ref": "tp_vip"
                     },
                     "'\n",
                     "virtualAddress2='",
                     {
-                    "Fn::GetAtt": [
-                    "Bigip2subnet1Az1Interface",
-                    "PrimaryPrivateIpAddress"
-                    ]
+                        "Fn::Ref": "tp_vip"
                     },
                     "'\n",
                     "node1='",
                     {
-                    "Ref": "pApp1PrivateIP"
+                        "Fn::Ref": "tp_node"
                     },
                     "'\n",
                     "\n",

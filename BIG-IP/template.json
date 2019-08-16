@@ -545,6 +545,11 @@
         "Type": "String",
         "Default": "10.0.4.10"
         },
+        "pVirtualPrivateIP": {
+            "ConstraintDescription": "Tier3 Virtual address",
+            "Type": "String",
+            "Default": "10.0.4.11"
+        },
       "pTier": {
         "AllowedValues": [
             "Tier1",
@@ -1579,7 +1584,9 @@
                             },"mgmt.json"
                             ]
                         ]
-                    }
+                    },
+                    "tp_vip": { "Fn::Ref": "Bigip1VipPrivateIp" },
+                    "tp_node": { "Fn::Ref": "pJumpHostPrivateIP" }
                 }
             }
         },
@@ -1599,7 +1606,15 @@
                             "combined.json"
                             ]
                         ]
-                    }
+                    },
+                    "tp_vip": { "Fn::Ref": "Bigip1VipPrivateIp" },
+                    "tp_node": { "Fn::If": [
+                        "Tier1",
+                        {"Fn::Ref": "pVirtualPrivateIP" },
+                        {"Fn::Ref": "pAppPrivateIP" }
+                    ]
+                    },
+                    "tp_Tier1" : "pTier"
                 }
             }
         }
