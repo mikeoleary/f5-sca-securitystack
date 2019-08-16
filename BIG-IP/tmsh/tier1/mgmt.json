@@ -1,4 +1,5 @@
 {
+  "mgmt-baseline": {
     "commands": {
         "084-apply-mgmt-baseline": { 
             "test" : "[ -f /config/deployBaseline.sh ]",
@@ -35,17 +36,23 @@
                   "\n",
                   "virtualAddress='",
                   {
-                  "Fn::Ref": "tp_vip"
+                  "Fn::GetAtt": [
+                  "Bigip1subnet1Az1Interface",
+                  "PrimaryPrivateIpAddress"
+                  ]
                   },
                   "'\n",
                   "virtualAddress2='",
                   {
-                    "Fn::Ref": "tp_vip"
+                  "Fn::GetAtt": [
+                  "Bigip2subnet1Az1Interface",
+                  "PrimaryPrivateIpAddress"
+                  ]
                   },
                   "'\n",
                   "node1='",
                   {
-                    "Fn::Ref": "tp_node"
+                  "Ref": "pJumpHostPrivateIP"
                   },
                   "'\n",
                   "\n",
@@ -84,17 +91,23 @@
                 "\n",
                 "virtualAddress='",
                 {
-                "Fn::Ref": "tp_vip"
+                "Fn::GetAtt": [
+                "Bigip1subnet1Az1Interface",
+                "PrimaryPrivateIpAddress"
+                ]
                 },
                 "'\n",
                 "virtualAddress2='",
                 {
-                    "Fn::Ref": "tp_vip"
+                "Fn::GetAtt": [
+                "Bigip2subnet1Az1Interface",
+                "PrimaryPrivateIpAddress"
+                ]
                 },
                 "'\n",
                 "node1='",
                 {
-                    "Fn::Ref": "tp_node"
+                "Ref": "pJumpHostPrivateIP"
                 },
                 "'\n",
                 "\n",
@@ -120,4 +133,5 @@
         }
     }
     }
+  }
 }
