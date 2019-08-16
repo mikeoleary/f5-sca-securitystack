@@ -1,5 +1,4 @@
 {
-  "mgmt-baseline": {
     "commands": {
         "084-apply-mgmt-baseline": { 
             "test" : "[ -f /config/deployBaseline.sh ]",
@@ -133,5 +132,4 @@
         }
     }
     }
-  }
 }

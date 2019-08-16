@@ -716,7 +716,7 @@
       "Metadata": {
        "AWS::CloudFormation::Init": {
         "configSets" : {
-            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing", "mgmt-baseline", "app1-baseline-tier1" ],
+            "SCCA" : [ "config", "bigipstig", "dodCerts", "AS3-baseline-routing", "mgmt-baseline", "app1-baseline" ],
             "Enterprise": [ "config", "AS3-baseline-routing" ]
           },
         "config": {
@@ -1583,7 +1583,7 @@
                 }
             }
         },
-        "app1-baseline-tier1" :{
+        "app1-baseline" :{
             "Fn::Transform" :{
                 "Name": "AWS::Include",
                 "Parameters": {
@@ -1596,16 +1596,7 @@
                                 "Ref": "S3Bucket"
                             },
                             "/BIG-IP/tmsh/",
-                            {
-                                "Fn::If":
-                                [
-                                    "Tier1",
-                                    "tier1",
-                                    "tier3"
-                                ]
-                            },
-                            "app",
-                            "app.json"
+                            "combined.json"
                             ]
                         ]
                     }
