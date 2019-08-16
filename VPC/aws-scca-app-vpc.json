@@ -1,0 +1,584 @@
+{
+    "Parameters": {
+        "pProject": {
+            "Type": "String",
+            "Default": "SCCA-App-Demo",
+            "Description": "Project name to use for tagging"
+        },
+        "pAppVpcCidr": {
+            "Type": "String",
+            "Default": "10.1.0.0/16",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+            "Description": "CIDR Block for the app VPC",
+            "MaxLength": 18,
+            "MinLength": 9
+        },
+        "pTransitGatewayStackName": {
+            "Type": "String",
+            "Default": "SccaTgwStack",
+            "Description": "Transit Gateway Stack Name"
+        }
+    },
+    "Resources": {
+        "rAppVpc": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": {
+                    "Ref": "pAppVpcCidr"
+                },
+                "EnableDnsHostnames": true,
+                "EnableDnsSupport": true,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "app-vpc"
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "pProject"
+                        }
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rAppVpc"
+            }
+        },
+        "rAppMainRouteTable": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "rAppVpc"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "app-main-rt"
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "pProject"
+                        }
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rAppMainRouteTable"
+            }
+        },
+        "rAppSubnetA": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": {
+                    "Fn::Select": [
+                        0,
+                        {
+                            "Fn::Cidr": [
+                                {
+                                    "Ref": "pAppVpcCidr"
+                                },
+                                16,
+                                "8"
+                            ]
+                        }
+                    ]
+                },
+                "VpcId": {
+                    "Ref": "rAppVpc"
+                },
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        0,
+                        {
+                            "Fn::GetAZs": ""
+                        }
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "App-SubnetA"
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "pProject"
+                        }
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rAppSubnetA"
+            }
+        },
+        "rAppSubnetARouteTableAssociation": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "rAppMainRouteTable"
+                },
+                "SubnetId": {
+                    "Ref": "rAppSubnetA"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rAppMainRouteTableAssociation"
+            }
+        },
+        "rAppSubnetB": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": {
+                    "Fn::Select": [
+                        2,
+                        {
+                            "Fn::Cidr": [
+                                {
+                                    "Ref": "pAppVpcCidr"
+                                },
+                                16,
+                                "8"
+                            ]
+                        }
+                    ]
+                },
+                "VpcId": {
+                    "Ref": "rAppVpc"
+                },
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        0,
+                        {
+                            "Fn::GetAZs": ""
+                        }
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "app-subnet-b"
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "pProject"
+                        }
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rAppSubnetB"
+            }
+        },
+        "rAppSubnetBRouteTableAssociation": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "rAppMainRouteTable"
+                },
+                "SubnetId": {
+                    "Ref": "rAppSubnetB"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rAppMainRouteTableAssociation"
+            }
+        },
+        "rAppSubnetPeer": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": {
+                    "Fn::Select": [
+                        4,
+                        {
+                            "Fn::Cidr": [
+                                {
+                                    "Ref": "pAppVpcCidr"
+                                },
+                                16,
+                                "8"
+                            ]
+                        }
+                    ]
+                },
+                "VpcId": {
+                    "Ref": "rAppVpc"
+                },
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        0,
+                        {
+                            "Fn::GetAZs": ""
+                        }
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "app-subnet-peer"
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "pProject"
+                        }
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rAppSubnetPeer"
+            }
+        },
+        "rAppSubnetPeerRouteTableAssociation": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "rAppMainRouteTable"
+                },
+                "SubnetId": {
+                    "Ref": "rAppSubnetPeer"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rAppMainRouteTableAssociation"
+            }
+        },
+        "rAppTransitGatewayAttachement": {
+            "Type": "AWS::EC2::TransitGatewayAttachment",
+            "Properties": {
+                "SubnetIds": [
+                    {
+                        "Ref": "rAppSubnetPeer"
+                    }
+                ],
+                "TransitGatewayId": {
+                    "Fn::ImportValue": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                {
+                                    "Ref": "pTransitGatewayStackName"
+                                },
+                                "-SccaTgwId"
+                            ]
+                        ]
+                    }
+                },
+                "VpcId": {
+                    "Ref": "rAppVpc"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "app-tgw-attachment"
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "pProject"
+                        }
+                    }
+                ]
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rTransitGatewayAttachement"
+            }
+        },
+        "rAppTransitGatewayRouteTableAssociation": {
+            "Type": "AWS::EC2::TransitGatewayRouteTableAssociation",
+            "Properties": {
+                "TransitGatewayAttachmentId": {
+                    "Ref": "rAppTransitGatewayAttachement"
+                },
+                "TransitGatewayRouteTableId": {
+                    "Fn::ImportValue": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                {
+                                    "Ref": "pTransitGatewayStackName"
+                                },
+                                "-SccaMainTgwRouteTableId"
+                            ]
+                        ]
+                    }
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rTransitGatewayRouteTableAssociation"
+            }
+        },
+        "rAppTransitGatewayRouteTablePropagation": {
+            "Type": "AWS::EC2::TransitGatewayRouteTablePropagation",
+            "Properties": {
+                "TransitGatewayAttachmentId": {
+                    "Ref": "rAppTransitGatewayAttachement"
+                },
+                "TransitGatewayRouteTableId": {
+                    "Fn::ImportValue": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                {
+                                    "Ref": "pTransitGatewayStackName"
+                                },
+                                "-SccaMainTgwRouteTableId"
+                            ]
+                        ]
+                    }
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rTransitGatewayRouteTablePropagation"
+            }
+        },
+        "rAppTransitGatewayRouteApp": {
+            "Type": "AWS::EC2::TransitGatewayRoute",
+            "Properties": {
+                "TransitGatewayRouteTableId": {
+                    "Fn::ImportValue": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                {
+                                    "Ref": "pTransitGatewayStackName"
+                                },
+                                "-SccaMainTgwRouteTableId"
+                            ]
+                        ]
+                    }
+                },
+                "DestinationCidrBlock": {
+                    "Ref": "pAppVpcCidr"
+                },
+                "TransitGatewayAttachmentId": {
+                    "Ref": "rAppTransitGatewayAttachement"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaAppStack/rMainTransitGatewayRouteVdss"
+            }
+        },
+        "rAppDefaultRoute" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rAppTransitGatewayAttachement",
+            "Properties" : {
+              "RouteTableId" : { "Ref" : "rAppMainRouteTable" },
+              "DestinationCidrBlock" : "0.0.0.0/0",
+              "TransitGatewayId": {
+               "Fn::ImportValue": {
+                   "Fn::Join": [
+                     "",
+                     [
+                         {
+                             "Ref": "pTransitGatewayStackName"
+                         },
+                         "-SccaTgwId"
+                     ]
+                   ]
+                 }
+             }
+         }
+        }
+    }, 
+    "Outputs": {
+        "StackName": {
+            "Value": {
+                "Ref": "AWS::StackName"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-StackName"
+                        ]
+                    ]
+                }
+            }
+        },
+        "AppSubnetPeerIpRange": {
+            "Value": {
+                "Fn::Select": [
+                    4,
+                    {
+                        "Fn::Cidr": [
+                            {
+                                "Ref": "pAppVpcCidr"
+                            },
+                            16,
+                            "8"
+                        ]
+                    }
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-PeerSubnetIpRange"
+                        ]
+                    ]
+                }
+            }
+        },
+        "AppSubnetAIpRange": {
+            "Value": {
+                "Fn::Select": [
+                    0,
+                    {
+                        "Fn::Cidr": [
+                            {
+                                "Ref": "pAppVpcCidr"
+                            },
+                            16,
+                            "8"
+                        ]
+                    }
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-AppSubnetAIpRange"
+                        ]
+                    ]
+                }
+            }
+        },
+        "AppSubnetBIpRange": {
+            "Value": {
+                "Fn::Select": [
+                    2,
+                    {
+                        "Fn::Cidr": [
+                            {
+                                "Ref": "pAppVpcCidr"
+                            },
+                            16,
+                            "8"
+                        ]
+                    }
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-AppSubnetBIpRange"
+                        ]
+                    ]
+                }
+            }
+        },
+        "AppVpcId": {
+            "Value": {
+                "Ref": "rAppVpc"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-AppVpcId"
+                        ]
+                    ]
+                }
+            }
+        },
+        "AppSubnetPeertId": {
+            "Value": {
+                "Ref": "rAppSubnetPeer"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-AppSubnetPeerID"
+                        ]
+                    ]
+                }
+            }
+        },
+        "AppSubneAtId": {
+            "Value": {
+                "Ref": "rAppSubnetA"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-AppSubnetAID"
+                        ]
+                    ]
+                }
+            }
+        },
+        "AppSubneBtId": {
+            "Value": {
+                "Ref": "rAppSubnetB"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-AppSubnetBId"
+                        ]
+                    ]
+                }
+            }
+        },
+        "AppMainRouteTable": {
+            "Value": {
+                "Ref": "rAppMainRouteTable"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-AppMainRouteTable"
+                        ]
+                    ]
+                }
+            }
+        }
+    }
+}

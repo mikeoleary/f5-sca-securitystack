@@ -50,6 +50,24 @@
       "MaxLength": 18,
       "MinLength": 9
     },
+    "pAppVpcCidr": {
+        "Type": "String",
+        "Default": "10.1.0.0/16",
+        "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+        "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+        "Description": "CIDR Block for the app VPC",
+        "MaxLength": 18,
+        "MinLength": 9
+    },
+    "pFargateVpcCidr": {
+        "Type": "String",
+        "Default": "10.2.0.0/16",
+        "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+        "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+        "Description": "CIDR Block for the app VPC",
+        "MaxLength": 18,
+        "MinLength": 9
+    },
     "licenseKey1": {
       "AllowedPattern": "([\\x41-\\x5A][\\x41-\\x5A|\\x30-\\x39]{4})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{7})",
       "ConstraintDescription": "Verify your F5 BYOL regkey.",
@@ -131,6 +149,7 @@
     },
     "VdssStack": {
       "Type": "AWS::CloudFormation::Stack",
+      "DependsOn" : "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -170,8 +189,93 @@
         "aws:cdk:path": "sccaMainStack/VdssStack"
       }
     },
+    "AppVpcStack": {
+        "Type": "AWS::CloudFormation::Stack",
+        "DependsOn" : "TransitGatewayStack",
+        "Properties": {
+          "TemplateURL": {
+            "Fn::Sub": [
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-app-vpc.json",
+              {
+                "S3Region": {
+                  "Fn::If": [
+                    "GovCloud",
+                    "s3-us-gov-west-1",
+                    "s3"
+                  ]
+                }
+              }
+            ]
+          },
+          "Parameters": {
+            "pTransitGatewayStackName": {
+              "Fn::GetAtt": [
+                "TransitGatewayStack",
+                "Outputs.StackName"
+              ]
+            },
+            "pAppVpcCidr": {
+              "Ref": "pAppVpcCidr"
+            }
+          },
+          "Tags": [
+            {
+              "Key": "Project",
+              "Value": {
+                "Ref": "pProject"
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaMainStack/AppVPCStack"
+        }
+    },
+    "FargateVpcStack": {
+        "Type": "AWS::CloudFormation::Stack",
+        "DependsOn" : "TransitGatewayStack",
+        "Properties": {
+          "TemplateURL": {
+            "Fn::Sub": [
+              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-fargate-vpc.json",
+              {
+                "S3Region": {
+                  "Fn::If": [
+                    "GovCloud",
+                    "s3-us-gov-west-1",
+                    "s3"
+                  ]
+                }
+              }
+            ]
+          },
+          "Parameters": {
+            "pTransitGatewayStackName": {
+              "Fn::GetAtt": [
+                "TransitGatewayStack",
+                "Outputs.StackName"
+              ]
+            },
+            "pFargateVpcCidr": {
+              "Ref": "pFargateVpcCidr"
+            }
+          },
+          "Tags": [
+            {
+              "Key": "Project",
+              "Value": {
+                "Ref": "pProject"
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaMainStack/FargateVPCStack"
+        }
+    },
     "JumpHostStack": {
       "Type": "AWS::CloudFormation::Stack",
+      "DependsOn" : "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -214,6 +318,7 @@
     },
     "F5BIGIP1": {
       "Type": "AWS::CloudFormation::Stack",
+      "DependsOn" : "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -287,6 +392,7 @@
     },
     "F5BIGIP2": {
       "Type": "AWS::CloudFormation::Stack",
+      "DependsOn" : "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -360,6 +466,7 @@
     },
     "IPSStack": {
       "Type": "AWS::CloudFormation::Stack",
+      "DependsOn" : "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
