@@ -1771,7 +1771,7 @@
                   "mode": "000755",
                   "owner": "root",
                   "content": { 
-                    "Fn::if": [
+                    "Fn::If": [
                         "Tier1",
                     {"Fn::Join": [  
                      "", 
