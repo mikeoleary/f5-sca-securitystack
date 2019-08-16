@@ -600,6 +600,13 @@
         ]
     ]
     },
+    "ptp_app_node": {
+        "Fn::If": [
+            "Tier1",
+            { "Fn::Ref": "pVirtualPrivateIP" },
+            { "Fn::Ref": "pAppPrivateIP" }
+        ]
+    },
      "allowUsageAnalytics": {
       "AllowedValues": [
        "Yes",
@@ -1595,7 +1602,7 @@
             }
         },
         "mgmt-baseline": {
-            "Fn::Transform" :{
+            "Fn::Transform" : {
                 "Name": "AWS::Include",
                 "Parameters": {
                     "Location": { "Fn::Ref": "pMgmtUrl"},
@@ -1604,18 +1611,13 @@
                 }
             }
         },
-        "app1-baseline" :{
-            "Fn::Transform" :{
+        "app1-baseline" : {
+            "Fn::Transform" : {
                 "Name": "AWS::Include",
                 "Parameters": {
                     "Location": { "Fn::Ref": "pAppUrl" },
                     "tp_vip": { "Fn::Ref": "Bigip1VipPrivateIp" },
-                    "tp_node": { "Fn::If": [
-                        "Tier1",
-                        {"Fn::Ref": "pVirtualPrivateIP" },
-                        {"Fn::Ref": "pAppPrivateIP" }
-                    ]
-                    },
+                    "tp_node": { "Fn::Ref": "ptp_app_node" },
                     "tp_Tier1" : "pTier"
                 }
             }
