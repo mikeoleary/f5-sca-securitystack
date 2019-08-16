@@ -454,6 +454,12 @@
                 }
               }
             ]
+          },
+          "pTier3VipAddress": {
+            "Fn::GetAtt": [
+              "F5BIGIP2",
+              "Outputs.Bigip1VipPrivateIp"
+            ]
           }
         },
         "Tags": [

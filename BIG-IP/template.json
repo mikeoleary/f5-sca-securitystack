@@ -194,7 +194,8 @@
         },
         "Parameters": [
          "declarationUrl",
-         "declarationUrlrouting"
+         "declarationUrlrouting",
+         "pTier3VipAddress"
         ]
        }
       ],
@@ -271,6 +272,9 @@
        },
        "timezone": {
         "default": "Timezone (Olson)"
+       },
+       "pTier3VipAddress" : {
+           "default": " address of tier3 virtual for application"
        }
       }
      },
@@ -480,47 +484,7 @@
          }
         ]
        ]
-      },
-      "pMgmtUrl": {
-        "Fn::Join": [
-            "",
-            [
-            "s3://",
-            {
-                "Ref": "S3Bucket"
-            },
-            "/BIG-IP/tmsh/",
-            {
-                "Fn::If":
-                [
-                    "Tier1",
-                    "tier1",
-                    "tier3"
-                ]
-            },"mgmt.json"
-            ]
-        ]
-    },
-    "pAppUrl": {
-    "Fn::Join": [
-        "",
-        [
-        "s3://",
-        {
-            "Ref": "S3Bucket"
-        },
-        "/BIG-IP/tmsh/",
-        "combined.json"
-        ]
-    ]
-    },
-    "ptp_app_node": {
-        "Fn::If": [
-            "Tier1",
-            { "Fn::Ref": "pVirtualPrivateIP" },
-            { "Fn::Ref": "pAppPrivateIP" }
-        ]
-    }
+      }
      },
      "Bigip2subnet1Az1Interface": {
       "Description": "External interface Id on BIG-IP",
@@ -1797,7 +1761,7 @@
                         "'\n",
                         "node1='",
                         {
-                        "Ref": "pVirtualPrivateIP"
+                        "Ref": "pTier3VipAddress"
                         },
                         "'\n",
                         "\n",
