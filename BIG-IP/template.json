@@ -567,6 +567,39 @@
       "MinLength": "1",
       "Type": "String"
        },
+    "pMgmtUrl": {
+        "Fn::Join": [
+            "",
+            [
+            "s3://",
+            {
+                "Ref": "S3Bucket"
+            },
+            "/BIG-IP/tmsh/",
+            {
+                "Fn::If":
+                [
+                    "Tier1",
+                    "tier1",
+                    "tier3"
+                ]
+            },"mgmt.json"
+            ]
+        ]
+    },
+    "pAppUrl": {
+    "Fn::Join": [
+        "",
+        [
+        "s3://",
+        {
+            "Ref": "S3Bucket"
+        },
+        "/BIG-IP/tmsh/",
+        "combined.json"
+        ]
+    ]
+    },
      "allowUsageAnalytics": {
       "AllowedValues": [
        "Yes",
@@ -1565,26 +1598,7 @@
             "Fn::Transform" :{
                 "Name": "AWS::Include",
                 "Parameters": {
-                    "Location": {
-                        "Fn::Join": [
-                            "",
-                            [
-                            "s3://",
-                            {
-                                "Ref": "S3Bucket"
-                            },
-                            "/BIG-IP/tmsh/",
-                            {
-                                "Fn::If":
-                                [
-                                    "Tier1",
-                                    "tier1",
-                                    "tier3"
-                                ]
-                            },"mgmt.json"
-                            ]
-                        ]
-                    },
+                    "Location": { "Fn::Ref": "pMgmtUrl"},
                     "tp_vip": { "Fn::Ref": "Bigip1VipPrivateIp" },
                     "tp_node": { "Fn::Ref": "pJumpHostPrivateIP" }
                 }
@@ -1594,19 +1608,7 @@
             "Fn::Transform" :{
                 "Name": "AWS::Include",
                 "Parameters": {
-                    "Location": {
-                        "Fn::Join": [
-                            "",
-                            [
-                            "s3://",
-                            {
-                                "Ref": "S3Bucket"
-                            },
-                            "/BIG-IP/tmsh/",
-                            "combined.json"
-                            ]
-                        ]
-                    },
+                    "Location": { "Fn::Ref": "pAppUrl" },
                     "tp_vip": { "Fn::Ref": "Bigip1VipPrivateIp" },
                     "tp_node": { "Fn::If": [
                         "Tier1",
