@@ -144,7 +144,8 @@
          "pJumpHostPrivateIP",
          "pTier",
          "numberOfAdditionalNics",
-         "additionalNicLocation"
+         "additionalNicLocation",
+         "pTier3VipAddress"
         ]
        },
        {
@@ -194,8 +195,7 @@
         },
         "Parameters": [
          "declarationUrl",
-         "declarationUrlrouting",
-         "pTier3VipAddress"
+         "declarationUrlrouting"
         ]
        }
       ],
@@ -272,9 +272,6 @@
        },
        "timezone": {
         "default": "Timezone (Olson)"
-       },
-       "pTier3VipAddress" : {
-           "default": " address of tier3 virtual for application"
        }
       }
      },
