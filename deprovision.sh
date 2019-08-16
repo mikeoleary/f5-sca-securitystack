@@ -1,3 +1,4 @@
+if [ -f "./load-keys.sh" ]; then source "./load-keys.sh"; fi
 if [ -z ${stackName} ]; then echo "stackName is unset" && exit 1; fi
 
 # delete S3 bucket content for BIG-IP clusters
