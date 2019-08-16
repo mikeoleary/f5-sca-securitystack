@@ -1555,6 +1555,62 @@
                     }
                 }   
             }
+        },
+        "mgmt-baseline": {
+            "Fn::Transform" :{
+                "Name": "AWS::Include",
+                "Parameters": {
+                    "Location": {
+                        "Fn::Join": [
+                            "",
+                            [
+                            "s3://",
+                            {
+                                "Ref": "S3Bucket"
+                            },
+                            "/BIG-IP/tmsh/",
+                            {
+                                "Fn::If":
+                                [
+                                    "Tier1",
+                                    "tier1",
+                                    "tier3"
+                                ]
+                            },"mgmt.json"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "app1-baseline-tier1" :{
+            "Fn::Transform" :{
+                "Name": "AWS::Include",
+                "Parameters": {
+                    "Location": {
+                        "Fn::Join": [
+                            "",
+                            [
+                            "s3://",
+                            {
+                                "Ref": "S3Bucket"
+                            },
+                            "/BIG-IP/tmsh/",
+                            {
+                                "Fn::If":
+                                [
+                                    "Tier1",
+                                    "tier1",
+                                    "tier3"
+                                ]
+                            },
+                            "app",
+                            "app.json"
+                            ]
+                        ]
+                    }
+                }
+            }
         }
        }
       },
