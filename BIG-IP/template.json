@@ -144,8 +144,7 @@
          "pJumpHostPrivateIP",
          "pTier",
          "numberOfAdditionalNics",
-         "additionalNicLocation",
-         "pTier3VipAddress"
+         "additionalNicLocation"
         ]
        },
        {
@@ -1758,7 +1757,7 @@
                         "'\n",
                         "node1='",
                         {
-                        "Ref": "pTier3VipAddress"
+                        "Ref": "pVirtualPrivateIP"
                         },
                         "'\n",
                         "\n",
