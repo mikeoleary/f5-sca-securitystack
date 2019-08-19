@@ -1,13 +1,13 @@
 #!/usr/bin/bash
 # partition
-partition="app1"
-appName="app1"
+partition="app2"
+appName="app2"
 # nodes
 node1="5.6.7.9"
 # virtual addresss
 virtualAddress="9.10.11.12"
 # afm policy
-afmPolicy="app1"
+afmPolicy="app2"
 # partition
 echo  -e 'create cli transaction;
 create auth partition '${partition}' { };
@@ -36,7 +36,7 @@ submit cli transaction' | tmsh -q
 
 # add afm and logging
 echo  -e 'create cli transaction;
-modify ltm virtual /'${partition}'/'${afmPolicy}'_https fw-enforced-policy '${partition}'/'${afmPolicy}' security-log-profiles add { '${partition}'/'${afmPolicy}'_afm };
+modify ltm virtual /'${partition}'/'${afmPolicy}'_https fw-enforced-policy /'${partition}'/'${afmPolicy}' security-log-profiles add { /'${partition}'/'${afmPolicy}'_afm };
 submit cli transaction' | tmsh -q
 
 # save config

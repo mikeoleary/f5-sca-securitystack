@@ -94,7 +94,7 @@
                     "\n",
                     "# add afm and logging\n",
                     "echo  -e 'create cli transaction;\n",
-                    "modify ltm virtual /'${partition}'/'${afmPolicy}'_https fw-enforced-policy '${partition}'/'${afmPolicy}' security-log-profiles add { '${partition}'/'${afmPolicy}'_afm };\n",
+                    "modify ltm virtual /'${partition}'/'${afmPolicy}'_https fw-enforced-policy /'${partition}'/'${afmPolicy}' security-log-profiles add { /'${partition}'/'${afmPolicy}'_afm };\n",
                     "submit cli transaction' | tmsh -q\n",
                     "\n",
                     "# save config\n",
