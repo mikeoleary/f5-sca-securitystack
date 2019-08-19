@@ -44,7 +44,15 @@
                     "\n",
                     "virtualAddress='",
                     {
-                        "Ref": "Bigip1VipPrivateIp"
+                    "Fn::Select": [
+                        "0",
+                        {
+                            "Fn::GetAtt": [
+                            "Bigip1subnet1Az1Interface",
+                            "SecondaryPrivateIpAddresses"
+                            ]
+                        }
+                        ]
                     },
                     "'\n",
                     "virtualAddress2='",
@@ -110,7 +118,15 @@
                         "\n",
                         "virtualAddress='",
                         {
-                            "Ref": "Bigip1VipPrivateIp"
+                        "Fn::Select": [
+                            "0",
+                            {
+                             "Fn::GetAtt": [
+                              "Bigip1subnet1Az1Interface",
+                              "SecondaryPrivateIpAddresses"
+                             ]
+                            }
+                           ]
                         },
                         "'\n",
                         "virtualAddress2='",
