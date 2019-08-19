@@ -1739,6 +1739,8 @@
                         "#!/bin/bash\n",
                         "partition=\"app1\"",
                         "\n",
+                        "appName=\"app1\"",
+                        "\n",
                         "virtualAddress='",
                         {
                         "Fn::Select": [
@@ -1812,6 +1814,8 @@
                         [
                         "#!/bin/bash\n",
                             "partition=\"app1\"",
+                            "\n",
+                            "appName=\"app1\"",
                             "\n",
                             "virtualAddress='",
                             {
