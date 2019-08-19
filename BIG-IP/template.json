@@ -1741,10 +1741,7 @@
                         "\n",
                         "virtualAddress='",
                         {
-                        "Fn::GetAtt": [
-                        "Bigip1subnet1Az1Interface",
-                        "PrimaryPrivateIpAddress"
-                        ]
+                            "Ref": "Bigip1VipPrivateIp"
                         },
                         "'\n",
                         "virtualAddress2='",
@@ -1810,10 +1807,7 @@
                             "\n",
                             "virtualAddress='",
                             {
-                            "Fn::GetAtt": [
-                            "Bigip1subnet1Az1Interface",
-                            "PrimaryPrivateIpAddress"
-                            ]
+                                "Ref": "Bigip1VipPrivateIp"
                             },
                             "'\n",
                             "virtualAddress2='",
