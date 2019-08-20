@@ -1633,6 +1633,7 @@
                           "create ltm virtual /'${partition}'/bigip1_mgmt_https {  description jumphost_mgmt_https destination /'${partition}'/'${virtualAddress}':https ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_https_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
                           "create ltm pool /'${partition}'/jumphost_ssh_pool { members replace-all-with { /'${partition}'/'${node1}':ssh { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open }};\n",
                           "create ltm virtual /'${partition}'/jumphost_mgmt_ssh {  description jumphost_mgmt_ssh destination /'${partition}'/'${virtualAddress}':ssh ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_ssh_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
+                          "modify security ip-intelligence global-policy ip-intelligence-policy ip-intelligence;\n",
                           "submit cli transaction' | tmsh -q\n",
                           "\n",
                           "### END DEPLOYMENT OF FILE CREATION FOR MGMT ACCESS"
