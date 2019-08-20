@@ -36,7 +36,8 @@ submit cli transaction' | tmsh -q
 
 # add afm and logging
 echo  -e 'create cli transaction;
-modify ltm virtual /'${partition}'/'${afmPolicy}'_https fw-enforced-policy /'${partition}'/'${afmPolicy}' security-log-profiles add { /'${partition}'/'${afmPolicy}'_afm };
+modify ltm virtual /'${partition}'/'${afmPolicy}'_https fw-enforced-policy /'${partition}'/'${afmPolicy}' security-log-profiles add { /'${partition}'/'${afmPolicy}'_afm } ip-intelligence-policy ip-intelligence;
+modify ltm virtual /'${partition}'/'${afmPolicy}'_http ip-intelligence-policy ip-intelligence;
 submit cli transaction' | tmsh -q
 
 # save config
