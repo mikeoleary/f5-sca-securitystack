@@ -236,6 +236,21 @@
                 "aws:cdk:path": "SccaVdssStack/rVdssInternalRouteTable"
             }
         },
+        "rVdssInternalRouteTableNatGwRoute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "rVdssInternalRouteTable"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "NatGatewayId": {
+                    "Ref": "rNatGateway"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaVdssStack/rVdssDmz1RouteTableNatGwRoute"
+            }
+        },
         "rVdssDmz1Subnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
