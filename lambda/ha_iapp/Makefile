@@ -2,9 +2,8 @@
 
 default: test
 
-install: 
+install:
 	pipenv install --dev --skip-lock
 
 test:
 	PYTHONPATH=./src pytest
-
