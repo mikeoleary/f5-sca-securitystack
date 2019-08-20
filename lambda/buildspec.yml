@@ -8,4 +8,4 @@ phases:
     commands:
        - cd lambda/ha_iapp
        - make install 
-       - make test
+       - pipenv run make test
