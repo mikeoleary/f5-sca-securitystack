@@ -3,18 +3,17 @@ import ipaddress
 def validate(*expected_args):
     def decorator(f):
         def wrapper(*args, **kwargs):
-            i = 0
-            for arg in args:
-                if expected_args[i] == str:
-                    validate_string(arg, 'String')
-                elif expected_args[i] == 'ip':
-                    validate_ipaddress(arg, 'IP Address')
-                elif expected_args[i] == 'bigip':
-                    validate_bigip(arg, 'BIG-IP')
+            zipped = zip(expected_args[0].items(), args)
+            for (name, arg_type), arg in zipped:
+                if arg_type == 'str':
+                    validate_string(arg, name)
+                elif arg_type == 'ip':
+                    validate_ipaddress(arg, name)
+                elif arg_type == 'bigip':
+                    validate_bigip(arg, name)
                 else:
-                    raise AttributeError(f'unsupported attribute type')
-                i += 1
-            return f(*args, **kwargs)
+                    raise AttributeError(f'unsupported attribute type') 
+            f(*args, **kwargs)          
         return wrapper
     return decorator
 
@@ -43,28 +42,3 @@ def validate_bigip(bigip, name='BIG-IP', msg=''):
         bigip.raw()
     except:
         raise AttributeError(msg)
-
-
-# def valid_bigip(f):
-#     def wrapper(*args, **kwargs):
-#         try:
-#             list(args)[0].raw()
-#         except:
-#             raise AttributeError(f'a valid BIG-IP ManagementRoot object is required')
-
-#         return f(*args, **kwargs)
-#     return wrapper
-
-# def valid_ip(f):
-#     pass
-
-# def valid_string(attr_name, location, msg, empty_allowed=False):
-#     def decorator(f):
-#         def wrapper(*args, **kwargs):
-#             for arg in args:
-#                 print(f'TEST: {arg}')
-#                 if not arg:
-#                     raise AttributeError(f'a valid {msg} is required')
-#             return f(*args, **kwargs)
-#         return wrapper
-#     return decorator

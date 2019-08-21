@@ -1,24 +1,22 @@
 from f5.bigip import ManagementRoot
 from functools import wraps
 from . import validate 
-import ipaddress
 
-# @valid_string("ip", 0, "IP address")
-@validate({'ip': 'ip', 'user': str, 'pwd': str})
+@validate({'ip': 'ip', 'user': 'str', 'pwd': 'str'})
 def client(ip='', user='admin', pwd=''):
     """
     create a BIG-IP client to run commands against
     """
     return ManagementRoot(ip, user, pwd)
 
-@validate({'bigip': 'bigip', 'tmsh_cmd': str})
+@validate({'bigip': 'bigip', 'tmsh_cmd': 'str'})
 def run_tmsh_cmd(bigip='', tmsh_cmd=''):
     """
     Run a TMSH command against the provided bigip object
     """
     return bigip.tm.sys.config.exec_cmd(tmsh_cmd)
 
-@validate({'bigip': 'bigip', 'bash_cmd': str})
+@validate({'bigip': 'bigip', 'bash_cmd': 'str'})
 def run_bash_cmd(bigip='', bash_cmd=''):
     """
     Run a Bash command against the provided bigip object
@@ -26,7 +24,7 @@ def run_bash_cmd(bigip='', bash_cmd=''):
     pass
     
 
-@validate({'bigip': 'bigip', 'iapp_name': str, 'route_table_id': str, 'interface': str})
+@validate({'bigip': 'bigip', 'iapp_name': 'str', 'route_table_id': 'str', 'interface': 'str'})
 def cfg_ha_iapp(bigip='', iapp_name='', route_table_id='', interface=''):
     """
     configure the BIG-IP AWS HA iApp
