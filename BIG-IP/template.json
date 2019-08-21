@@ -1176,6 +1176,10 @@
               "",
               "#!/bin/bash\n",
               "# Generated from 4.2.0\n",
+              "MGMTIP=$(/sbin/ifconfig mgmt | grep 'inet' | cut -d: -f2 | awk '{print $2}')\n",
+              "\n",
+              "/sbin/ip route add 169.254.169.254/32 via $MGMTIP dev mgmt 2>/dev/null\n",
+              "\n",
               "hostname=`curl http://169.254.169.254/latest/meta-data/hostname`\n",
               "region='",
               {
@@ -2599,6 +2603,10 @@
               "",
               "#!/bin/bash\n",
               "# Generated from 4.2.0\n",
+              "MGMTIP=$(/sbin/ifconfig mgmt | grep 'inet' | cut -d: -f2 | awk '{print $2}')\n",
+              "\n",
+              "/sbin/ip route add 169.254.169.254/32 via $MGMTIP dev mgmt 2>/dev/null\n",
+              "\n",
               "hostname=`curl http://169.254.169.254/latest/meta-data/hostname`\n",
               "region='",
               {
