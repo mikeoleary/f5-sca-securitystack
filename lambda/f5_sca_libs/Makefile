@@ -1,4 +1,4 @@
-.PHONY: install test
+.PHONY: install test wheel
 
 default: test
 
@@ -7,3 +7,6 @@ install:
 
 test:
 	PYTHONPATH=./src pytest
+
+wheel:
+	pipenv run python setup.py bdist_wheel
