@@ -6,9 +6,11 @@ verify_ssl = true
 [dev-packages]
 pytest = "*"
 pytest-mock = "*"
+mock = "*"
 
 [packages]
 "boto3" = "*"
+"f5-sdk" = "*"
 
 [requires]
 python_version = "3.7"
