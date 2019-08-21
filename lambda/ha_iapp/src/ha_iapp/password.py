@@ -1,5 +1,7 @@
 import json
+from ha_iapp import validate
 
+@validate({'client': 's3', 'bucket': 'str'})
 def get(client, bucket):
     """
     Get the BIG-IP admin password from the S3 bucket created by the CFT

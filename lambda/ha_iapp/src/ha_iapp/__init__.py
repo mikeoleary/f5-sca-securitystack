@@ -11,9 +11,11 @@ def validate(*expected_args):
                     validate_ipaddress(arg, name)
                 elif arg_type == 'bigip':
                     validate_bigip(arg, name)
+                elif arg_type == 's3':
+                    validate_s3(arg, name)
                 else:
                     raise AttributeError(f'unsupported attribute type') 
-            f(*args, **kwargs)          
+            return f(*args, **kwargs)          
         return wrapper
     return decorator
 
@@ -42,3 +44,13 @@ def validate_bigip(bigip, name='BIG-IP', msg=''):
         bigip.raw()
     except:
         raise AttributeError(msg)
+
+@validate_wrapper
+def validate_s3(s3, name='S3', msg=''):
+    """
+    There is not a boto3 S3 object, so I can't validate it.  For now, make sure
+    it's not empty
+    """
+    # if not s3:
+    #     raise AttributeError(msg)
+    pass

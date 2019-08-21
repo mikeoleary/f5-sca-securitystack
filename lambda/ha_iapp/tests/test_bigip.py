@@ -10,9 +10,9 @@ class MockManagementRoot(ManagementRoot):
         class sys():
             class config():
                 def exec_cmd(cmd):
-                    return '{"result": "true"}'
+                    return '{"result": "True"}'
     def raw():
-        return "{}"
+        return '{"result": "true"}'
 
 @pytest.fixture
 def fakebigip():
@@ -48,8 +48,9 @@ def test_run_tmsh_cmd_without_tmsh_cmd(fakebigip):
         bigip.run_tmsh_cmd(fakebigip, '')
 
 def test_run_tmsh_cmd(fakebigip):
-    bigip.run_tmsh_cmd(fakebigip, 'show /ltm virtual')
+    res = bigip.run_tmsh_cmd(fakebigip, 'show /ltm virtual')
     fakebigip.tm.sys.config.exec_cmd.assert_called_with('show /ltm virtual')
+    assert res == '{"result": "True"}'
 
 # ----------- Run Bash Command ---------------------
 def test_run_bash_cmd_without_bigip():
@@ -82,6 +83,7 @@ def test_cfg_ha_iapp_without_interface(fakebigip):
         bigip.cfg_ha_iapp(fakebigip, 'f5.aws_advanced_ha.v1.4.0rc3', 'r123456789', '')
 
 def test_cfg_ha_iapp(fakebigip):
-    bigip.cfg_ha_iapp(fakebigip, 'f5.aws_advanced_ha.v1.4.0rc3', 'r123456789', '/Common/internal')
+    res = bigip.cfg_ha_iapp(fakebigip, 'f5.aws_advanced_ha.v1.4.0rc3', 'r123456789', '/Common/internal')
     tmsh_cmd = 'create /sys application service aws_HA template f5.aws_advanced_ha.v1.4.0rc3 tables add { subnet_routes__cidr_blocks { column-names { route_table_id dest_cidr_block } rows { { row { "r123456789" "0.0.0.0/0" } } } } } variables add { subnet_routes__route_management { value yes }, subnet_routes__interface { value /Common/internal }  }'
     fakebigip.tm.sys.config.exec_cmd.assert_called_with(tmsh_cmd)
+    assert res == '{"result": "True"}'

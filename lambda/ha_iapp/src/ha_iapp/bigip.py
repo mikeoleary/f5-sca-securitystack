@@ -1,6 +1,6 @@
 from f5.bigip import ManagementRoot
 from functools import wraps
-from . import validate 
+from ha_iapp import validate
 
 @validate({'ip': 'ip', 'user': 'str', 'pwd': 'str'})
 def client(ip='', user='admin', pwd=''):
@@ -14,7 +14,8 @@ def run_tmsh_cmd(bigip='', tmsh_cmd=''):
     """
     Run a TMSH command against the provided bigip object
     """
-    return bigip.tm.sys.config.exec_cmd(tmsh_cmd)
+    res = bigip.tm.sys.config.exec_cmd(tmsh_cmd)
+    return res
 
 @validate({'bigip': 'bigip', 'bash_cmd': 'str'})
 def run_bash_cmd(bigip='', bash_cmd=''):
