@@ -1,6 +1,3 @@
-# security
-bot
- logging profile
 # tls
 cert/key
 profile
