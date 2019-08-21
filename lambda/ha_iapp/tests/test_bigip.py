@@ -73,6 +73,11 @@ def test_run_bash_cmd(fakebigip):
     fakebigip.tm.util.bash.exec_cmd.assert_called_with('run', utilCmdArgs='-c "netstat -rn"')
 
 # ----------- Install HA iApp ---------------------
+def test_install_iapp(fakebigip):
+    url = 'https://raw.githubusercontent.com/F5Networks/f5-aws-cloudformation/v3.1.0/iApps/f5.aws_advanced_ha.v1.4.0rc3.tmpl'
+    res = bigip.install_iapp(fakebigip, url)
+    assert res == True
+
 
 # ----------- CFG HA iApp ---------------------
 def test_cfg_ha_iapp_without_bigip():
@@ -92,7 +97,9 @@ def test_cfg_ha_iapp_without_interface(fakebigip):
         bigip.cfg_ha_iapp(fakebigip, 'f5.aws_advanced_ha.v1.4.0rc3', 'r123456789', '')
 
 def test_cfg_ha_iapp(fakebigip):
-    res = bigip.cfg_ha_iapp(fakebigip, 'f5.aws_advanced_ha.v1.4.0rc3', 'r123456789', '/Common/internal')
-    tmsh_cmd = 'create /sys application service aws_HA template f5.aws_advanced_ha.v1.4.0rc3 tables add { subnet_routes__cidr_blocks { column-names { route_table_id dest_cidr_block } rows { { row { "r123456789" "0.0.0.0/0" } } } } } variables add { subnet_routes__route_management { value yes }, subnet_routes__interface { value /Common/internal }  }'
-    fakebigip.tm.sys.config.exec_cmd.assert_called_with(tmsh_cmd)
-    assert res == '{"result": "True"}'
+    iapp_name = 'f5.aws_advanced_ha.v1.4.0rc3'
+    route_table_id = 'r123456789'
+    interface = '/Common/internal'
+    res = bigip.cfg_ha_iapp(fakebigip, iapp_name, route_table_id, interface)
+    fakebigip.tm.util.bash.exec_cmd.assert_called_with('run', utilCmdArgs='-c "tmsh create /sys application service aws_HA template f5.aws_advanced_ha.v1.4.0rc3 tables add { subnet_routes__cidr_blocks { column-names { route_table_id dest_cidr_block } rows { { row { "r123456789" "0.0.0.0/0" } } } } } variables add { subnet_routes__route_management { value yes }, subnet_routes__interface { value /Common/internal }  }"')
+    assert res == True
