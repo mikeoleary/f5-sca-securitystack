@@ -51,3 +51,38 @@ box1
 [admin@ip-10-0-4-145:Standby:In Sync] ~ # cat /var/log/cloud/aws/install.log | grep Bucket
 2019-08-21T14:42:44.734Z info: [pid: 16786] [scripts/cluster.js] /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/cluster.js called with /usr/bin/f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/cluster.js --wait-for CUSTOM_CONFIG_DONE --signal CLUSTER_DONE -o /var/log/cloud/aws/cluster.log --log-level silly --host localhost --user admin --password-url file:///config/cloud/aws/.adminPassword --password-encrypted --cloud aws --provider-options s3Bucket: mazza-sca-test-f5bigip1-1cfpxm0jqb0j1-s3bucket-hjjo43cvrf9g  --master --config-sync-ip 10.0.1.94 --create-group --device-group same_az_failover_group --sync-type sync-failover --network-failover --device ip-10-0-4-145.ec2.internal --auto-sync
 box2
+
+
+# tests
+curl -v http://169.254.169.254/latest/meta-data/hostname
+
+cat /var/log/cloud/aws/install.log
+
+
+
+# bot def
+
+#!/bin/bash
+partition="app1"
+appName="app1"
+virtualAddress='10.0.2.59'
+virtualAddress2='10.0.2.247'
+node1='10.0.4.11'
+
+asmPolicy="app1"
+asmFile="/config/owasp-auto-tune.xml"
+# create BotDef and logging profile
+echo  -e 'create cli transaction;
+create security log profile /'${partition}'/'${appName}'_sec_log application replace-all-with { /'${partition}'/'${appName}' { filter replace-all-with { log-challenge-failure-requests { values replace-all-with { enabled } } request-type { values replace-all-with { all } } } response-logging illegal } } bot-defense replace-all-with { /'${partition}'/'${appName}' { filter { log-alarm enabled log-block enabled log-browser enabled log-browser-verification-action enabled log-captcha enabled log-challenge-failure-request enabled log-device-id-collection-request enabled log-honey-pot-page enabled log-malicious-bot enabled log-mobile-application enabled log-none enabled log-rate-limit enabled log-redirect-to-pool enabled log-suspicious-browser enabled log-tcp-reset enabled log-trusted-bot enabled log-unknown enabled log-untrusted-bot enabled } local-publisher /Common/local-db-publisher } };
+create security bot-defense profile /'${partition}'/'${appName}'_bot { allow-browser-access enabled api-access-strict-mitigation enabled app-service none blocking-page {  type default } browser-mitigation-action block captcha-response { failure {  type default } first { type default } } cross-domain-requests allow-all description none deviceid-mode generate-after-access  dos-attack-strict-mitigation enabled enforcement-mode transparent enforcement-readiness-period 7 grace-period 300 honeypot-page {  type default } mobile-detection { allow-android-rooted-device disabled allow-any-android-package enabled allow-any-ios-package enabled allow-emulators disabled allow-jailbroken-devices disabled block-debugger-enabled-device enabled client-side-challenge-mode pass } perform-challenge-in-transparent disabled redirect-to-pool-name none signature-staging-upon-update disabled single-page-application disabled template relaxed whitelist replace-all-with { apple_touch_1 { match-order 2 url /apple-touch-icon*.png } favicon_1 { match-order 1 url /favicon.ico } } };
+submit cli transaction' | tmsh -q
+
+# add asm bot and logging
+echo  -e 'create cli transaction;
+modify ltm virtual /'${partition}'/'${appName}'_https profiles add { /'${partition}'/'${appName}'_bot } policies add { /'${partition}'/'${appName}'_asm_policy_https} security-log-profiles replace-all-with { /'${partition}'/'${appName}'_sec_log };
+submit cli transaction' | tmsh -q
+
+
+echo  -e 'create cli transaction;
+create security log profile /'${partition}'/'${appName}'_sec_log application replace-all-with { /'${partition}'/'${appName}' { filter replace-all-with { log-challenge-failure-requests { values replace-all-with { enabled } } request-type { values replace-all-with { all } } } response-logging illegal } } bot-defense replace-all-with { /'${partition}'/'${appName}' { filter { log-alarm enabled log-block enabled log-browser enabled log-browser-verification-action enabled log-captcha enabled log-challenge-failure-request enabled log-device-id-collection-request enabled log-honey-pot-page enabled log-malicious-bot enabled log-mobile-application enabled log-none enabled log-rate-limit enabled log-redirect-to-pool enabled log-suspicious-browser enabled log-tcp-reset enabled log-trusted-bot enabled log-unknown enabled log-untrusted-bot enabled } local-publisher /Common/local-db-publisher } };
+submit cli transaction' | tmsh -q
