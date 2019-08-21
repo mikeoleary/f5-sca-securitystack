@@ -9,3 +9,4 @@ phases:
        - cd lambda/f5_sca_libs
        - make install 
        - pipenv run make test
+       - make wheel
