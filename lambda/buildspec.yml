@@ -10,3 +10,6 @@ phases:
        - make install 
        - pipenv run make test
        - make wheel
+artifacts:
+  files:
+    - lambda/f5_sca_libs/dist/f5_sca_libs-1.0.0-py3-none-any.whl
