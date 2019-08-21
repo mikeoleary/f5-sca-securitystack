@@ -2,7 +2,7 @@ import tempfile
 import pytest
 import boto3
 from botocore.stub import Stubber
-from ha_iapp import password
+from f5_sca_libs import password
 
 @pytest.fixture
 def infile():

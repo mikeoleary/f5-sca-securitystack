@@ -1,5 +1,5 @@
 import json
-from ha_iapp import validate
+from f5_sca_libs import validate
 
 @validate({'client': 's3', 'bucket': 'str'})
 def get(client, bucket):

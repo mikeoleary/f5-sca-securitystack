@@ -1,4 +1,4 @@
-ha_iapp
+f5_sca_libs
 =======
 
 Lambda function to install and configure the F5 BIG-IP AWS HA iApp for a BIG-IP devices service cluster.

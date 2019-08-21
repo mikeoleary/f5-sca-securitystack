@@ -6,6 +6,6 @@ phases:
       python: 3.7
   build:
     commands:
-       - cd lambda/ha_iapp
+       - cd lambda/f5_sca_libs
        - make install 
        - pipenv run make test

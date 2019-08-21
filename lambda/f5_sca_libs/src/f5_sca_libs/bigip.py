@@ -1,6 +1,6 @@
 from f5.bigip import ManagementRoot
 from functools import wraps
-from ha_iapp import validate
+from f5_sca_libs import validate
 
 @validate({'ip': 'ip', 'user': 'str', 'pwd': 'str'})
 def client(ip='', user='admin', pwd=''):

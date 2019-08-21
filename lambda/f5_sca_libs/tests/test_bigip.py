@@ -1,6 +1,6 @@
 import pytest
 import mock
-from ha_iapp import bigip
+from f5_sca_libs import bigip
 from f5.bigip import ManagementRoot
 from icontrol.session import iControlRESTSession
 
@@ -28,7 +28,7 @@ def fakebigip():
 
 # ----------- BIG-IP Client ---------------------
 def test_client(mocker):
-    mocker.patch('ha_iapp.bigip.ManagementRoot')
+    mocker.patch('f5_sca_libs.bigip.ManagementRoot')
     # create a big-ip client
     client = bigip.client('192.168.100.100', 'admin', 'admin123')
     bigip.ManagementRoot.assert_called_with('192.168.100.100', 'admin', 'admin123')

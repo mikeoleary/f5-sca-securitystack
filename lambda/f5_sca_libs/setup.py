@@ -4,7 +4,7 @@ with open ('README.rst', encoding='UTF-8') as f:
     readme = f.read()
 
 setup(
-    name = 'ha_iapp',
+    name = 'f5_sca_libs',
     version = '1.0.0',
     description = 'Deploy and configure the F5 BIG-IP AWS HA iApp',
     long_description = readme,
