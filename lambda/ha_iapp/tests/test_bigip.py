@@ -11,8 +11,15 @@ class MockManagementRoot(ManagementRoot):
             class config():
                 def exec_cmd(cmd):
                     return '{"result": "True"}'
+        class util():
+            class bash():
+                def exec_cmd(action, utilCmdArgs):
+                    class output:
+                        commandResult = '{"result": True")'
+                    result = output()
+                    return result
     def raw():
-        return '{"result": "true"}'
+        return '{"result": "True"}'
 
 @pytest.fixture
 def fakebigip():
@@ -57,11 +64,13 @@ def test_run_bash_cmd_without_bigip():
     with pytest.raises(AttributeError):
         bigip.run_bash_cmd('bigip', 'echo')
 
-def test_run_bash_cmd_without_bash_cmd():
-    pass
+def test_run_bash_cmd_without_bash_cmd(fakebigip):
+    with pytest.raises(AttributeError):
+        bigip.run_bash_cmd(fakebigip, '')
 
-def test_run_bash_cmd():
-    pass
+def test_run_bash_cmd(fakebigip):
+    res = bigip.run_bash_cmd(fakebigip, 'netstat -rn')
+    fakebigip.tm.util.bash.exec_cmd.assert_called_with('run', utilCmdArgs='-c "netstat -rn"')
 
 # ----------- Install HA iApp ---------------------
 

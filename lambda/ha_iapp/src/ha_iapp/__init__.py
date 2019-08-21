@@ -41,7 +41,7 @@ def validate_ipaddress(ip, name='ip address', msg=''):
 @validate_wrapper   
 def validate_bigip(bigip, name='BIG-IP', msg=''):
     try:
-        bigip.raw()
+        bigip.raw
     except:
         raise AttributeError(msg)
 

@@ -14,15 +14,15 @@ def run_tmsh_cmd(bigip='', tmsh_cmd=''):
     """
     Run a TMSH command against the provided bigip object
     """
-    res = bigip.tm.sys.config.exec_cmd(tmsh_cmd)
-    return res
+    return  bigip.tm.sys.config.exec_cmd(tmsh_cmd)
 
 @validate({'bigip': 'bigip', 'bash_cmd': 'str'})
 def run_bash_cmd(bigip='', bash_cmd=''):
     """
     Run a Bash command against the provided bigip object
     """
-    pass
+    res = bigip.tm.util.bash.exec_cmd('run', utilCmdArgs=f'-c "{bash_cmd}"')
+    return res.commandResult
     
 
 @validate({'bigip': 'bigip', 'iapp_name': 'str', 'route_table_id': 'str', 'interface': 'str'})
