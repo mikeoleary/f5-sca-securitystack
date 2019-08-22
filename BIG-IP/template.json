@@ -1742,9 +1742,9 @@
                      "", 
                      [ 
                         "#!/bin/bash\n",
-                        "partition=\"app1\"",
+                        "partition=\"app1\"\n",
                         "\n",
-                        "appName=\"app1\"",
+                        "appName=\"app1\"\n",
                         "# tag\n",
                         "tagKey=\"Tier2Vip\"\n", 
                         "tagValue=\"app1\"\n",
@@ -1826,9 +1826,9 @@
                         "",
                         [
                         "#!/bin/bash\n",
-                            "partition=\"app1\"",
+                            "partition=\"app1\"\n",
                             "\n",
-                            "appName=\"app1\"",
+                            "appName=\"app1\"\n",
                             "# tag\n",
                             "tagKey=\"APPNAME\"\n", 
                             "tagValue=\"LINUXSERVER\"\n",
