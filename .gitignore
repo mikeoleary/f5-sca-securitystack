@@ -6,3 +6,6 @@ lambda/f5_sca_libs/build
 lambda/f5_sca_libs/dist
 lambda/f5_sca_libs/src/*.egg-info
 lambda/ha_iapp/ha_iapp.zip
+lambda/ha_iapp/bin
+lambda/ha_iapp/certifi*
+lambda/ha_iapp/
