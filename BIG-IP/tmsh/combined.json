@@ -44,8 +44,8 @@
                     "\n",
                     "appName=\"app1\"",
                     "# tag\n",
-                    "tagKey=\"APPNAME\"\n", 
-                    "tagValue=\"LINUXSERVER\"\n",
+                    "tagKey=\"Tier2Vip\"\n", 
+                    "tagValue=\"app1\"\n",
                     "\n",
                     "virtualAddress='",
                     {
@@ -125,10 +125,9 @@
                     [
                     "#!/bin/bash\n",
                         "partition=\"app1\"",
-                        "\n",
-                        "appName=\"app1\"",
                         "# tag\n",
-                        "appTag=\"AppName\"\n",
+                        "tagKey=\"APPNAME\"\n", 
+                        "tagValue=\"LINUXSERVER\"\n",
                         "\n",
                         "virtualAddress='",
                         {
