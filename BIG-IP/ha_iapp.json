@@ -1,0 +1,178 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "pVpcStackName": {
+            "Type": "String",
+            "Default": "SCCA-Demo",
+            "Description": "VPC Stack used for referencing exported resources"
+        },
+        "pBigIPTier1Mgmt": {
+            "Type": "String",
+            "Default": "",
+            "Description": "BIGIP Management IP address for Tier1"
+        },
+        "pBigIPTier2Mgmt": {
+            "Type": "String",
+            "Default": "",
+            "Description": "BIGIP Management IP address for Tier2"
+        },
+        "pIAppUrl": {
+            "Type": "String",
+            "Default": "https://raw.githubusercontent.com/F5Networks/f5-aws-cloudformation/v3.1.0/iApps/f5.aws_advanced_ha.v1.4.0rc3.tmpl",
+            "Description": "URL to download BIG-IP AWS HA iApp"
+        },
+        "pBigIPTier1RouteTableId": {
+            "Type": "String",
+            "Default": "",
+            "Description": "Route Table ID for Tier1 HA iApp"
+        },
+        "pBigIPTier2RouteTableId": {
+            "Type": "String",
+            "Default": "",
+            "Description": "Route Table ID for Tier2 HA iApp"
+        },
+        "pBigIPTier1Interface": {
+            "Type": "String",
+            "Default": "/Common/internal",
+            "Description": "Interface for Tier1 HA iApp"
+        },
+        "pBigIPTier2Interface": {
+            "Type": "String",
+            "Default": "/Common/external",
+            "Description": "Interface for Tier2 HA iApp"
+        },
+        "pBigIPTier1S3Bucket": {
+            "Type": "String",
+            "Default": "",
+            "Description": "S3 Bucket where BIG-IP password is stored"
+        },
+        "pBigIPTier2S3Bucket": {
+            "Type": "String",
+            "Default": "",
+            "Description": "S3 Bucket where BIG-IP password is stored"
+        },
+        "pQuickstartS3BucketName": {
+            "Type": "String",
+            "Default": "f5-sca-securitystack",
+            "Description": "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
+        },
+        "pQuickstartS3KeyPrefix": {
+            "Type": "String",
+            "Default": "master",
+            "Description": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
+        }
+    },
+    "Resources": {
+        "IamRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+                    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+                ]
+            }
+        },
+        "CustomDeployHAiAppTier1": {
+            "Type": "Custom::DeployHAiApp",
+            "Version": "1.0",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn:GetAtt": [
+                        "LambdaHAiApp",
+                        "Arn"
+                    ]
+                },
+                "mgmt_ip": {
+                    "Ref": "pBigIPTier1Mgmt"
+                },
+                "iapp_url": {
+                    "Ref": "pIAppUrl"
+                },
+                "route_table_id": {
+                    "Ref": "pBigIPTier1RouteTableId"
+                },
+                "interface": {
+                    "Ref": "pBigIPTier1Interface"
+                },
+                "s3_bucket": {
+                    "Ref": "pBigIPTier1S3Bucket"
+                }
+            }
+        },
+        "CustomDeployHAiAppTier2": {
+            "Type": "Custom::DeployHAiApp",
+            "Version": "1.0",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn:GetAtt": [
+                        "LambdaHAiApp",
+                        "Arn"
+                    ]
+                },
+                "mgmt_ip": {
+                    "Ref": "pBigIPTier2Mgmt"
+                },
+                "iapp_url": {
+                    "Ref": "pIAppUrl"
+                },
+                "route_table_id": {
+                    "Ref": "pBigIPTier2RouteTableId"
+                },
+                "interface": {
+                    "Ref": "pBigIPTier2Interface"
+                },
+                "s3_bucket": {
+                    "Ref": "pBigIPTier2S3Bucket"
+                }
+            }
+        },
+        "LambdaHAiApp": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "index.lambda_handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "IamRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.6",
+                "Timeout": 30,
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "pQuickstartS3BucketName"
+                    },
+                    "S3Key": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                {
+                                    "Ref": "pQuickstartS3KeyPrefix"
+                                },
+                                "/ha_iapp.zip"
+                            ]
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
