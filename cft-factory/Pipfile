@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+troposphere = "*"
+awacs = "*"
 
 [requires]
 python_version = "3.7"
