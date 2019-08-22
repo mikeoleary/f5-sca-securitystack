@@ -29,3 +29,8 @@ def lambda_handler(event, context):
         bigip.install_iapp(client, iapp_url)
         iapp_name = iapp_url.split('/')[-1].replace('.tmpl', '')
         bigip.cfg_ha_iapp(client, iapp_name, route_table_id, interface)
+
+        cfnresponse.send(event, context, cfnresponse.SUCCESS, True)
+
+    if event['RequestType'] == 'Delete':
+        cfnresponse.send(event, context, cfnresponse.SUCCESS, {})

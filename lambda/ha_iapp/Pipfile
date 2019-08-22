@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 f5-sdk = "*"
 f5-sca-libs = {path = "./../f5_sca_libs/dist/f5_sca_libs-1.0.0-py3-none-any.whl"}
+cfnresponse = "*"
 
 [requires]
 python_version = "3.7"
