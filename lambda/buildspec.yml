@@ -6,15 +6,22 @@ phases:
       python: 3.7
   build:
     commands:
+      # test and build f5_sca_libs
        - cd lambda/f5_sca_libs
        - make install 
        - pipenv run make test
        - make wheel
+       # test and zip ha_iapp lambda
        - cd ../ha_iapp
        - make install
        - make zip
+       # make ha_iapp CFT
+       - cd ../cft-factory
+       - make install
+       - make cft
 artifacts:
   files:
     - lambda/f5_sca_libs/dist/f5_sca_libs-1.0.0-py3-none-any.whl
     - lambda/ha_iapp/ha_iapp.zip
+    - cft-factory/ha_iapp.json
   discard-paths: yes
