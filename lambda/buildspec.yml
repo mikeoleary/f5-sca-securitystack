@@ -10,7 +10,11 @@ phases:
        - make install 
        - pipenv run make test
        - make wheel
+       - cd ../ha_iapp
+       - make install
+       - make zip
 artifacts:
   files:
     - lambda/f5_sca_libs/dist/f5_sca_libs-1.0.0-py3-none-any.whl
+    - lambda/ha_iapp/ha_iapp.zip
   discard-paths: yes

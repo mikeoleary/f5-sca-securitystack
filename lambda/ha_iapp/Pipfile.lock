@@ -1,0 +1,28 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "620213b39ff2b0e010c0297372fb5f98d2581e45291451df04be4701be41892f"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.7"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "f5-sca-libs": {
+            "hashes": [
+                "sha256:2c51b3a7b8566b4babe232028806d216a2e93a7be7721819924dc43a60fa4b7a"
+            ],
+            "path": "./../f5_sca_libs/dist/f5_sca_libs-1.0.0-py3-none-any.whl",
+            "version": "==1.0.0"
+        }
+    },
+    "develop": {}
+}

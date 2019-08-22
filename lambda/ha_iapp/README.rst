@@ -1,7 +1,7 @@
-f5_sca_libs
+ha_iapp
 =======
 
-Python library to help deploy the F5 Secure Cloud Arhictecture in AWS
+Lambda function to install and configure the F5 BIG-IP AWS HA iApp for a BIG-IP devices service cluster.
 
 Development
 -----------
