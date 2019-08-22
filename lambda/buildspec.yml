@@ -16,7 +16,7 @@ phases:
        - make install
        - make zip
        # make ha_iapp CFT
-       - cd ../../cft-factory/ha_iapp
+       - cd ../../cft-factory
        - make install
        - make cft
 artifacts:
