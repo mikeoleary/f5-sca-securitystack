@@ -2165,8 +2165,9 @@
             {"Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-VdssDmz2SubnetId" }}
           ]
        },
-       "Tags": {
-        "Fn::If" : [
+       "Tags": [
+        {
+            "Fn::If" : [
             "Tier1",
             {
                 "Key" : "Tier1Vip",
@@ -2177,7 +2178,8 @@
                 "Value" : "app1"
             }
           ]
-       }
+        }
+        ]
       },
       "Type": "AWS::EC2::NetworkInterface"
      },
