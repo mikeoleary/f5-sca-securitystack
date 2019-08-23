@@ -100,32 +100,6 @@
             "ToPort": "443",
             "CidrIp": "10.0.0.0/8"
           }
-        ],
-        "Tags": [
-            {
-              "Key": "Name",
-              "Value": {
-                "Fn::Join": [
-                  "",
-                  [
-                    {
-                      "Ref": "pDeploymentName"
-                    },
-                    "-",
-                    {
-                      "Ref": "pApplication"
-                    },
-                    " app security group"
-                  ]
-                ]
-              }
-            },
-            {
-              "Key": "Application",
-              "Value": {
-                "Ref": "application"
-              }
-            }
         ]
       }
     },
@@ -163,7 +137,7 @@
                 "# Deploy App\n",
                 "sudo docker run --name f5demo -p 80:80 -p 443:443 -d ",
                 {
-                  "Ref": "containerName"
+                  "Ref": "pContainerName"
                 },
                 "\n"
               ]
@@ -175,33 +149,14 @@
     "rAppAutoscaleGroup": {
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "Properties": {
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": {
-              "Fn::Join": [
-                "",
-                [
-                  "App Autoscale Instance: ",
-                  {
-                    "Ref": "pDeploymentName"
-                  },
-                  "-",
-                  {
-                    "Ref": "pApplication"
-                  }
-                ]
-              ]
-            },
-            "PropagateAtLaunch": true
-          },        
+        "Tags": [    
           {
             "Key": "APPNAME",
             "Value": "LINUXSERVER",
             "PropagateAtLaunch": true
           }
         ],
-       "VPCZoneIdentifier": { "Fn::ImportValue": { "Fn::Sub": "${pVpcStackName}-AppSubnetAId" }},
+      "VPCZoneIdentifier": { "Fn::ImportValue": { "Fn::Sub": "${pVpcStackName}-AppSubnetAId" }},
       "Cooldown": "600",
       "HealthCheckGracePeriod": 120,
       "LaunchConfigurationName": {
@@ -223,5 +178,6 @@
         }
       }
     }
-  }    
+  }
+ }
 }
