@@ -46,10 +46,10 @@
                     "\n",
                     "virtualAddress='",
                     {
-                    "Fn::GetAtt": [
-                    "Bigip1subnet1Az1Interface",
-                    "PrimaryPrivateIpAddress"
-                    ]
+                        "Fn::GetAtt": [
+                        "Bigip1subnet1Az1Interface",
+                        "PrimaryPrivateIpAddress"
+                        ]
                     },
                     "'\n",
                     "virtualAddress2='",

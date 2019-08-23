@@ -1602,10 +1602,15 @@
                           "\n",
                           "virtualAddress='",
                           {
-                          "Fn::GetAtt": [
-                          "Bigip1subnet1Az1Interface",
-                          "PrimaryPrivateIpAddress"
-                          ]
+                            "Fn::Select": [
+                                "0",
+                                {
+                                    "Fn::GetAtt": [
+                                    "Bigip1subnet1Az1Interface",
+                                    "SecondaryPrivateIpAddresses"
+                                    ]
+                                }
+                                ]
                           },
                           "'\n",
                           "virtualAddress2='",
@@ -1658,11 +1663,16 @@
                         "\n",
                         "virtualAddress='",
                         {
-                        "Fn::GetAtt": [
-                        "Bigip1subnet1Az1Interface",
-                        "PrimaryPrivateIpAddress"
-                        ]
-                        },
+                            "Fn::Select": [
+                                "0",
+                                {
+                                    "Fn::GetAtt": [
+                                    "Bigip1subnet1Az1Interface",
+                                    "SecondaryPrivateIpAddresses"
+                                    ]
+                                }
+                                ]
+                            },
                         "'\n",
                         "virtualAddress2='",
                         {
@@ -1751,14 +1761,9 @@
                         "\n",
                         "virtualAddress='",
                         {
-                        "Fn::Select": [
-                            "0",
-                            {
-                                "Fn::GetAtt": [
-                                "Bigip1subnet1Az1Interface",
-                                "SecondaryPrivateIpAddresses"
-                                ]
-                            }
+                            "Fn::GetAtt": [
+                            "Bigip1subnet1Az1Interface",
+                            "PrimaryPrivateIpAddress"
                             ]
                         },
                         "'\n",
@@ -1835,14 +1840,9 @@
                             "\n",
                             "virtualAddress='",
                             {
-                            "Fn::Select": [
-                                "0",
-                                {
-                                    "Fn::GetAtt": [
-                                    "Bigip1subnet1Az1Interface",
-                                    "SecondaryPrivateIpAddresses"
-                                    ]
-                                }
+                                "Fn::GetAtt": [
+                                "Bigip1subnet1Az1Interface",
+                                "PrimaryPrivateIpAddress"
                                 ]
                             },
                             "'\n",

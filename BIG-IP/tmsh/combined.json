@@ -50,7 +50,7 @@
                     "virtualAddress='",
                     {
                         "Fn::GetAtt": [
-                        "Bigip2subnet1Az1Interface",
+                        "Bigip1subnet1Az1Interface",
                         "PrimaryPrivateIpAddress"
                         ]
                     },
@@ -132,7 +132,7 @@
                         "virtualAddress='",
                         {
                             "Fn::GetAtt": [
-                            "Bigip2subnet1Az1Interface",
+                            "Bigip1subnet1Az1Interface",
                             "PrimaryPrivateIpAddress"
                             ]
                         },
