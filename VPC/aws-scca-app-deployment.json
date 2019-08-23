@@ -34,35 +34,7 @@
         ]
     }
     },
-    "pApplicationSubnets": {
-      "Description": "Application Subnet IDs",
-      "Type": "AWS::EC2::Subnet::Id",
-      "Fn::ImportValue": {
-        "Fn::Join": [
-            "",
-            [
-                {
-                    "Ref": "AWS::StackName"
-                },
-                "--AppSubnetAID"
-            ]
-        ]
-    }
-    },
-    "instanceType": {
-      "AllowedValues": [
-        "t2.small"
-      ],
-      "ConstraintDescription": "must be a valid EC2 instance type",
-      "Default": "t2.small",
-      "Description": "App EC2 instance type",
-      "Type": "String"
-    },
-    "sshKey": {
-      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
-      "Type": "AWS::EC2::KeyPair::KeyName"
-    },
-    "containerName" : {
+    "pContainerName" : {
       "Description" : "Container Name",
       "Type" : "String",
       "Default": "f5devcentral/f5-demo-app:latest"
@@ -119,12 +91,22 @@
   },
 
   "Resources": {
-      "appSecurityGroup": {
+      "rAppSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "VpcId": {
-          "Ref": "pVpc"
-        },
+        "Fn::ImportValue": {
+        "Fn::Join": [
+            "",
+            [
+                {
+                    "Ref": "AWS::StackName"
+                },
+                "--AppVpcId"
+            ]
+         ]
+        }
+       },
         "GroupDescription": "Enable SSH access via port 22 and enable access to web on 80 and 443",
         "SecurityGroupIngress": [
           {
@@ -154,11 +136,11 @@
                   "",
                   [
                     {
-                      "Ref": "deploymentName"
+                      "Ref": "pDeploymentName"
                     },
                     "-",
                     {
-                      "Ref": "application"
+                      "Ref": "pApplication"
                     },
                     " app security group"
                   ]
@@ -174,7 +156,7 @@
         ]
       }
     },
-    "appLaunchConfig": {
+    "rAppLaunchConfig": {
       "Type": "AWS::AutoScaling::LaunchConfiguration",
       "Properties": {
         "ImageId": {
@@ -186,13 +168,11 @@
             "AMI"
           ]
         },
-        "InstanceType": {
-          "Ref": "instanceType"
-        },
+        "InstanceType": "t2.small",
         "AssociatePublicIpAddress": false,
         "SecurityGroups": [
           {
-            "Ref": "appSecurityGroup"
+            "Ref": "rAppSecurityGroup"
           }
         ],
         "UserData": {
@@ -231,11 +211,11 @@
                 [
                   "App Autoscale Instance: ",
                   {
-                    "Ref": "deploymentName"
+                    "Ref": "pDeploymentName"
                   },
                   "-",
                   {
-                    "Ref": "application"
+                    "Ref": "pApplication"
                   }
                 ]
               ]
@@ -245,7 +225,7 @@
           {
             "Key": "Application",
             "Value": {
-              "Ref": "application"
+              "Ref": "pApplication"
             },
             "PropagateAtLaunch": true
           },
@@ -255,7 +235,18 @@
             "PropagateAtLaunch": true
           }
         ],
-        "VPCZoneIdentifier": { "Ref": "pApplicationSubnets" },
+        "VPCZoneIdentifier": {
+        "Fn::ImportValue": {
+        "Fn::Join": [
+            "",
+            [
+                {
+                    "Ref": "AWS::StackName"
+                },
+                "--AppSubnetAID"
+            ]
+        ]
+      },
         "Cooldown": "600",
         "HealthCheckGracePeriod": 120,
         "LaunchConfigurationName": {
