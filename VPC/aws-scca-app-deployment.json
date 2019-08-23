@@ -233,11 +233,11 @@
             "Value": "LINUXSERVER",
             "PropagateAtLaunch": true
           }
-        ],
-      }
+        ]
+      },
         "VPCZoneIdentifier": {
-        "Fn::ImportValue": {
-        "Fn::Join": [
+          "Fn::ImportValue": {
+          "Fn::Join": [
             "",
             [
                 {
@@ -246,6 +246,7 @@
                 "--AppSubnetAID"
             ]
         ]
+       } 
       },
         "Cooldown": "600",
         "HealthCheckGracePeriod": 120,
@@ -268,12 +269,4 @@
         }
       }
     }
-  },
-  "Outputs": {
-    "appAutoscaleGroupName": {
-      "Value": {
-        "Ref": "appAutoscaleGroup"
-      }
-    }
-  }
-}
+} 
