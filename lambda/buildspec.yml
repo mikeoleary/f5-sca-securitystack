@@ -24,4 +24,5 @@ artifacts:
     - lambda/f5_sca_libs/dist/f5_sca_libs-1.0.0-py3-none-any.whl
     - lambda/ha_iapp/ha_iapp.zip
     - cft-factory/ha_iapp.json
+    - cft-factory/install_lambda.json
   discard-paths: yes
