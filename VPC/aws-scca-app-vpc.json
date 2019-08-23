@@ -25,6 +25,55 @@
             "Default": "f5devcentral/f5-demo-app:latest"
         }
     },
+    "Mappings": {
+        "imageRegionMap": {
+          "ap-northeast-1":{
+            "AMI":"ami-0a84a504d6d5ad732"
+          },
+          "ap-northeast-2":{
+            "AMI":"ami-0f7b7753aba0b7a5d"
+          },
+          "ap-south-1":{
+            "AMI":"ami-0ce2a01ec1fe31129"
+          },
+          "ap-southeast-1":{
+            "AMI":"ami-042a84288996ec3c1"
+          },
+          "ap-southeast-2":{
+            "AMI":"ami-0118debc71f4a5be3"
+          },
+          "ca-central-1":{
+            "AMI":"ami-0179543623c8e6647"
+          },
+          "eu-central-1":{
+            "AMI":"ami-0dffee650f80cbced"
+          },
+          "eu-west-1":{
+            "AMI":"ami-06f42fd8c0931ce4b"
+          },
+          "eu-west-2":{
+            "AMI":"ami-09b984525e8ba2206"
+          },
+          "eu-west-3":{
+            "AMI":"ami-0b12754d476af8dbb"
+          },
+          "sa-east-1":{
+            "AMI":"ami-0f921f57ccbc209c2"
+          },
+          "us-east-1":{
+            "AMI":"ami-05fb04e2687120d6b"
+          },
+          "us-east-2":{
+            "AMI":"ami-087868e91f1a665d1"
+          },
+          "us-west-1":{
+            "AMI":"ami-0ec3e3a838330c61f"
+          },
+          "us-west-2":{
+            "AMI":"ami-09eb876a926ae86db"
+          }
+        }
+    },
     "Resources": {
         "rAppVpc": {
             "Type": "AWS::EC2::VPC",
