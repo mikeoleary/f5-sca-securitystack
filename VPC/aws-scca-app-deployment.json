@@ -19,21 +19,6 @@
         "Default": "SCCA-App-Demo",
         "Description": "Project name to use for tagging"
     },
-    "pVpc": {
-      "Description": "Common VPC for whole deployment",
-      "Type": "AWS::EC2::VPC::Id",
-      "Fn::ImportValue": {
-        "Fn::Join": [
-            "",
-            [
-                {
-                    "Ref": "AWS::StackName"
-                },
-                "--AppVpcId"
-            ]
-        ]
-    }
-    },
     "pContainerName" : {
       "Description" : "Container Name",
       "Type" : "String",
@@ -90,7 +75,7 @@
     }
   },
   "Resources": {
-      "rAppSecurityGroup": {
+    "rAppSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "VpcId": {
@@ -198,7 +183,7 @@
         }
       }
     },
-    "appAutoscaleGroup": {
+    "rAppAutoscaleGroup": {
       "Type": "AWS::AutoScaling::AutoScalingGroup",
       "Properties": {
         "Tags": [
@@ -268,5 +253,5 @@
          "PauseTime": "PT3M"
         }
       }
-    }
+  }
 } 
