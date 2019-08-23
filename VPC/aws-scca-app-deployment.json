@@ -89,7 +89,6 @@
       }
     }
   },
-
   "Resources": {
       "rAppSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
@@ -235,6 +234,7 @@
             "PropagateAtLaunch": true
           }
         ],
+      }
         "VPCZoneIdentifier": {
         "Fn::ImportValue": {
         "Fn::Join": [
