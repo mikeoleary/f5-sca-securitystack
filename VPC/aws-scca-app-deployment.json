@@ -205,21 +205,13 @@
               ]
             },
             "PropagateAtLaunch": true
-          },
-          {
-            "Key": "Application",
-            "Value": {
-              "Ref": "pApplication"
-            },
-            "PropagateAtLaunch": true
-          },
+          },        
           {
             "Key": "APPNAME",
             "Value": "LINUXSERVER",
             "PropagateAtLaunch": true
           }
-        ]
-      },
+        ],
         "VPCZoneIdentifier": {
           "Fn::ImportValue": {
           "Fn::Join": [
@@ -230,17 +222,17 @@
                 },
                 "-AppSubnetAID"
             ]
-        ]
-       } 
+          ]
+        } 
       },
-        "Cooldown": "600",
-        "HealthCheckGracePeriod": 120,
-        "LaunchConfigurationName": {
-          "Ref": "appLaunchConfig"
+      "Cooldown": "600",
+      "HealthCheckGracePeriod": 120,
+      "LaunchConfigurationName": {
+        "Ref": "appLaunchConfig"
         },
-        "MaxSize": "3",
-        "MinSize": "1",
-        "MetricsCollection": [
+      "MaxSize": "3",
+      "MinSize": "1",
+      "MetricsCollection": [
           {
             "Granularity": "1Minute"
           }
@@ -253,5 +245,6 @@
          "PauseTime": "PT3M"
         }
       }
-  }
-} 
+    }
+  }    
+}
