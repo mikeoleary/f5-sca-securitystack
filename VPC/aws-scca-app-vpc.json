@@ -18,6 +18,11 @@
             "Type": "String",
             "Default": "SccaTgwStack",
             "Description": "Transit Gateway Stack Name"
+        },
+        "pContainerName" : {
+            "Description" : "Container Name",
+            "Type" : "String",
+            "Default": "f5devcentral/f5-demo-app:latest"
         }
     },
     "Resources": {
@@ -382,8 +387,120 @@
                  }
              }
          }
-        }
-    }, 
+        },
+        "rAppSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+              "VpcId": {
+                "Ref": "rAppVpc"
+              },
+              "GroupDescription": "Enable SSH access via port 22 and enable access to web on 80 and 443",
+              "SecurityGroupIngress": [
+                {
+                  "IpProtocol": "tcp",
+                  "FromPort": "22",
+                  "ToPort": "22",
+                  "CidrIp": "10.0.0.0/8"
+                },
+                {
+                  "IpProtocol": "tcp",
+                  "FromPort": "80",
+                  "ToPort": "80",
+                  "CidrIp": "10.0.0.0/8"
+                },
+                {
+                  "IpProtocol": "tcp",
+                  "FromPort": "443",
+                  "ToPort": "443",
+                  "CidrIp": "10.0.0.0/8"
+                }
+              ]
+          },
+          "rAppLaunchConfig": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+              "ImageId": {
+                "Fn::FindInMap": [
+                  "imageRegionMap",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "AMI"
+                ]
+              },
+              "InstanceType": "t2.small",
+              "AssociatePublicIpAddress": false,
+              "SecurityGroups": [
+                {
+                  "Ref": "rAppSecurityGroup"
+                }
+              ],
+              "UserData": {
+                "Fn::Base64": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "#!/bin/bash\n",
+                      "### Xenial 16.04\n",
+                      "# Install Docker\n",
+                      "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - \n",
+                      "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"\n",
+                      "sudo apt-get update\n",
+                      "sudo apt-get install -y docker-ce\n",
+                      "# Deploy App\n",
+                      "sudo docker run --name f5demo -p 80:80 -p 443:443 -d ",
+                      {
+                        "Ref": "pContainerName"
+                      },
+                      "\n"
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "rAppAutoscaleGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+              "Tags": [
+                {
+                  "Key": "Application",
+                  "Value": {
+                    "Ref": "application"
+                  },
+                  "PropagateAtLaunch": true
+                },
+                {
+                  "Key": "containerName",
+                  "Value": {
+                    "Ref": "containerName"
+                  },
+                  "PropagateAtLaunch": true
+                }
+              ],
+              "VPCZoneIdentifier": { "Ref": "rAppSubnetA" },
+              "Cooldown": "600",
+              "HealthCheckGracePeriod": 120,
+              "LaunchConfigurationName": {
+                "Ref": "appLaunchConfig"
+              },
+              "MaxSize": "3",
+              "MinSize": "1",
+              "MetricsCollection": [
+                {
+                  "Granularity": "1Minute"
+                }
+              ]
+            },
+            "UpdatePolicy": {
+              "AutoScalingRollingUpdate": {
+               "MaxBatchSize": "1",
+               "MinInstancesInService": "1",
+               "PauseTime": "PT3M"
+              }
+            }
+          }
+    },
     "Outputs": {
         "StackName": {
             "Value": {
@@ -581,4 +698,5 @@
             }
         }
     }
+ }
 }

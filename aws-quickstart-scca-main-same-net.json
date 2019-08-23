@@ -507,45 +507,6 @@
         "aws:cdk:path": "sccaMainStack/IPSStack"
       }
     },
-    "AppDeploymentStack": {
-      "Type": "AWS::CloudFormation::Stack",
-      "DependsOn" : "AppVpcStack",
-      "Properties": {
-        "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-app-deployment.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
-        },
-        "Parameters": {
-          "pTransitGatewayStackName": {
-            "Fn::GetAtt": [
-              "TransitGatewayStack",
-              "Outputs.StackName"
-            ]
-          },
-        "Tags": [
-          {
-            "Key": "Project",
-            "Value": {
-              "Ref": "pProject"
-            }
-          }
-        ]
-      },
-      "Metadata": {
-        "aws:cdk:path": "sccaMainStack/FargateVPCStack"
-      }
-     }
-   },
     "RouteTableUpdates": {
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
