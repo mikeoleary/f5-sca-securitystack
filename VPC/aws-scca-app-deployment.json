@@ -201,13 +201,11 @@
             "PropagateAtLaunch": true
           }
         ],
-        "VPCZoneIdentifier": {
-          "Fn::ImportValue": { "Fn::Sub": "${pVpcStackName}-AppSubnetAId" }
-      },
+       "VPCZoneIdentifier": { "Fn::ImportValue": { "Fn::Sub": "${pVpcStackName}-AppSubnetAId" }},
       "Cooldown": "600",
       "HealthCheckGracePeriod": 120,
       "LaunchConfigurationName": {
-        "Ref": "appLaunchConfig"
+        "Ref": "rAppLaunchConfig"
         },
       "MaxSize": "3",
       "MinSize": "1",
