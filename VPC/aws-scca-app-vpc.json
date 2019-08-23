@@ -415,8 +415,9 @@
                   "CidrIp": "10.0.0.0/8"
                 }
               ]
-          },
-          "rAppLaunchConfig": {
+            }
+        },
+        "rAppLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Properties": {
               "ImageId": {
@@ -458,8 +459,8 @@
                 }
               }
             }
-          },
-          "rAppAutoscaleGroup": {
+        },
+        "rAppAutoscaleGroup": {
             "Type": "AWS::AutoScaling::AutoScalingGroup",
             "Properties": {
               "Tags": [
@@ -499,7 +500,7 @@
                "PauseTime": "PT3M"
               }
             }
-          }
+        }
     },
     "Outputs": {
         "StackName": {
