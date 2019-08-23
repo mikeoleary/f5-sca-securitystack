@@ -78,18 +78,7 @@
     "rAppSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
-        "VpcId": {
-        "Fn::ImportValue": {
-        "Fn::Join": [
-            "",
-            [
-                {
-                    "Ref": "AWS::StackName"
-                },
-                "-AppVpcId"
-            ]
-         ]
-        }
+        "VpcId": { "Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-AppVpcId" }
        },
         "GroupDescription": "Enable SSH access via port 22 and enable access to web on 80 and 443",
         "SecurityGroupIngress": [
@@ -213,17 +202,7 @@
           }
         ],
         "VPCZoneIdentifier": {
-          "Fn::ImportValue": {
-          "Fn::Join": [
-            "",
-            [
-                {
-                    "Ref": "AWS::StackName"
-                },
-                "-AppSubnetAID"
-            ]
-          ]
-        } 
+          "Fn::ImportValue": { "Fn::Sub": "${pVpcStackName}-AppSubnetAId" }
       },
       "Cooldown": "600",
       "HealthCheckGracePeriod": 120,
