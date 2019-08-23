@@ -465,16 +465,9 @@
             "Properties": {
               "Tags": [
                 {
-                  "Key": "Application",
-                  "Value": {
-                    "Ref": "application"
-                  },
-                  "PropagateAtLaunch": true
-                },
-                {
                   "Key": "containerName",
                   "Value": {
-                    "Ref": "containerName"
+                    "Ref": "pContainerName"
                   },
                   "PropagateAtLaunch": true
                 }
@@ -483,7 +476,7 @@
               "Cooldown": "600",
               "HealthCheckGracePeriod": 120,
               "LaunchConfigurationName": {
-                "Ref": "appLaunchConfig"
+                "Ref": "rAppLaunchConfig"
               },
               "MaxSize": "3",
               "MinSize": "1",
