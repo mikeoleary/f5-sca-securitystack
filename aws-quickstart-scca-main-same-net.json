@@ -509,7 +509,7 @@
     },
     "AppDeploymentStack": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn" : "TransitGatewayStack",
+      "DependsOn" : "AppVpcStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
