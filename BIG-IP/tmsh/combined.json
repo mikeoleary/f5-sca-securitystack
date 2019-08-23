@@ -40,14 +40,22 @@
                  "", 
                  [ 
                     "#!/bin/bash\n",
-                    "partition=\"app1\"",
+                    "partition=\"app1\"\n",
                     "\n",
-                    "appName=\"app1\"",
+                    "appName=\"app1\"\n",
                     "# tag\n",
                     "tagKey=\"Tier2Vip\"\n", 
                     "tagValue=\"app1\"\n",
                     "\n",
                     "virtualAddress='",
+                    {
+                        "Fn::GetAtt": [
+                        "Bigip2subnet1Az1Interface",
+                        "PrimaryPrivateIpAddress"
+                        ]
+                    },
+                    "'\n",
+                    "virtualAddress2='",
                     {
                     "Fn::Select": [
                         "0",
@@ -58,14 +66,6 @@
                             ]
                         }
                         ]
-                    },
-                    "'\n",
-                    "virtualAddress2='",
-                    {
-                    "Fn::GetAtt": [
-                    "Bigip2subnet1Az1Interface",
-                    "PrimaryPrivateIpAddress"
-                    ]
                     },
                     "'\n",
                     "node1='",
@@ -124,30 +124,30 @@
                     "",
                     [
                     "#!/bin/bash\n",
-                        "partition=\"app1\"",
+                        "partition=\"app1\"\n",
                         "# tag\n",
                         "tagKey=\"APPNAME\"\n", 
                         "tagValue=\"LINUXSERVER\"\n",
                         "\n",
                         "virtualAddress='",
                         {
-                        "Fn::Select": [
-                            "0",
-                            {
-                             "Fn::GetAtt": [
-                              "Bigip1subnet1Az1Interface",
-                              "SecondaryPrivateIpAddresses"
-                             ]
-                            }
-                           ]
+                            "Fn::GetAtt": [
+                            "Bigip2subnet1Az1Interface",
+                            "PrimaryPrivateIpAddress"
+                            ]
                         },
                         "'\n",
                         "virtualAddress2='",
                         {
-                        "Fn::GetAtt": [
-                        "Bigip2subnet1Az1Interface",
-                        "PrimaryPrivateIpAddress"
-                        ]
+                        "Fn::Select": [
+                            "0",
+                            {
+                                "Fn::GetAtt": [
+                                "Bigip1subnet1Az1Interface",
+                                "SecondaryPrivateIpAddresses"
+                                ]
+                            }
+                            ]
                         },
                         "'\n",
                         "node1='",
