@@ -511,6 +511,7 @@
         },
         "rAppAutoscaleGroup": {
             "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "DependsOn" : "rAppSubnetA",
             "Properties": {
               "Tags": [
                 {
