@@ -808,16 +808,11 @@
               "--default-gw ${GATEWAY} ",
               "--self-ip name:external-self,address:",
               {
-                "Fn::Select": [
-                 "1",
-                 {
-                  "Fn::GetAtt": [
-                   "Bigip1subnet1Az1Interface",
-                   "SecondaryPrivateIpAddresses"
-                  ]
-                 }
-                ]
-               },
+               "Fn::GetAtt": [
+                "Bigip1subnet1Az1Interface",
+                "PrimaryPrivateIpAddress"
+               ]
+              },
               "/${GATEWAY_PREFIX},vlan:external,allow:none ",
               "--vlan name:internal,nic:1.2 ",
               "--self-ip 'name:internal-self,address:",
@@ -2173,7 +2168,7 @@
          "Ref": "bigipExternalSecurityGroup"
         }
        ],
-       "SecondaryPrivateIpAddressCount": "2",
+       "SecondaryPrivateIpAddressCount": "1",
        "SourceDestCheck": false,
        "SubnetId": {
         "Fn::If" : [
