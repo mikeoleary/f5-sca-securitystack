@@ -938,7 +938,7 @@
                  "Ref": "licenseKey1"
                 },
                 "-d tm.tcpudptxchecksum:software-only ",
-                "--ping",
+                "--ping f5.com",
                 "&>> /var/log/cloud/aws/install.log < /dev/null &"
                ]
               ]
@@ -2449,7 +2449,7 @@
                  "Ref": "licenseKey2"
                 },
                 "-d tm.tcpudptxchecksum:software-only ",
-                "--ping",
+                "--ping f5.com",
                 "&>> /var/log/cloud/aws/install.log < /dev/null &"
                ]
               ]
