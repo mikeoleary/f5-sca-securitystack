@@ -893,7 +893,7 @@
                 },
                 "--metrics \"cloudName:aws,region:${REGION},bigipVersion:14.1.0.3-0.0.6,customerId:${CUSTOMERID},deploymentId:${DEPLOYMENTID},templateName:f5-existing-stack-same-az-cluster-byol-3nic-bigip.template,templateVersion:4.2.0,licenseType:byol\"",
                 "-d tm.tcpudptxchecksum:software-only ",
-                "--ping",
+                "--ping f5.com",
                 "&>> /var/log/cloud/aws/install.log < /dev/null &"
                ]
               ]
@@ -2404,7 +2404,7 @@
                 },
                 "--metrics \"cloudName:aws,region:${REGION},bigipVersion:14.1.0.3-0.0.6,customerId:${CUSTOMERID},deploymentId:${DEPLOYMENTID},templateName:f5-existing-stack-same-az-cluster-byol-3nic-bigip.template,templateVersion:4.2.0,licenseType:byol\"",
                 "-d tm.tcpudptxchecksum:software-only ",
-                "--ping",
+                "--ping f5.com",
                 "&>> /var/log/cloud/aws/install.log < /dev/null &"
                ]
               ]
