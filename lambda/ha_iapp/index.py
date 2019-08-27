@@ -36,9 +36,10 @@ def lambda_handler(event, context):
             bigip.cfg_ha_iapp(client, iapp_name, route_table_id, interface)
 
             logger.info('Successfully updated the HA iApp')
-            cfnresponse.send(event, context, cfnresponse.SUCCESS, True)
+            response = {'Response': 'true'}
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, response)
             return
-            
+
         except Exception:
             logger.exception('Signaling failure to CloudFormation.')
             cfnresponse.send(event, context, cfnresponse.FAILED, {})
