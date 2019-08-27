@@ -580,6 +580,10 @@
             }
           ]
         },
+        "Parameters": {
+          "pLambdaS3BucketName": "${pQuickstartS3BucketName}",
+          "pLambdaS3KeyPrefix": "${pQuickstartS3KeyPrefix}"
+        },
         "Tags": [
           {
             "Key": "Project",
