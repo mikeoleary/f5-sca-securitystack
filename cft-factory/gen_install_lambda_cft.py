@@ -1,4 +1,4 @@
-from troposphere import GetAtt, Join, Ref, Template
+from troposphere import GetAtt, Join, Ref, Template, Parameter
 from troposphere.iam import Role
 from troposphere.awslambda import Code, Function
 

@@ -7,5 +7,6 @@ lambda/f5_sca_libs/dist
 lambda/f5_sca_libs/src/*.egg-info
 lambda/ha_iapp/ha_iapp.zip
 
-# CFT Factory
+# CFT Factory - these files are generated
 cft-factory/ha_iapp.json
+cft-factory/install_lambda.json
