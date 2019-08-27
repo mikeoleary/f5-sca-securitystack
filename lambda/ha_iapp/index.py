@@ -3,6 +3,7 @@ from f5_sca_libs import password
 import boto3
 import json
 import logging
+import cfnresponse
 
 def lambda_handler(event, context):
     print("Received event: " + json.dumps(event, indent=2))

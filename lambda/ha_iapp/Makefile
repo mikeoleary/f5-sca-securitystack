@@ -12,4 +12,4 @@ zip:
 	chmod 755 $$(find ./ -type d)
 	zip -FSr ha_iapp.zip ./*
 	pipenv run pip uninstall -r requirements.txt -y
-	rm -rf requirements.txt f5_sca_libs* bin ch* dev* certifi* f5* ic* id* re* setup* six* url*
+	rm -rf requirements.txt f5_sca_libs* bin ch* dev* certifi* f5* ic* id* re* setup* six* url* boto* cfn* date* doc* jme* python_dateutil*
