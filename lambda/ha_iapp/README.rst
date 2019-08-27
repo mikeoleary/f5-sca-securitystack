@@ -11,17 +11,17 @@ Development
 3. Install dev dependencies ``make install``
 4. Activate virtualenv: ``pipenv shell``
 
-Running Tests
--------------
+Building Lambda ZIP file
+-------------------------
 
-Run tests locally using ``make`` if virtualenv is active:
+Zip the lambda function so it can be uploaded to AWS using ``make zip`` if virtualenv is active:
 
 ::
 
-    $ make
+    $ make zip
 
 If virtualenv isn't active then use:
 
 ::
 
-    $ pipenv run make
+    $ pipenv run make zip

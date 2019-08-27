@@ -1,6 +1,6 @@
 .PHONY: install test wheel
 
-default: test
+default: zip
 
 install:
 	pipenv install --dev --skip-lock
