@@ -581,6 +581,9 @@
           ]
         },
         "Parameters": {
+          "pPrefix": {
+            "Fn::Sub": "${AWS::StackName}"
+          },
           "pLambdaS3BucketName": {
             "Ref": "pQuickstartS3BucketName"
           },
@@ -603,7 +606,6 @@
     },
     "HAiAppTier1": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn": "F5BIGIP1",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -620,6 +622,9 @@
           ]
         },
         "Parameters": {
+          "pPrefix": {
+            "Fn::Sub": "${AWS::StackName}"
+          },
           "pBigIPMgmt": {
             "Fn::GetAtt": [
               "F5BIGIP1",
@@ -655,7 +660,6 @@
     },
     "HAiAppTier2": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn": "F5BIGIP2",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -672,6 +676,9 @@
           ]
         },
         "Parameters": {
+          "pPrefix": {
+            "Fn::Sub": "${AWS::StackName}"
+          },
           "pBigIPMgmt": {
             "Fn::GetAtt": [
               "F5BIGIP2",

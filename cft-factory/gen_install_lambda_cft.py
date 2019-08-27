@@ -1,4 +1,4 @@
-from troposphere import GetAtt, Join, Ref, Template, Parameter
+from troposphere import GetAtt, Join, Ref, Template, Parameter, Sub
 from troposphere.iam import Role
 from troposphere.awslambda import Code, Function
 
@@ -8,6 +8,12 @@ from awacs.sts import AssumeRole
 template = Template()
 
 # add parameters
+pPrefix = template.add_parameter(Parameter(
+    'pPrefix',
+    Description='Lambda Function Name Prefix',
+    Type='String'
+))
+
 pLambdaS3BucketName = template.add_parameter(Parameter(
     'pLambdaS3BucketName',
     Description='S3 bucket where lambda code is stored',
@@ -42,6 +48,7 @@ iamRole = template.add_resource(Role(
 
 ha_lambda = template.add_resource(Function(
     'HAiApp',
+    FunctionName= Sub('${pPrefix}-ha-iapp'),
     Handler= 'index.lambda_handler',
     Role=  GetAtt('LambdaRole', 'Arn'),
     Code= Code(

@@ -1,4 +1,4 @@
-from troposphere import GetAtt, Join, Ref, Template, Parameter
+from troposphere import GetAtt, Join, Ref, Template, Parameter, Sub
 from troposphere.cloudformation import AWSCustomObject, CustomResource
 from troposphere.awslambda import Code, Function
 
@@ -8,6 +8,12 @@ from awacs.sts import AssumeRole
 template = Template()
 
 # add parameters
+pPrefix = template.add_parameter(Parameter(
+    'pPrefix',
+    Description='Lambda Function Name Prefix',
+    Type='String'
+))
+
 piAppUrl = template.add_parameter(Parameter(
     'piAppUrl',
     Description='URL to download the BIG-IP AWS HA iApp',
@@ -29,7 +35,7 @@ pBigIPRouteTableId = template.add_parameter(Parameter(
 
 pBigIPInterface = template.add_parameter(Parameter(
     'pBigIPInterface',
-    Description='Tier 1 BIG-IP interface for HA',
+    Description='BIG-IP interface for HA',
     Type='String'
 ))
 
@@ -42,7 +48,8 @@ pBigIPS3Bucket = template.add_parameter(Parameter(
 
 custom = template.add_resource(CustomResource(
     'CustomLambdaExec',
-    ServiceToken=GetAtt('InstallLambda', 'Arn'),
+    # ServiceToken=GetAtt('install-lambda-test-ha-iapp', 'Arn'),
+    ServiceToken=Sub('arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${pPrefix}-ha-iapp'),
     mgmt_ip=Ref('pBigIPMgmt'),
     iapp_url=Ref('piAppUrl'),
     route_table_id=Ref('pBigIPRouteTableId'),
