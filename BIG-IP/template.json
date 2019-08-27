@@ -769,7 +769,7 @@
               " --wait-for PASSWORD_CREATED",
               " --signal ADMIN_CREATED",
               " --file /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/createUser.sh",
-              " --cl-args '--user admin",
+              " --cl-args '--user xadmin",
               " --password-file /config/cloud/aws/.adminPassword",
               " --password-encrypted",
               "'",
@@ -808,9 +808,14 @@
               "--default-gw ${GATEWAY} ",
               "--self-ip name:external-self,address:",
               {
-               "Fn::GetAtt": [
-                "Bigip1subnet1Az1Interface",
-                "PrimaryPrivateIpAddress"
+               "Fn::Select": [
+                "1",
+                {
+                 "Fn::GetAtt": [
+                  "Bigip1subnet1Az1Interface",
+                  "SecondaryPrivateIpAddresses"
+                 ]
+                }
                ]
               },
               "/${GATEWAY_PREFIX},vlan:external,allow:none ",
@@ -2168,7 +2173,7 @@
          "Ref": "bigipExternalSecurityGroup"
         }
        ],
-       "SecondaryPrivateIpAddressCount": "1",
+       "SecondaryPrivateIpAddressCount": "2",
        "SourceDestCheck": false,
        "SubnetId": {
         "Fn::If" : [
@@ -2280,7 +2285,7 @@
               " --wait-for PASSWORD_CREATED",
               " --signal ADMIN_CREATED",
               " --file /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/createUser.sh",
-              " --cl-args '--user admin",
+              " --cl-args '--user xadmin",
               " --password-file /config/cloud/aws/.adminPassword",
               " --password-encrypted",
               "'",
