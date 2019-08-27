@@ -434,6 +434,9 @@
             "Ref": "licenseKey2"
           },
           "pTier": "Tier1",
+          "instanceType": {
+            "Ref": "instanceTypeTier1"
+          },
           "sshKey": {
             "Ref": "sshKey"
           },
@@ -508,6 +511,9 @@
             "Ref": "licenseKey4"
           },
           "pTier": "Tier2",
+          "instanceType": {
+            "Ref": "instanceTypeTier2"
+          },
           "sshKey": {
             "Ref": "sshKey"
           },
