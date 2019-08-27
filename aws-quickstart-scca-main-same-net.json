@@ -580,14 +580,6 @@
             }
           ]
         },
-        "Parameters": {
-          "pLambdaS3BucketName": {
-            "Fn::Ref": "pQuickstartS3BucketName"
-          },
-          "pLambdaS3KeyPrefix": {
-            "Fn::Ref": "pQuickstartS3KeyPrefix"
-          }
-        },
         "Tags": [
           {
             "Key": "Project",
@@ -629,7 +621,7 @@
           "pBigIPRouteTableId": {
             "Fn::GetAtt": [
               "VdssStack",
-              "VdssDmz1SubnetRouteTable"
+              "Outputs.VdssDmz1SubnetRouteTable"
             ]
           },
           "pBigIPInterface": "/Common/internal",
@@ -681,7 +673,7 @@
           "pBigIPRouteTableId": {
             "Fn::GetAtt": [
               "VdssStack",
-              "VdssDmz2SubnetRouteTable"
+              "Outputs.VdssDmz2SubnetRouteTable"
             ]
           },
           "pBigIPInterface": "/Common/internal",
