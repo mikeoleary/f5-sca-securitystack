@@ -42,7 +42,7 @@ pBigIPS3Bucket = template.add_parameter(Parameter(
 
 custom = template.add_resource(CustomResource(
     'CustomLambdaExec',
-    ServiceToken=GetAtt('HAiApp', 'Arn'),
+    ServiceToken=GetAtt('InstallLambda', 'Arn'),
     mgmt_ip=Ref('pBigIPMgmt'),
     iapp_url=Ref('piAppUrl'),
     route_table_id=Ref('pBigIPRouteTableId'),

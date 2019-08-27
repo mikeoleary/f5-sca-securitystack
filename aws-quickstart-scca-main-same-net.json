@@ -581,8 +581,12 @@
           ]
         },
         "Parameters": {
-          "pLambdaS3BucketName": "${pQuickstartS3BucketName}",
-          "pLambdaS3KeyPrefix": "${pQuickstartS3KeyPrefix}"
+          "pLambdaS3BucketName": {
+            "Ref": "pQuickstartS3BucketName"
+          },
+          "pLambdaS3KeyPrefix": {
+            "Ref": "pQuickstartS3KeyPrefix"
+          }
         },
         "Tags": [
           {
