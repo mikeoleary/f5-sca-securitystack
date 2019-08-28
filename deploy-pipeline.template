@@ -21,9 +21,9 @@ Parameters:
     Type: String
 Resources:
   CodePipelineArtifactStoreBucket:
-    Type: 'AWS::S3::Bucket'
+    Type: "AWS::S3::Bucket"
   CodePipelineArtifactStoreBucketPolicy:
-    Type: 'AWS::S3::BucketPolicy'
+    Type: "AWS::S3::BucketPolicy"
     Properties:
       Bucket: !Ref CodePipelineArtifactStoreBucket
       PolicyDocument:
@@ -31,39 +31,39 @@ Resources:
         Statement:
           - Sid: DenyUnEncryptedObjectUploads
             Effect: Deny
-            Principal: '*'
-            Action: 's3:PutObject'
+            Principal: "*"
+            Action: "s3:PutObject"
             Resource: !Join 
-              - ''
+              - ""
               - - !GetAtt 
                   - CodePipelineArtifactStoreBucket
                   - Arn
                 - /*
             Condition:
               StringNotEquals:
-                's3:x-amz-server-side-encryption': 'aws:kms'
+                "s3:x-amz-server-side-encryption": "aws:kms"
           - Sid: DenyInsecureConnections
             Effect: Deny
-            Principal: '*'
-            Action: 's3:*'
+            Principal: "*"
+            Action: "s3:*"
             Resource: !Join 
-              - ''
+              - ""
               - - !GetAtt 
                   - CodePipelineArtifactStoreBucket
                   - Arn
                 - /*
             Condition:
               Bool:
-                'aws:SecureTransport': false
+                "aws:SecureTransport": false
   AppPipelineWebhook:
-    Type: 'AWS::CodePipeline::Webhook'
+    Type: "AWS::CodePipeline::Webhook"
     Properties:
       Authentication: GITHUB_HMAC
       AuthenticationConfiguration:
         SecretToken: "Null"
       Filters:
         - JsonPath: $.ref
-          MatchEquals: 'refs/heads/{Branch}'
+          MatchEquals: "refs/heads/{Branch}"
       TargetPipeline: !Ref AppPipeline
       TargetAction: SourceAction
       Name: AppPipelineWebhook
@@ -72,9 +72,9 @@ Resources:
         - Version
       RegisterWithThirdParty: true
   AppPipeline:
-    Type: 'AWS::CodePipeline::Pipeline'
+    Type: "AWS::CodePipeline::Pipeline"
     Properties:
-      Name: !Sub '${AWS::StackName}-pipeline'
+      Name: !Sub "${AWS::StackName}-pipeline"
       RoleArn: !GetAtt 
         - CodePipelineServiceRole
         - Arn
@@ -125,7 +125,7 @@ Resources:
               Configuration: 
                 BucketName: !Ref S3Bucket
                 ObjectKey: !Ref S3Key
-                Extract: 'true'
+                Extract: "true"
             - Name: DeployArtifacts
               InputArtifacts: 
                 - Name: f5_sca_libs
@@ -137,16 +137,16 @@ Resources:
               Configuration: 
                 BucketName: !Ref S3Bucket
                 ObjectKey: !Ref S3Key
-                Extract: 'true'
+                Extract: "true"
 
 
       ArtifactStore:
         Type: S3
         Location: !Ref CodePipelineArtifactStoreBucket
   CodePipelineServiceRole:
-    Type: 'AWS::IAM::Role'
+    Type: "AWS::IAM::Role"
     Properties:
-      RoleName: !Sub '${AWS::StackName}-CodePipelineRole'
+      RoleName: !Sub "${AWS::StackName}-CodePipelineRole"
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -154,70 +154,70 @@ Resources:
             Principal:
               Service:
                 - codepipeline.amazonaws.com
-            Action: 'sts:AssumeRole'
+            Action: "sts:AssumeRole"
       Path: /
       Policies:
-        - PolicyName: !Sub '${AWS::StackName}-CodePipelinePolicy'
+        - PolicyName: !Sub "${AWS::StackName}-CodePipelinePolicy"
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - 'codecommit:CancelUploadArchive'
-                  - 'codecommit:GetBranch'
-                  - 'codecommit:GetCommit'
-                  - 'codecommit:GetUploadArchiveStatus'
-                  - 'codecommit:UploadArchive'
-                Resource: '*'
+                  - "codecommit:CancelUploadArchive"
+                  - "codecommit:GetBranch"
+                  - "codecommit:GetCommit"
+                  - "codecommit:GetUploadArchiveStatus"
+                  - "codecommit:UploadArchive"
+                Resource: "*"
               - Effect: Allow
                 Action:
-                  - 'codedeploy:CreateDeployment'
-                  - 'codedeploy:GetApplicationRevision'
-                  - 'codedeploy:GetDeployment'
-                  - 'codedeploy:GetDeploymentConfig'
-                  - 'codedeploy:RegisterApplicationRevision'
-                Resource: '*'
+                  - "codedeploy:CreateDeployment"
+                  - "codedeploy:GetApplicationRevision"
+                  - "codedeploy:GetDeployment"
+                  - "codedeploy:GetDeploymentConfig"
+                  - "codedeploy:RegisterApplicationRevision"
+                Resource: "*"
               - Effect: Allow
                 Action:
-                  - 'codebuild:BatchGetBuilds'
-                  - 'codebuild:StartBuild'
-                Resource: '*'
+                  - "codebuild:BatchGetBuilds"
+                  - "codebuild:StartBuild"
+                Resource: "*"
               - Effect: Allow
                 Action:
-                  - 'devicefarm:ListProjects'
-                  - 'devicefarm:ListDevicePools'
-                  - 'devicefarm:GetRun'
-                  - 'devicefarm:GetUpload'
-                  - 'devicefarm:CreateUpload'
-                  - 'devicefarm:ScheduleRun'
-                Resource: '*'
+                  - "devicefarm:ListProjects"
+                  - "devicefarm:ListDevicePools"
+                  - "devicefarm:GetRun"
+                  - "devicefarm:GetUpload"
+                  - "devicefarm:CreateUpload"
+                  - "devicefarm:ScheduleRun"
+                Resource: "*"
               - Effect: Allow
                 Action:
-                  - 'lambda:InvokeFunction'
-                  - 'lambda:ListFunctions'
-                Resource: '*'
+                  - "lambda:InvokeFunction"
+                  - "lambda:ListFunctions"
+                Resource: "*"
               - Effect: Allow
                 Action:
-                  - 'iam:PassRole'
-                Resource: '*'
+                  - "iam:PassRole"
+                Resource: "*"
               - Effect: Allow
                 Action:
-                  - 'elasticbeanstalk:*'
-                  - 'ec2:*'
-                  - 'elasticloadbalancing:*'
-                  - 'autoscaling:*'
-                  - 'cloudwatch:*'
-                  - 's3:*'
-                  - 'sns:*'
-                  - 'cloudformation:*'
-                  - 'rds:*'
-                  - 'sqs:*'
-                  - 'ecs:*'
-                Resource: '*'
+                  - "elasticbeanstalk:*"
+                  - "ec2:*"
+                  - "elasticloadbalancing:*"
+                  - "autoscaling:*"
+                  - "cloudwatch:*"
+                  - "s3:*"
+                  - "sns:*"
+                  - "cloudformation:*"
+                  - "rds:*"
+                  - "sqs:*"
+                  - "ecs:*"
+                Resource: "*"
   CodeBuildServiceRole:
-    Type: 'AWS::IAM::Role'
+    Type: "AWS::IAM::Role"
     Properties:
-      RoleName: !Sub '${AWS::StackName}-CodeBuildRole'
+      RoleName: !Sub "${AWS::StackName}-CodeBuildRole"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -225,19 +225,19 @@ Resources:
               Principal:
                 Service:
                   - codebuild.amazonaws.com
-              Action: 'sts:AssumeRole'
+              Action: "sts:AssumeRole"
       Path: /service-role/
       Policies:
-        - PolicyName: !Sub '${AWS::StackName}-CodeBuildPolicy'
+        - PolicyName: !Sub "${AWS::StackName}-CodeBuildPolicy"
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - 'cloudformation:Get*'
-                  - 'cloudformation:Describe*'
-                  - 'cloudformation:List*'
-                Resource: '*'
+                  - "cloudformation:Get*"
+                  - "cloudformation:Describe*"
+                  - "cloudformation:List*"
+                Resource: "*"
               - Effect: Allow
                 Action:
                   - "codecommit:ListBranches"
@@ -245,7 +245,7 @@ Resources:
                   - "codecommit:BatchGetRepositories"
                   - "codecommit:Get*"
                   - "codecommit:GitPull"
-                Resource: '*'
+                Resource: "*"
               - Effect: Allow
                 Action:
                   - "ec2:Describe*"
@@ -257,7 +257,7 @@ Resources:
                   - "logs:Describe*"
                   - "logs:Get*"
                   - "tag:Get*"
-                Resource: '*'
+                Resource: "*"
               - Effect: "Allow"
                 Action:
                   - "logs:CreateLogGroup"
@@ -272,20 +272,20 @@ Resources:
                   - "s3:GetObjectVersion"
                   - "s3:ListBucket"
                 Resource:
-                  - !Sub 'arn:aws:s3:::codepipeline-${AWS::Region}-*'
-                  - !Sub 'arn:aws:s3:::${CodePipelineArtifactStoreBucket}/*'
-                  - !Sub 'arn:aws:s3:::${CodePipelineArtifactStoreBucket}'
+                  - !Sub "arn:aws:s3:::codepipeline-${AWS::Region}-*"
+                  - !Sub "arn:aws:s3:::${CodePipelineArtifactStoreBucket}/*"
+                  - !Sub "arn:aws:s3:::${CodePipelineArtifactStoreBucket}"
   BuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: !Sub '${AWS::StackName}-BuildProject'
+      Name: !Sub "${AWS::StackName}-BuildProject"
       Description: Build to validate and copy CFN templates
       ServiceRole: !GetAtt [CodeBuildServiceRole, Arn ]
       Artifacts:
         Type: S3
         Location:
           Ref: CodePipelineArtifactStoreBucket
-        Name: !Sub '${AWS::StackName}-BuildCFN'
+        Name: !Sub "${AWS::StackName}-BuildCFN"
       BadgeEnabled: true
       Environment:
         Type: LINUX_CONTAINER
@@ -294,6 +294,6 @@ Resources:
       Source:
         Auth:
           Type: OAUTH
-        Location: !Sub 'https://github.com/${GitHubOwner}/${RepositoryName}'
+        Location: !Sub "https://github.com/${GitHubOwner}/${RepositoryName}"
         Type: GITHUB
       TimeoutInMinutes: 30
