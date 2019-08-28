@@ -12,6 +12,13 @@ Parameters:
   OAuthSecretName:
     Description: Name of OAuth Token in Secrets Manager
     Type: String
+  S3Bucket:
+    Description: S3 bucket to deploy lambda and CFN templates into
+    Type: String
+    Default: f5-sca-securitystack
+  S3Key:
+    Description: S3 bucket folder to deploy into
+    Type: String
 Resources:
   CodePipelineArtifactStoreBucket:
     Type: 'AWS::S3::Bucket'
@@ -105,6 +112,22 @@ Resources:
               OutputArtifacts:
                 - Name: f5_sca_libs
               RunOrder: 1
+        - Name: Deploy
+          Actions:
+            - Name: DeployArtifacts
+              InputArtifacts: 
+                - Name: f5_sca_libs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: "S3"
+              Configuration: 
+                BucketName: !Ref S3Bucket
+                ObjectKey: !Ref S3Key
+                Extract: 'true'
+
+
       ArtifactStore:
         Type: S3
         Location: !Ref CodePipelineArtifactStoreBucket
