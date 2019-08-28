@@ -114,6 +114,18 @@ Resources:
               RunOrder: 1
         - Name: Deploy
           Actions:
+            - Name: DeploySource
+              InputArtifacts: 
+                - Name: SourceOutput
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: "S3"
+              Configuration: 
+                BucketName: !Ref S3Bucket
+                ObjectKey: !Ref S3Key
+                Extract: 'true'
             - Name: DeployArtifacts
               InputArtifacts: 
                 - Name: f5_sca_libs
