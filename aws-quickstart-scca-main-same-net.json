@@ -51,22 +51,22 @@
       "MinLength": 9
     },
     "pAppVpcCidr": {
-        "Type": "String",
-        "Default": "10.1.0.0/16",
-        "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-        "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
-        "Description": "CIDR Block for the app VPC",
-        "MaxLength": 18,
-        "MinLength": 9
+      "Type": "String",
+      "Default": "10.1.0.0/16",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+      "Description": "CIDR Block for the app VPC",
+      "MaxLength": 18,
+      "MinLength": 9
     },
     "pFargateVpcCidr": {
-        "Type": "String",
-        "Default": "10.2.0.0/16",
-        "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-        "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
-        "Description": "CIDR Block for the app VPC",
-        "MaxLength": 18,
-        "MinLength": 9
+      "Type": "String",
+      "Default": "10.2.0.0/16",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+      "Description": "CIDR Block for the app VPC",
+      "MaxLength": 18,
+      "MinLength": 9
     },
     "licenseKey1": {
       "AllowedPattern": "([\\x41-\\x5A][\\x41-\\x5A|\\x30-\\x39]{4})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{5})\\-([\\x41-\\x5A|\\x30-\\x39]{7})",
@@ -149,7 +149,7 @@
     },
     "VdssStack": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn" : "TransitGatewayStack",
+      "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -190,92 +190,92 @@
       }
     },
     "AppVpcStack": {
-        "Type": "AWS::CloudFormation::Stack",
-        "DependsOn" : "TransitGatewayStack",
-        "Properties": {
-          "TemplateURL": {
-            "Fn::Sub": [
-              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-app-vpc.json",
-              {
-                "S3Region": {
-                  "Fn::If": [
-                    "GovCloud",
-                    "s3-us-gov-west-1",
-                    "s3"
-                  ]
-                }
-              }
-            ]
-          },
-          "Parameters": {
-            "pTransitGatewayStackName": {
-              "Fn::GetAtt": [
-                "TransitGatewayStack",
-                "Outputs.StackName"
-              ]
-            },
-            "pAppVpcCidr": {
-              "Ref": "pAppVpcCidr"
-            }
-          },
-          "Tags": [
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": "TransitGatewayStack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Sub": [
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-app-vpc.json",
             {
-              "Key": "Project",
-              "Value": {
-                "Ref": "pProject"
+              "S3Region": {
+                "Fn::If": [
+                  "GovCloud",
+                  "s3-us-gov-west-1",
+                  "s3"
+                ]
               }
             }
           ]
         },
-        "Metadata": {
-          "aws:cdk:path": "sccaMainStack/AppVPCStack"
-        }
+        "Parameters": {
+          "pTransitGatewayStackName": {
+            "Fn::GetAtt": [
+              "TransitGatewayStack",
+              "Outputs.StackName"
+            ]
+          },
+          "pAppVpcCidr": {
+            "Ref": "pAppVpcCidr"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": {
+              "Ref": "pProject"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "sccaMainStack/AppVPCStack"
+      }
     },
     "FargateVpcStack": {
-        "Type": "AWS::CloudFormation::Stack",
-        "DependsOn" : "TransitGatewayStack",
-        "Properties": {
-          "TemplateURL": {
-            "Fn::Sub": [
-              "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-fargate-vpc.json",
-              {
-                "S3Region": {
-                  "Fn::If": [
-                    "GovCloud",
-                    "s3-us-gov-west-1",
-                    "s3"
-                  ]
-                }
-              }
-            ]
-          },
-          "Parameters": {
-            "pTransitGatewayStackName": {
-              "Fn::GetAtt": [
-                "TransitGatewayStack",
-                "Outputs.StackName"
-              ]
-            },
-            "pFargateVpcCidr": {
-              "Ref": "pFargateVpcCidr"
-            }
-          },
-          "Tags": [
+      "Type": "AWS::CloudFormation::Stack",
+      "DependsOn": "TransitGatewayStack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Sub": [
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-fargate-vpc.json",
             {
-              "Key": "Project",
-              "Value": {
-                "Ref": "pProject"
+              "S3Region": {
+                "Fn::If": [
+                  "GovCloud",
+                  "s3-us-gov-west-1",
+                  "s3"
+                ]
               }
             }
           ]
         },
-        "Metadata": {
-          "aws:cdk:path": "sccaMainStack/FargateVPCStack"
-        }
+        "Parameters": {
+          "pTransitGatewayStackName": {
+            "Fn::GetAtt": [
+              "TransitGatewayStack",
+              "Outputs.StackName"
+            ]
+          },
+          "pFargateVpcCidr": {
+            "Ref": "pFargateVpcCidr"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": {
+              "Ref": "pProject"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "sccaMainStack/FargateVPCStack"
+      }
     },
     "JumpHostStack": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn" : "TransitGatewayStack",
+      "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -318,7 +318,7 @@
     },
     "F5BIGIP1": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn" : "TransitGatewayStack",
+      "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -392,7 +392,7 @@
     },
     "F5BIGIP2": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn" : "TransitGatewayStack",
+      "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -466,7 +466,7 @@
     },
     "IPSStack": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn" : "TransitGatewayStack",
+      "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
@@ -561,6 +561,155 @@
       },
       "Metadata": {
         "aws:cdk:path": "sccaMainStack/RouteUpdatesStack"
+      }
+    },
+    "InstallLambda": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Sub": [
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/install_lambda.json",
+            {
+              "S3Region": {
+                "Fn::If": [
+                  "GovCloud",
+                  "s3-us-gov-west-1",
+                  "s3"
+                ]
+              }
+            }
+          ]
+        },
+        "Parameters": {
+          "pPrefix": {
+            "Fn::Sub": "${AWS::StackName}"
+          },
+          "pLambdaS3BucketName": {
+            "Ref": "pQuickstartS3BucketName"
+          },
+          "pLambdaS3KeyPrefix": {
+            "Ref": "pQuickstartS3KeyPrefix"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": {
+              "Ref": "pProject"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "sccaMainStack/InstallLambdaStack"
+      }
+    },
+    "HAiAppTier1": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Sub": [
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/ha_iapp.json",
+            {
+              "S3Region": {
+                "Fn::If": [
+                  "GovCloud",
+                  "s3-us-gov-west-1",
+                  "s3"
+                ]
+              }
+            }
+          ]
+        },
+        "Parameters": {
+          "pPrefix": {
+            "Fn::Sub": "${AWS::StackName}"
+          },
+          "pBigIPMgmt": {
+            "Fn::GetAtt": [
+              "F5BIGIP1",
+              "Outputs.Bigip1ManagementEipAddress"
+            ]
+          },
+          "pBigIPRouteTableId": {
+            "Fn::GetAtt": [
+              "VdssStack",
+              "Outputs.VdssDmz1SubnetRouteTable"
+            ]
+          },
+          "pBigIPInterface": "/Common/internal",
+          "pBigIPS3Bucket": {
+            "Fn::GetAtt": [
+              "F5BIGIP1",
+              "Outputs.S3BucketName"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": {
+              "Ref": "pProject"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "sccaMainStack/InstallLambdaStack"
+      }
+    },
+    "HAiAppTier2": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Sub": [
+            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/ha_iapp.json",
+            {
+              "S3Region": {
+                "Fn::If": [
+                  "GovCloud",
+                  "s3-us-gov-west-1",
+                  "s3"
+                ]
+              }
+            }
+          ]
+        },
+        "Parameters": {
+          "pPrefix": {
+            "Fn::Sub": "${AWS::StackName}"
+          },
+          "pBigIPMgmt": {
+            "Fn::GetAtt": [
+              "F5BIGIP2",
+              "Outputs.Bigip1ManagementEipAddress"
+            ]
+          },
+          "pBigIPRouteTableId": {
+            "Fn::GetAtt": [
+              "VdssStack",
+              "Outputs.VdssDmz2SubnetRouteTable"
+            ]
+          },
+          "pBigIPInterface": "/Common/internal",
+          "pBigIPS3Bucket": {
+            "Fn::GetAtt": [
+              "F5BIGIP2",
+              "Outputs.S3BucketName"
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": {
+              "Ref": "pProject"
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "sccaMainStack/InstallLambdaStack"
       }
     }
   }
