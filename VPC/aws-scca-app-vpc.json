@@ -520,6 +520,11 @@
                     "Ref": "pContainerName"
                   },
                   "PropagateAtLaunch": true
+                },
+                {
+                 "Key" : "APPNAME",
+                 "Value" :"LINUXSERVER",
+                "PropagateAtLaunch": true
                 }
               ],
               "VPCZoneIdentifier": [
