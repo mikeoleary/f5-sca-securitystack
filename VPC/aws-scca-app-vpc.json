@@ -522,7 +522,11 @@
                   "PropagateAtLaunch": true
                 }
               ],
-              "VPCZoneIdentifier": { "Ref": "rAppSubnetA" },
+              "VPCZoneIdentifier": [
+                 {
+                  "Ref" : "rAppSubnetA"   
+                 } 
+              ],
               "Cooldown": "600",
               "HealthCheckGracePeriod": 120,
               "LaunchConfigurationName": {
