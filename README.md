@@ -56,3 +56,18 @@ Third, BIG-IP tier 1 and tier 2 are deployed
 Fourth, routes are replaced utilizing lambda functions since it's not natively allowed
 
 Lastly, the AS3 Update template updates AS3 
+
+## Development
+This project uses the AWS CloudPipeline to build the require Lambda functions as well as generating some of the CFN Templates.
+
+To start developing against this project please follow the below procedures:
+
+1) Create a GitHub [Personal Access Token](https://docs.aws.amazon.com/codepipeline/latest/userguide/GitHub-create-personal-token-CLI.html)
+2) Add the GitHub PAT to your AWS Secrets Manager.  **Note:** ensure the key uses the value GitHubPersonalAccessToken
+3) Deploy the deploy-pipeline.template CloudFormation Template
+    1. BranchName: the branch name of your Git repository - usually master unless you created a branch for development.
+	2. GitHubOwner: the GitHub account owner for the repository.  This is used to build the GitHub URL to access the repository.
+	3. OAuthSecretName: the name of your AWS Secrets Manager object that stores the GitHub PAT
+	4. RepositoryName: the Git repository name.  This is used to build the GitHub URL to access the repository.
+	5. S3Bucket: the S3 bucket you want the CFN templates and lambda files installed to. **Note:** this bucket must already exists.
+	6. S3Key: the directory inside your S3 bucket that will contain the deployment artifacts. 
