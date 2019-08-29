@@ -1,0 +1,14 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+f5-sdk = "*"
+f5-sca-libs = {path = "./../f5_sca_libs/dist/f5_sca_libs-1.0.0-py3-none-any.whl"}
+cfnresponse = "*"
+
+[requires]
+python_version = "3.7"

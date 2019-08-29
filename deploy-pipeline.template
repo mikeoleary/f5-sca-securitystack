@@ -1,0 +1,297 @@
+Parameters:
+  BranchName:
+    Description: GitHub branch name
+    Type: String
+    Default: master
+  RepositoryName:
+    Description: GitHub repository name
+    Type: String
+    Default: f5-sca-securitystack
+  GitHubOwner:
+    Type: String
+  OAuthSecretName:
+    Description: Name of OAuth Token in Secrets Manager
+    Type: String
+  S3Bucket:
+    Description: S3 bucket to deploy lambda and CFN templates into
+    Type: String
+    Default: f5-sca-securitystack
+  S3Key:
+    Description: S3 bucket folder to deploy into
+    Type: String
+Resources:
+  CodePipelineArtifactStoreBucket:
+    Type: "AWS::S3::Bucket"
+  CodePipelineArtifactStoreBucketPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref CodePipelineArtifactStoreBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: DenyUnEncryptedObjectUploads
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:PutObject"
+            Resource: !Join 
+              - ""
+              - - !GetAtt 
+                  - CodePipelineArtifactStoreBucket
+                  - Arn
+                - /*
+            Condition:
+              StringNotEquals:
+                "s3:x-amz-server-side-encryption": "aws:kms"
+          - Sid: DenyInsecureConnections
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource: !Join 
+              - ""
+              - - !GetAtt 
+                  - CodePipelineArtifactStoreBucket
+                  - Arn
+                - /*
+            Condition:
+              Bool:
+                "aws:SecureTransport": false
+  AppPipelineWebhook:
+    Type: "AWS::CodePipeline::Webhook"
+    Properties:
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: "Null"
+      Filters:
+        - JsonPath: $.ref
+          MatchEquals: "refs/heads/{Branch}"
+      TargetPipeline: !Ref AppPipeline
+      TargetAction: SourceAction
+      Name: !Sub "${AWS::StackName}-AppPipelineWebhook"
+      TargetPipelineVersion: !GetAtt 
+        - AppPipeline
+        - Version
+      RegisterWithThirdParty: true
+  AppPipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      Name: !Sub "${AWS::StackName}-pipeline"
+      RoleArn: !GetAtt 
+        - CodePipelineServiceRole
+        - Arn
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: SourceAction
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: "1"
+                Provider: GitHub
+              OutputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                Owner: !Ref GitHubOwner
+                Repo: !Ref RepositoryName
+                Branch: !Ref BranchName
+                OAuthToken: !Sub "{{resolve:secretsmanager:${OAuthSecretName}:SecretString:GitHubPersonalAccessToken}}"
+                PollForSourceChanges: false
+              RunOrder: 1
+        - Name: Test
+          Actions:
+            - Name: CodeBuild
+              InputArtifacts:
+                - Name: SourceOutput
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !GetAtt [BuildProject, Arn ]
+                PrimarySource: SourceOutput
+              OutputArtifacts:
+                - Name: f5_sca_libs
+              RunOrder: 1
+        - Name: Deploy
+          Actions:
+            - Name: DeploySource
+              InputArtifacts: 
+                - Name: SourceOutput
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: S3
+              Configuration: 
+                BucketName: !Ref S3Bucket
+                ObjectKey: !Ref S3Key
+                Extract: "true"
+            - Name: DeployArtifacts
+              InputArtifacts: 
+                - Name: f5_sca_libs
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: "1"
+                Provider: S3
+              Configuration: 
+                BucketName: !Ref S3Bucket
+                ObjectKey: !Ref S3Key
+                Extract: "true"
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodePipelineArtifactStoreBucket
+  CodePipelineServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-CodePipelineRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: /
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}-CodePipelinePolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "codecommit:CancelUploadArchive"
+                  - "codecommit:GetBranch"
+                  - "codecommit:GetCommit"
+                  - "codecommit:GetUploadArchiveStatus"
+                  - "codecommit:UploadArchive"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "codedeploy:CreateDeployment"
+                  - "codedeploy:GetApplicationRevision"
+                  - "codedeploy:GetDeployment"
+                  - "codedeploy:GetDeploymentConfig"
+                  - "codedeploy:RegisterApplicationRevision"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "codebuild:BatchGetBuilds"
+                  - "codebuild:StartBuild"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "devicefarm:ListProjects"
+                  - "devicefarm:ListDevicePools"
+                  - "devicefarm:GetRun"
+                  - "devicefarm:GetUpload"
+                  - "devicefarm:CreateUpload"
+                  - "devicefarm:ScheduleRun"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "lambda:InvokeFunction"
+                  - "lambda:ListFunctions"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "iam:PassRole"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "elasticbeanstalk:*"
+                  - "ec2:*"
+                  - "elasticloadbalancing:*"
+                  - "autoscaling:*"
+                  - "cloudwatch:*"
+                  - "s3:*"
+                  - "sns:*"
+                  - "cloudformation:*"
+                  - "rds:*"
+                  - "sqs:*"
+                  - "ecs:*"
+                Resource: "*"
+  CodeBuildServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-CodeBuildRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - codebuild.amazonaws.com
+              Action: "sts:AssumeRole"
+      Path: /service-role/
+      Policies:
+        - PolicyName: !Sub "${AWS::StackName}-CodeBuildPolicy"
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "cloudformation:Get*"
+                  - "cloudformation:Describe*"
+                  - "cloudformation:List*"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "codecommit:ListBranches"
+                  - "codecommit:ListRepositories"
+                  - "codecommit:BatchGetRepositories"
+                  - "codecommit:Get*"
+                  - "codecommit:GitPull"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "ec2:Describe*"
+                  - "cloudformation:ValidateTemplate"
+                  - "elasticloadbalancing:Describe*"
+                  - "autoscaling:Describe*"
+                  - "iam:Get*"
+                  - "iam:List*"
+                  - "logs:Describe*"
+                  - "logs:Get*"
+                  - "tag:Get*"
+                Resource: "*"
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource:
+                  - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+              - Effect: "Allow"
+                Action:
+                  - "s3:PutObject"
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:ListBucket"
+                Resource:
+                  - !Sub "arn:aws:s3:::codepipeline-${AWS::Region}-*"
+                  - !Sub "arn:aws:s3:::${CodePipelineArtifactStoreBucket}/*"
+                  - !Sub "arn:aws:s3:::${CodePipelineArtifactStoreBucket}"
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub "${AWS::StackName}-BuildProject"
+      Description: Build to validate and copy CFN templates
+      ServiceRole: !GetAtt [CodeBuildServiceRole, Arn ]
+      Artifacts:
+        Type: S3
+        Location:
+          Ref: CodePipelineArtifactStoreBucket
+        Name: !Sub "${AWS::StackName}-BuildCFN"
+      BadgeEnabled: true
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:1.0
+      Source:
+        Auth:
+          Type: OAUTH
+        Location: !Sub "https://github.com/${GitHubOwner}/${RepositoryName}"
+        Type: GITHUB
+      TimeoutInMinutes: 30

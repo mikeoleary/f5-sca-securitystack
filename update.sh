@@ -7,9 +7,8 @@ if [ -z ${licenseKey3} ]; then echo "licenseKey3 is unset"  && exit 1; fi
 if [ -z ${licenseKey4} ]; then echo "licenseKey4 is unset"  && exit 1; fi
 if [ -z ${S3Key} ]; then export s3Key="master"; fi
 
-aws cloudformation create-stack \
+aws cloudformation update-stack \
 --stack-name $stackName \
 --template-body file://./aws-quickstart-scca-main-same-net.json \
---disable-rollback \
 --capabilities CAPABILITY_IAM \
 --parameters ParameterKey=licenseKey1,ParameterValue=$licenseKey1  ParameterKey=licenseKey2,ParameterValue=$licenseKey2 ParameterKey=licenseKey3,ParameterValue=$licenseKey3 ParameterKey=licenseKey4,ParameterValue=$licenseKey4 ParameterKey=pBaselineCompliance,ParameterValue="Enterprise" ParameterKey=pQuickstartS3KeyPrefix,ParameterValue="$S3Key" ParameterKey=sshKey,ParameterValue="$sshKeyName" 

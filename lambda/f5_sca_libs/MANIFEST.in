@@ -1,0 +1,2 @@
+include README.rst
+resursive-include tests *.py
