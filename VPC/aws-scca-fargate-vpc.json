@@ -1,23 +1,45 @@
 {
+    "AWSTemplateFormatVersion": "2010-09-09",
     "Parameters": {
+        "pStackName": {
+            "Type": "String",
+            "Default": "production",
+            "Description": "The name of the parent Fargate networking stack that you created. Necessary to locate and reference resources created by that stack."
+        },
         "pProject": {
             "Type": "String",
             "Default": "SCCA-App-Demo",
             "Description": "Project name to use for tagging"
         },
-        "pFargateVpcCidr": {
+        "pServiceName": {
             "Type": "String",
-            "Default": "10.2.0.0/16",
-            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
-            "Description": "CIDR Block for the app VPC",
-            "MaxLength": 18,
-            "MinLength": 9
+            "Default": "nginx",
+            "Description": "A name for the service"
         },
-        "pTransitGatewayStackName": {
+        "pImageUrl": {
             "Type": "String",
-            "Default": "SccaTgwStack",
-            "Description": "Transit Gateway Stack Name"
+            "Default": "nginx",
+            "Description": "The url of a docker image that contains the application process that will handle the traffic for this service"
+        },
+        "pContainerPort": {
+            "Type": "Number",
+            "Default": 80,
+            "Description": "What port number the application inside the docker container is binding to"
+        },
+        "pContainerCpu": {
+            "Type": "Number",
+            "Default": 256,
+            "Description": "How much CPU to give the container. 1024 is 1 CPU"
+        },
+        "pContainerMemory": {
+            "Type": "Number",
+            "Default": 512,
+            "Description": "How much memory in megabytes to give the container"
+        },
+        "pDesiredCount": {
+            "Type": "Number",
+            "Default": 2,
+            "Description": "How many copies of the service task to run"
         }
     },
     "Resources": {
@@ -362,7 +384,7 @@
                 "aws:cdk:path": "SccaFargateStack/rMainTransitGatewayRouteVdss"
             }
         },
-        "FargateDefaultRoute" : {
+        "rFargateDefaultRoute" : {
             "Type" : "AWS::EC2::Route",
             "DependsOn" : "rFargateTransitGatewayAttachement",
             "Properties" : {
@@ -382,7 +404,170 @@
                  }
             }
         }
-      }
+        },
+        "rFargateSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+              "VpcId": {
+                "Ref": "rAppVpc"
+              },
+              "GroupDescription": "Enable SSH access via port 22 and enable access to web on 80 and 443",
+              "SecurityGroupIngress": [
+                {
+                  "IpProtocol": "tcp",
+                  "FromPort": "22",
+                  "ToPort": "22",
+                  "CidrIp": "10.0.0.0/8"
+                },
+                {
+                  "IpProtocol": "tcp",
+                  "FromPort": "80",
+                  "ToPort": "80",
+                  "CidrIp": "10.0.0.0/8"
+                },
+                {
+                  "IpProtocol": "tcp",
+                  "FromPort": "443",
+                  "ToPort": "443",
+                  "CidrIp": "10.0.0.0/8"
+                }
+              ]
+            }
+        },
+        "rFargateEcsCluster": {
+            "Type": "AWS::ECS::Cluster"
+        },          
+        "rTaskDefinition": {
+            "Type": "AWS::ECS::TaskDefinition",
+            "Properties": {
+                "Family": {
+                    "Ref": "pServiceName"
+                },
+                "Cpu": {
+                    "Ref": "pContainerCpu"
+                },
+                "Memory": {
+                    "Ref": "pContainerMemory"
+                },
+                "NetworkMode": "awsvpc",
+                "RequiresCompatibilities": [
+                    "FARGATE"
+                ],
+                "ExecutionRoleArn": {
+                    "Fn::ImportValue": {
+                        "Fn::Join": [
+                            ":",
+                            [
+                                {
+                                    "Ref": "StackName"
+                                },
+                                "ECSTaskExecutionRole"
+                            ]
+                        ]
+                    }
+                },
+                "TaskRoleArn": {
+                    "Fn::If": [
+                        "HasCustomRole",
+                        {
+                            "Ref": "Role"
+                        },
+                        {
+                            "Ref": "AWS::NoValue"
+                        }
+                    ]
+                },
+                "ContainerDefinitions": [
+                    {
+                        "Name": {
+                            "Ref": "pServiceName"
+                        },
+                        "Cpu": {
+                            "Ref": "pContainerCpu"
+                        },
+                        "Memory": {
+                            "Ref": "pContainerMemory"
+                        },
+                        "Image": {
+                            "Ref": "pImageUrl"
+                        },
+                        "PortMappings": [
+                            {
+                                "ContainerPort": {
+                                    "Ref": "pContainerPort"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "rService": {
+            "Type": "AWS::ECS::Service",
+            "Properties": {
+                "ServiceName": {
+                    "Ref": "pServiceName"
+                },
+                "Cluster": { "Ref" : "rFargateEcsCluster"
+                },
+                "LaunchType": "FARGATE",
+                "DeploymentConfiguration": {
+                    "MaximumPercent": 200,
+                    "MinimumHealthyPercent": 75
+                },
+                "DesiredCount": {
+                    "Ref": "pDesiredCount"
+                },
+                "NetworkConfiguration": {
+                    "AwsvpcConfiguration": {
+                        "AssignPublicIp": "DISABLED",
+                        "SecurityGroups": [
+                          { "Ref" : "rFargateSecurityGroup" }
+                        ],
+                        "Subnets": [ {"Ref": "rFargateSubnetA"}, {"Ref" : "rSubnetB"}
+                        ]
+                    }
+                },
+                "TaskDefinition": {
+                    "Ref": "pTaskDefinition"
+                }
+            }
+        },
+        "rServiceDisoveryPrivateDnsNameSpace": {
+            "Type": "AWS::ServiceDiscovery::PrivateDnsNamespace",
+            "Properties": {
+                "Vpc" : {
+                   "Fn::ImportValue": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "pTransitGatewayStackName"
+                            },
+                            "-VdssVpcId"
+                        ]
+                    ]
+                  }
+                },
+                 "Name" : "private-example.com"
+            }
+        },
+        "rServiceDiscoverService": {
+            "Type": "AWS::ServiceDiscovery::Service",
+            "Properties": {
+                "Description" : "Example Service Disovery NameSpace",
+                "DnsConfig" : {
+                    "DnsRecords" : {
+                        "TTL" : 60,
+                        "Type" : "A"
+                    },
+                    "RoutingPolicy" : "MULTIVALE"
+                },
+                "DnSRecord" : "A",
+                "Name" : "www",
+                "NamespaceId" : {"Ref" : "rServiceDisoveryPrivateDnsNameSpace"}
+            }
+        }
     },
     "Outputs": {
         "StackName": {
