@@ -450,7 +450,45 @@
         },
         "rFargateEcsCluster": {
             "Type": "AWS::ECS::Cluster"
-        },          
+        },
+        "rFargateECSServiceRole":{
+            "Type":"AWS::IAM::Role",
+            "Properties":{
+              "AssumeRolePolicyDocument":{
+                "Statement":[
+                  {
+                    "Effect":"Allow",
+                    "Principal":{
+                      "Service":[
+                        "ecs.amazonaws.com"
+                      ]
+                    },
+                    "Action":[
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Path":"/",
+              "Policies":[
+                {
+                  "PolicyName":"ecs-service",
+                  "PolicyDocument":{
+                    "Statement":[
+                      {
+                        "Effect":"Allow",
+                        "Action":[
+                          "ec2:Describe*",
+                          "ec2:AuthorizeSecurityGroupIngress"
+                        ],
+                        "Resource":"*"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },          
         "rTaskDefinition": {
             "Type": "AWS::ECS::TaskDefinition",
             "Properties": {
@@ -468,17 +506,7 @@
                     "FARGATE"
                 ],
                 "ExecutionRoleArn": {
-                    "Fn::ImportValue": {
-                        "Fn::Join": [
-                            ":",
-                            [
-                                {
-                                    "Ref": "StackName"
-                                },
-                                "ECSTaskExecutionRole"
-                            ]
-                        ]
-                    }
+                    "Ref" : "rFargateECSServiceRole"
                 },
                 "TaskRoleArn": {
                     "Fn::If": [
@@ -556,7 +584,7 @@
                         "",
                         [
                             {
-                                "Ref": "pTransitGatewayStackName"
+                                "Ref": "AWS::StackName"
                             },
                             "-VdssVpcId"
                         ]
