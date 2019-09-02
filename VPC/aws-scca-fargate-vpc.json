@@ -20,11 +20,11 @@
             "MaxLength": 18,
             "MinLength": 9
         },
-        "pTransitGatewayStackName": {
+        "pVpcStackName" : {
+            "Description" : "Name of the Stack that deployed the VPC",
             "Type": "String",
-            "Default": "SccaTgwStack",
-            "Description": "Transit Gateway Stack Name"
-        },
+            "Default": "VDSS"
+       },
         "pServiceName": {
             "Type": "String",
             "Default": "nginx",
@@ -667,9 +667,9 @@
             "Type": "AWS::ServiceDiscovery::PrivateDnsNamespace",
             "Properties": {
                 "Vpc" : {
-                   "Fn::ImportValue": { "Fn::Sub": "${pTransitGatewayStackName}-VdssVpcId" },
-                 "Name" : "sca.example.com"
-            }
+                   "Fn::ImportValue": { "Fn::Sub": "${pVpcStackName}-VdssVpcId" }
+            },
+            "Name" : "sca.example.com"
            }
         },
         "rServiceDiscoverService": {
