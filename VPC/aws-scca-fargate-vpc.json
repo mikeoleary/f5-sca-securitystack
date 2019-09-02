@@ -670,6 +670,7 @@
                    "Fn::ImportValue": { "Fn::Sub": "${pTransitGatewayStackName}-VdssVpcId" },
                  "Name" : "sca.example.com"
             }
+           }
         },
         "rServiceDiscoverService": {
             "Type": "AWS::ServiceDiscovery::Service",
@@ -884,5 +885,4 @@
             }
         }
     }
-}
 }
