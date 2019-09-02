@@ -25,6 +25,11 @@
             "Type": "String",
             "Default": "VDSS"
        },
+       "pTransitGatewayStackName": {
+        "Type": "String",
+        "Default": "SccaTgwStack",
+        "Description": "Transit Gateway Stack Name"
+        },
         "pServiceName": {
             "Type": "String",
             "Default": "nginx",
