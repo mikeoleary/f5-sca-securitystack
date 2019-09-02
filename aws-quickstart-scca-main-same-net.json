@@ -233,7 +233,7 @@
     },
     "FargateVpcStack": {
       "Type": "AWS::CloudFormation::Stack",
-      "DependsOn": "TransitGatewayStack",
+      "DependsOn": "VdssStack",
       "Properties": {
         "TemplateURL": {
           "Fn::Sub": [
