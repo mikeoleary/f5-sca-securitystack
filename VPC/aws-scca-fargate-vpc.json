@@ -538,7 +538,7 @@
                         "SecurityGroups": [
                           { "Ref" : "rFargateSecurityGroup" }
                         ],
-                        "Subnets": [ {"Ref": "rFargateSubnetA"}, {"Ref" : "rSubnetB"}
+                        "Subnets": [ {"Ref": "rFargateSubnetA"}, {"Ref" : "rFargateSubnetB"}
                         ]
                     }
                 },
