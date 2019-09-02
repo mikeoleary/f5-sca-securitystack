@@ -663,12 +663,12 @@
                 }
             }
         },
-        "rServiceDisoveryPrivateDnsNameSpace": {
+        "rServiceDiscoveryPrivateDnsNameSpace": {
             "Type": "AWS::ServiceDiscovery::PrivateDnsNamespace",
             "Properties": {
                 "Vpc" : {
                    "Fn::ImportValue": { "Fn::Sub": "${pTransitGatewayStackName}-VdssVpcId" },
-                 "Name" : "private-example.com"
+                 "Name" : "sca.example.com"
             }
         },
         "rServiceDiscoverService": {
@@ -680,10 +680,10 @@
                     "DnsRecords" : {
                         "TTL" : 60,
                         "Type" : "A"
-                    }
+                    },
+                    "RoutingPolicy" : "MULTIVALUE"
                 },
-                "RoutingPolicy" : "MULTIVALUE",
-                "NamespaceId" : {"Ref" : "rServiceDisoveryPrivateDnsNameSpace"}
+                "NamespaceId" : {"Ref" : "rServiceDiscoveryPrivateDnsNameSpace"}
             }
         }
     },
