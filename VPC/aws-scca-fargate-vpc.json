@@ -56,6 +56,37 @@
             "Description": "How many copies of the service task to run"
         }
     },
+    "Mappings":{
+        "AWSRegionToAMI":{
+          "us-east-1":{
+            "AMIID":"ami-eca289fb"
+          },
+          "us-east-2":{
+            "AMIID":"ami-446f3521"
+          },
+          "us-west-1":{
+            "AMIID":"ami-9fadf8ff"
+          },
+          "us-west-2":{
+            "AMIID":"ami-7abc111a"
+          },
+          "eu-west-1":{
+            "AMIID":"ami-a1491ad2"
+          },
+          "eu-central-1":{
+            "AMIID":"ami-54f5303b"
+          },
+          "ap-northeast-1":{
+            "AMIID":"ami-9cd57ffd"
+          },
+          "ap-southeast-1":{
+            "AMIID":"ami-a900a3ca"
+          },
+          "ap-southeast-2":{
+            "AMIID":"ami-5781be34"
+          }
+        }
+    },
     "Resources": {
         "rFargateVpc": {
             "Type": "AWS::EC2::VPC",
@@ -423,7 +454,7 @@
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
               "VpcId": {
-                "Ref": "rAppVpc"
+                "Ref": "rFargateVpc"
               },
               "GroupDescription": "Enable SSH access via port 22 and enable access to web on 80 and 443",
               "SecurityGroupIngress": [
@@ -450,6 +481,23 @@
         },
         "rFargateEcsCluster": {
             "Type": "AWS::ECS::Cluster"
+        },
+        "rCloudwatchLogsGroup":{
+            "Type":"AWS::Logs::LogGroup",
+            "Properties":{
+              "LogGroupName":{
+                "Fn::Join":[
+                  "-",
+                  [
+                    "ECSLogGroup",
+                    {
+                      "Ref":"AWS::StackName"
+                    }
+                  ]
+                ]
+              },
+              "RetentionInDays":14
+            }
         },
         "rFargateECSServiceRole":{
             "Type":"AWS::IAM::Role",
@@ -478,8 +526,13 @@
                       {
                         "Effect":"Allow",
                         "Action":[
-                          "ec2:Describe*",
-                          "ec2:AuthorizeSecurityGroupIngress"
+                            "ec2:AttachNetworkInterface",
+                            "ec2:CreateNetworkInterface",
+                            "ec2:CreateNetworkInterfacePermission",
+                            "ec2:DeleteNetworkInterface",
+                            "ec2:DeleteNetworkInterfacePermission",
+                            "ec2:Describe*",
+                            "ec2:DetachNetworkInterface"
                         ],
                         "Resource":"*"
                       }
@@ -488,8 +541,51 @@
                 }
               ]
             }
-          },          
-        "rTaskDefinition": {
+        },
+        "rFargateECSTaskRole":{
+            "Type":"AWS::IAM::Role",
+            "Properties":{
+              "AssumeRolePolicyDocument":{
+                "Statement":[
+                  {
+                    "Effect":"Allow",
+                    "Principal":{
+                      "Service":[
+                        "ecs.amazonaws.com"
+                      ]
+                    },
+                    "Action":[
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Path":"/",
+              "Policies":[
+                {
+                  "PolicyName":"ecs-service",
+                  "PolicyDocument":{
+                    "Statement":[
+                      {
+                        "Effect":"Allow",
+                        "Action":[
+                            "ecr:GetAuthorizationToken",
+                            "ecr:BatchCheckLayerAvailability",
+                            "ecr:GetDownloadUrlForLayer",
+                            "ecr:BatchGetImage",
+                            "logs:CreateLogStream",
+                            "logs:PutLogEvents"
+
+                        ],
+                        "Resource":"*"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+        },            
+        "TaskDefinition": {
             "Type": "AWS::ECS::TaskDefinition",
             "Properties": {
                 "Family": {
@@ -506,18 +602,10 @@
                     "FARGATE"
                 ],
                 "ExecutionRoleArn": {
-                    "Ref" : "rFargateECSServiceRole"
+                   "Ref": "rFargateECSServiceRole"
                 },
                 "TaskRoleArn": {
-                    "Fn::If": [
-                        "HasCustomRole",
-                        {
-                            "Ref": "Role"
-                        },
-                        {
-                            "Ref": "AWS::NoValue"
-                        }
-                    ]
+                   "Ref" : "rFargateECSTaskRole"
                 },
                 "ContainerDefinitions": [
                     {
