@@ -675,15 +675,15 @@
             "Type": "AWS::ServiceDiscovery::Service",
             "Properties": {
                 "Description" : "Example Service Disovery NameSpace",
+                "Name" : "www",
                 "DnsConfig" : {
                     "DnsRecords" : {
                         "TTL" : 60,
                         "Type" : "A"
-                    },
-                    "RoutingPolicy" : "MULTIVALE",
-                    "NamespaceId" : {"Ref" : "rServiceDisoveryPrivateDnsNameSpace"}
+                    }
                 },
-                "Name" : "www"
+                "RoutingPolicy" : "MULTIVALUE",
+                "NamespaceId" : {"Ref" : "rServiceDisoveryPrivateDnsNameSpace"}
             }
         }
     },
