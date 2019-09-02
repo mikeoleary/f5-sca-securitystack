@@ -10,6 +10,20 @@
             "Type": "String",
             "Default": "SCCA-App-Demo",
             "Description": "Project name to use for tagging"
+        },    
+        "pFargateVpcCidr": {
+            "Type": "String",
+            "Default": "10.2.0.0/16",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+            "Description": "CIDR Block for the app VPC",
+            "MaxLength": 18,
+            "MinLength": 9
+        },
+        "pTransitGatewayStackName": {
+            "Type": "String",
+            "Default": "SccaTgwStack",
+            "Description": "Transit Gateway Stack Name"
         },
         "pServiceName": {
             "Type": "String",
