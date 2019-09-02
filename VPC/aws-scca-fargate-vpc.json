@@ -667,18 +667,7 @@
             "Type": "AWS::ServiceDiscovery::PrivateDnsNamespace",
             "Properties": {
                 "Vpc" : {
-                   "Fn::ImportValue": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "AWS::StackName"
-                            },
-                            "-VdssVpcId"
-                        ]
-                    ]
-                  }
-                },
+                   "Fn::ImportValue": { "Fn::Sub": "${pTransitGatewayStackName}-VdssVpcId" },
                  "Name" : "private-example.com"
             }
         },
@@ -896,4 +885,5 @@
             }
         }
     }
+}
 }
