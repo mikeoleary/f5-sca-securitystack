@@ -680,10 +680,10 @@
                         "TTL" : 60,
                         "Type" : "A"
                     },
-                    "RoutingPolicy" : "MULTIVALE"
+                    "RoutingPolicy" : "MULTIVALE",
+                    "NamespaceId" : {"Ref" : "rServiceDisoveryPrivateDnsNameSpace"}
                 },
-                "Name" : "www",
-                "NamespaceId" : {"Ref" : "rServiceDisoveryPrivateDnsNameSpace"}
+                "Name" : "www"
             }
         }
     },
