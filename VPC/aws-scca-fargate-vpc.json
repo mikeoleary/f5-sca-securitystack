@@ -682,7 +682,6 @@
                     },
                     "RoutingPolicy" : "MULTIVALE"
                 },
-                "DnSRecord" : "A",
                 "Name" : "www",
                 "NamespaceId" : {"Ref" : "rServiceDisoveryPrivateDnsNameSpace"}
             }
