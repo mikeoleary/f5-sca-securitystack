@@ -543,7 +543,7 @@
                     }
                 },
                 "TaskDefinition": {
-                    "Ref": "pTaskDefinition"
+                    "Ref": "rTaskDefinition"
                 }
             }
         },
