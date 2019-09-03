@@ -677,7 +677,7 @@
             "Name" : "sca.example.com"
            }
         },
-        "rServiceDiscoverService": {
+        "rServiceDiscoveryService": {
             "Type": "AWS::ServiceDiscovery::Service",
             "Properties": {
                 "Description" : "Example Service Disovery NameSpace",
