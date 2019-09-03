@@ -671,16 +671,7 @@
         "rServiceDiscoveryPrivateDnsNameSpace": {
             "Type": "AWS::ServiceDiscovery::PrivateDnsNamespace",
             "Properties": {
-                "Vpc" : {"Fn::ImportValue": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "pVpcStackName"
-                            },
-                            "-VdssVpcId"
-                        ]
-                    ]
+                "Vpc" : {"Fn::ImportValue": { "Fn::Sub" : { "Ref": "${pVpcStackName}-VdssVpcId"}
                 }
             },
             "Name" : "sca.example.com"
