@@ -683,10 +683,12 @@
                 "Description" : "Example Service Disovery NameSpace",
                 "Name" : "www",
                 "DnsConfig" : {
-                    "DnsRecords" : {
+                    "DnsRecords" : [
+                        {
                         "TTL" : 60,
                         "Type" : "A"
-                    },
+                        }
+                    ],   
                     "RoutingPolicy" : "MULTIVALUE"
                 },
                 "NamespaceId" : {"Ref" : "rServiceDiscoveryPrivateDnsNameSpace"}
