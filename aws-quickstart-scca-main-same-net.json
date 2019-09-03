@@ -258,6 +258,12 @@
           },
           "pFargateVpcCidr": {
             "Ref": "pFargateVpcCidr"
+          },
+          "pVpcStackName": {
+            "Fn::GetAtt": [
+              "VdssStack",
+              "Outputs.StackName"
+            ]
           }
         },
         "Tags": [
