@@ -320,6 +320,7 @@
         },
         "rFargateTransitGatewayAttachement": {
             "Type": "AWS::EC2::TransitGatewayAttachment",
+            "DependsOn" : "rFargateSubnetPeer",
             "Properties": {
                 "SubnetIds": [
                     {
