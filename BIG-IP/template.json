@@ -624,6 +624,7 @@
      "instanceType": {
       "AllowedValues": [
        "m5.xlarge",
+       "m5.2xlarge",
        "m5.4xlarge",
        "m5.large",
        "m5.12xlarge",
