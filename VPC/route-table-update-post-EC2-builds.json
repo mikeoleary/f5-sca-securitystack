@@ -348,7 +348,7 @@
                     "    data = s3.get_object(Bucket=bucket, Key=key)",
                     "    json_data = data['Body'].read()",
                     "    password = json.loads(json_data)[\"password\"]",
-                    "    user = 'admin'",
+                    "    user = json.loads(json_data)[\"username\"]",
                     "    headers = (user, password)",
                     "",
                     "    url1 = ('https://' + mgmt_ip1 + '/mgmt/tm/cm/failover-status')",

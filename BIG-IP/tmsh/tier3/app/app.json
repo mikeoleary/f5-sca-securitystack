@@ -1,0 +1,124 @@
+{
+    "commands": {
+        "085-apply-app1-baseline": { 
+            "test" : "[ -f /config/appBaseline.sh ]",
+            "command": { 
+                "Fn::Join": [  
+                " ", 
+                [ 
+                    "nohup /config/waitThenRun.sh",
+                    "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
+                    "--file /config/deployapp1.sh",
+                    "--output /var/log/deployapp1.log",
+                    "--log-level silly",
+                    "--wait-for MGMT_DONE",
+                    "--signal APP1_DONE",
+                    "&>> /var/log/cloud/aws/install.log < /dev/null &"
+                ] 
+                ] 
+            }, 
+            "cwd" : "/config"  
+            } 
+            
+    },
+    "files": {
+        "/config/owasp-auto-tune.xml": {
+            "group": "root",
+            "mode": "000755",
+            "owner": "root",
+            "source": "https://raw.githubusercontent.com/f5devcentral/f5-asm-policy-templates/master/owasp_ready_template/owasp-auto-tune-v1.1.xml"
+        },
+        "/config/deployapp1.sh": {
+            "group": "root",
+            "mode": "000755",
+            "owner": "root",
+            "content": {
+                "Fn::Join": [
+                    "",
+                    [
+                    "#!/bin/bash\n",
+                    "partition=\"app1\"",
+                    "\n",
+                    "appName=\"app1\"",
+                    "\n",
+                    "virtualAddress='",
+                    {
+                        "Fn::GetAtt": [
+                        "Bigip1subnet1Az1Interface",
+                        "PrimaryPrivateIpAddress"
+                        ]
+                    },
+                    "'\n",
+                    "virtualAddress2='",
+                    {
+                    "Fn::GetAtt": [
+                    "Bigip2subnet1Az1Interface",
+                    "PrimaryPrivateIpAddress"
+                    ]
+                    },
+                    "'\n",
+                    "node1='",
+                    {
+                    "Ref": "pJumpHostPrivateIP"
+                    },
+                    "'\n",
+                    "\n",
+                    "asmPolicy=\"app1\"\n",
+                    "asmFile=\"/config/owasp-auto-tune.xml\"\n",
+                    "### FILE CREATION FOR APP ACCESS\n",
+                    "#partition\n",
+                    "echo  -e 'create cli transaction;\n",
+                    "create auth partition '${partition}' { };\n",
+                    "submit cli transaction' | tmsh -q\n",
+                    "\n",
+                    "# asm policy\n",
+                    "echo  -e 'create cli transaction;\n",
+                    "cd /'${partition}';\n",
+                    "load asm policy file '${asmFile}'\n",
+                    "submit cli transaction' | tmsh -q\n",
+                    "\n",
+                    "# traffic policy\n",
+                    "echo  -e 'create cli transaction;\n",
+                    "cd /'${partition}';\n",
+                    "create ltm policy /'${partition}'/Drafts/app1_asm_policy_https controls add { asm } rules add { default { actions add { 1 { asm enable policy /Common/owasp-auto-tune} } ordinal 1 } } strategy /Common/first-match;\n", 
+                    "submit cli transaction' | tmsh -q\n",
+                    "\n",
+                    "# publish traffic policy\n",
+                    "echo  -e 'create cli transaction;\n",
+                    "cd /'${partition}';\n",
+                    "publish ltm policy /'${partition}'/Drafts/app1_asm_policy_https;\n",
+                    "submit cli transaction' | tmsh -q\n",
+                    "\n",
+                    "#virtual servers\n",
+                    "echo  -e 'create cli transaction;\n",
+                    "cd /'${partition}';\n",
+                    "create ltm node /'${partition}'/'${node1}' { address '${node1}' };\n",
+                    "create ltm virtual /'${partition}'/'${appName}'_http { description '${appName}'_http destination /'${partition}'/'${virtualAddress}':http ip-protocol tcp mask 255.255.255.255 persist none profiles replace-all-with { /Common/f5-tcp-progressive {} http } rules { /Common/_sys_https_redirect } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
+                    "create ltm pool /'${partition}'/'${appName}'_https_pool { members replace-all-with { myapp.local:https { fqdn { autopopulate enabled name myapp.local } } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open } };\n",
+                    "create ltm virtual /'${partition}'/'${appName}'_https {  description '${appName}'_https destination /'${partition}'/'${virtualAddress}':https ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/cookie { default yes } } pool /'${partition}'/app1_https_pool security-log-profiles add { \"Log all requests\" } profiles replace-all-with { /Common/f5-tcp-progressive { } http websecurity } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
+                    "submit cli transaction' | tmsh -q\n",
+                    "\n",
+                    "# create BotDef and logging profile\n",
+                    "echo  -e 'create cli transaction;\n",
+                    "create security log profile /'${partition}'/'${appName}'_sec_log application replace-all-with { /'${partition}'/'${appName}' { filter replace-all-with {  request-type { values replace-all-with { all } } } response-logging illegal } } bot-defense replace-all-with { /'${partition}'/'${appName}' { filter { log-alarm enabled log-block enabled log-browser enabled log-browser-verification-action enabled log-captcha enabled log-device-id-collection-request enabled log-malicious-bot enabled log-mobile-application enabled log-none enabled log-rate-limit enabled log-suspicious-browser enabled log-tcp-reset enabled log-trusted-bot enabled log-unknown enabled log-untrusted-bot enabled } local-publisher /Common/local-db-publisher } };\n",
+                    "create security bot-defense profile /'${partition}'/'${appName}'_bot {  api-access-strict-mitigation enabled app-service none blocking-page {  type default }  captcha-response { failure {  type default } first { type default } } cross-domain-requests allow-all description none deviceid-mode generate-after-access  dos-attack-strict-mitigation enabled enforcement-mode transparent enforcement-readiness-period 7 grace-period 300  mobile-detection { allow-android-rooted-device disabled allow-any-android-package enabled allow-any-ios-package enabled allow-emulators disabled allow-jailbroken-devices disabled block-debugger-enabled-device enabled client-side-challenge-mode pass } perform-challenge-in-transparent disabled signature-staging-upon-update disabled single-page-application disabled template relaxed whitelist replace-all-with { apple_touch_1 { match-order 2 url /apple-touch-icon*.png } favicon_1 { match-order 1 url /favicon.ico } } };\n",
+                    "submit cli transaction' | tmsh -q\n",
+                    "\n",
+                    "# add asm bot and logging\n",
+                    "echo  -e 'create cli transaction;\n",
+                    "modify ltm virtual /'${partition}'/'${appName}'_https profiles add { /'${partition}'/'${appName}'_bot } policies add { /'${partition}'/'${appName}'_asm_policy_https} security-log-profiles replace-all-with { /'${partition}'/'${appName}'_sec_log };\n",
+                    "submit cli transaction' | tmsh -q\n",
+                    "\n",
+                    "# save config\n",
+                    "echo  -e 'create cli transaction;\n",
+                    "save sys config partitions all;\n",
+                    "submit cli transaction' | tmsh -q\n",
+                    "\n",
+                    "### END DEPLOYMENT OF FILE CREATION FOR APP ACCESS"
+                    ]
+                ]
+            }
+        }
+    }
+
+}
