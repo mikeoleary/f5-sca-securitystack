@@ -1,0 +1,56 @@
+{
+  "/config/deleteBaseline.sh": {
+    "group": "root",
+    "mode": "000755",
+    "owner": "root",
+    "content": {
+        "Fn::Join": [
+            "",
+            [
+            "#!/bin/bash\n",
+            "partition=\"mgmt\"",
+            "\n",
+            "virtualAddress='",
+            {
+            "Fn::GetAtt": [
+            "Bigip1subnet1Az1Interface",
+            "PrimaryPrivateIpAddress"
+            ]
+            },
+            "'\n",
+            "virtualAddress2='",
+            {
+            "Fn::GetAtt": [
+            "Bigip2subnet1Az1Interface",
+            "PrimaryPrivateIpAddress"
+            ]
+            },
+            "'\n",
+            "node1='",
+            {
+            "Ref": "pJumpHostPrivateIP"
+            },
+            "'\n",
+            "\n",
+            "### DELETE ITEMS FOR MGMT ACCESS\n",
+            "echo  -e 'create cli transaction;\n",
+            "delete ltm virtual /'${partition}'/jumphost_mgmt_ssh;\n",
+            "delete ltm virtual /'${partition}'/bigip1_mgmt_https;\n",
+            "delete ltm virtual /'${partition}'/bigip1_mgmt_http;\n",
+            "delete ltm virtual /'${partition}'/forward_outbound;\n",
+            "delete ltm pool /'${partition}'/jumphost_ssh_pool;\n",
+            "delete ltm pool /'${partition}'/jumphost_https_pool;\n",
+            "delete ltm pool /'${partition}'/jumphost_http_pool;\n",
+            "delete ltm node /'${partition}'/'${node1}';\n",
+            "submit cli transaction' | tmsh -q\n",
+            "\n",
+            "echo  -e 'create cli transaction;\n",
+            "delete auth partition '${partition}'\n",
+            "submit cli transaction' | tmsh -q\n",
+            "\n",
+            "### END DEPLOYMENT OF OBJECT REMOVAL FOR MGMT ACCESS"
+            ]
+        ]
+    }
+}
+}
