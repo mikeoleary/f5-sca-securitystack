@@ -57,7 +57,7 @@
         },
         "pDesiredCount": {
             "Type": "Number",
-            "Default": 2,
+            "Default": 0,
             "Description": "How many copies of the service task to run"
         }
     },
