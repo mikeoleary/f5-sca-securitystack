@@ -56,7 +56,7 @@
          "c5n.4xlarge"
         ],
         "ConstraintDescription": "Must be a valid EC2 instance type for BIG-IP",
-        "Default": "m5.xlarge",
+        "Default": "c4.xlarge",
         "Description": "Big-IP Tier 1: Size of the F5 BIG-IP Virtual Instance",
         "Type": "String"
        },
@@ -94,7 +94,7 @@
          "c5n.4xlarge"
         ],
         "ConstraintDescription": "Must be a valid EC2 instance type for BIG-IP",
-        "Default": "m5.2xlarge",
+        "Default": "c4.2xlarge",
         "Description": "Big-IP Tier 2: Size of the F5 BIG-IP Virtual Instance",
         "Type": "String"
        },
@@ -187,82 +187,6 @@
       "MinLength": "1",
       "Type": "String"
     },
-    "instanceTypeTier1": {
-        "AllowedValues": [
-         "m5.xlarge",
-         "m5.2xlarge",
-         "m5.4xlarge",
-         "m5.large",
-         "m5.12xlarge",
-         "m4.xlarge",
-         "m4.large",
-         "m4.4xlarge",
-         "m4.2xlarge",
-         "m4.16xlarge",
-         "m4.10xlarge",
-         "m3.xlarge",
-         "m3.medium",
-         "m3.large",
-         "m3.2xlarge",
-         "cc2.8xlarge",
-         "c5.xlarge",
-         "c5.large",
-         "c5.4xlarge",
-         "c5.9xlarge",
-         "c4.xlarge",
-         "c4.8xlarge",
-         "c4.4xlarge",
-         "c4.2xlarge",
-         "c3.xlarge",
-         "c3.8xlarge",
-         "c3.4xlarge",
-         "c3.2xlarge",
-         "c5n.2xlarge",
-         "c5n.4xlarge"
-        ],
-        "ConstraintDescription": "Must be a valid EC2 instance type for BIG-IP",
-        "Default": "m5.xlarge",
-        "Description": "Big-IP Tier 1: Size of the F5 BIG-IP Virtual Instance",
-        "Type": "String"
-       },
-       "instanceTypeTier2": {
-        "AllowedValues": [
-         "m5.xlarge",
-         "m5.2xlarge",
-         "m5.4xlarge",
-         "m5.large",
-         "m5.12xlarge",
-         "m4.xlarge",
-         "m4.large",
-         "m4.4xlarge",
-         "m4.2xlarge",
-         "m4.16xlarge",
-         "m4.10xlarge",
-         "m3.xlarge",
-         "m3.medium",
-         "m3.large",
-         "m3.2xlarge",
-         "cc2.8xlarge",
-         "c5.xlarge",
-         "c5.large",
-         "c5.4xlarge",
-         "c5.9xlarge",
-         "c4.xlarge",
-         "c4.8xlarge",
-         "c4.4xlarge",
-         "c4.2xlarge",
-         "c3.xlarge",
-         "c3.8xlarge",
-         "c3.4xlarge",
-         "c3.2xlarge",
-         "c5n.2xlarge",
-         "c5n.4xlarge"
-        ],
-        "ConstraintDescription": "Must be a valid EC2 instance type for BIG-IP",
-        "Default": "m5.2xlarge",
-        "Description": "Big-IP Tier 2: Size of the F5 BIG-IP Virtual Instance",
-        "Type": "String"
-       },
     "sshKey": {
       "Description": "EC2 SSH Key for BIG-IP and Linux images",
       "Type": "AWS::EC2::KeyPair::KeyName"
@@ -499,12 +423,6 @@
               "Outputs.StackName"
             ]
           },
-          "pJumpHostPrivateIP": {
-            "Fn::GetAtt": [
-              "JumpHostStack",
-              "Outputs.JumpHostPrivateIp"
-            ]
-          },
           "restrictedSrcAddressApp": "0.0.0.0/0",
           "licenseKey1": {
             "Ref": "licenseKey1"
@@ -513,9 +431,6 @@
             "Ref": "licenseKey2"
           },
           "pTier": "Tier1",
-          "instanceType": {
-            "Ref": "instanceTypeTier1"
-          },
           "sshKey": {
             "Ref": "sshKey"
           },
@@ -576,12 +491,6 @@
               "Outputs.StackName"
             ]
           },
-          "pJumpHostPrivateIP": {
-            "Fn::GetAtt": [
-              "JumpHostStack",
-              "Outputs.JumpHostPrivateIp"
-            ]
-          },
           "pBaselineCompliance": {
             "Ref": "pBaselineCompliance"
           },
@@ -593,9 +502,6 @@
             "Ref": "licenseKey4"
           },
           "pTier": "Tier2",
-          "instanceType": {
-            "Ref": "instanceTypeTier2"
-          },
           "sshKey": {
             "Ref": "sshKey"
           },
