@@ -141,7 +141,6 @@
         },
         "Parameters": [
          "pVpcStackName",
-         "pJumpHostPrivateIP",
          "pTier",
          "numberOfAdditionalNics",
          "additionalNicLocation"
@@ -201,9 +200,6 @@
       "ParameterLabels": {
        "pVpcStackName": {
         "default": "Name of the Stack that deployed the VPC"
-        },
-        "pJumpHostPrivateIP": {
-            "default": "Private IP address of Jump Host"
         },
        "pTier": {
         "default": "Tier1 or Tier2. Defines which Tier of the architecture the BIG-IP devices will sit in."
@@ -540,17 +536,12 @@
       "Type": "String",
       "Default": "VDSS"
       },
-      "pJumpHostPrivateIP": {
-        "ConstraintDescription": "JumpHost Private IP address",
-        "Type": "String",
-        "Default": "10.0.4.10"
-        },
-        "pVirtualPrivateIP": {
-            "ConstraintDescription": "Tier3 Virtual address",
-            "Type": "String",
-            "Default": "10.0.4.11"
-        },
-      "pTier": {
+       "pVirtualPrivateIP": {
+           "ConstraintDescription": "Tier3 Virtual address",
+           "Type": "String",
+           "Default": "10.0.4.11"
+       },
+       "pTier": {
         "AllowedValues": [
             "Tier1",
             "Tier2"
@@ -1523,11 +1514,6 @@
                             ]
                             },
                             "'\n",
-                            "JUMPHOSTIP='",
-                            {
-                            "Ref": "pJumpHostPrivateIP"
-                            },
-                            "'\n",
                             "\n",
                             "### START DEPLOYMENT OF AS3 DECLARATION FOR MGMT ACCESS\n",
                             "source /config/cloud/aws/onboard_config_vars\n",
@@ -1536,7 +1522,6 @@
                             "file_loc=\"/config/cloud/as3_config\"\n",
                             "if [[ $declarationUrlrouting =~ $url_regex ]]; then\n",
                             "  response_code=$(/usr/bin/curl -sk -w \"%{http_code}\" $declarationUrlrouting -o $file_loc)\n",
-                            "  sed -i 's/ReplaceWithJumpHostIP/'\"$JUMPHOSTIP\"'/g' $file_loc\n",
                             "  sed -i 's/ReplaceWithVIP1/'\"$VIP1\"'/g' $file_loc\n",
                             "  if [[ $response_code == 200 ]]; then\n",
                             "    echo \"AS3 download complete; checking for valid JSON.\"\n",
@@ -1621,11 +1606,6 @@
                           ]
                           },
                           "'\n",
-                          "node1='",
-                          {
-                          "Ref": "pJumpHostPrivateIP"
-                          },
-                          "'\n",
                           "\n",
                           "### FILE CREATION FOR MGMT ACCESS\n",
                           "echo  -e 'create cli transaction;\n",
@@ -1634,14 +1614,7 @@
                           "\n",
                           "echo  -e 'create cli transaction;\n",
                           "cd /'${partition}';\n",
-                          "create ltm node /'${partition}'/'${node1}' { address '${node1}' };\n",
                           "create ltm virtual /'${partition}'/forward_outbound { description foward_outbound destination /'${partition}'/0.0.0.0:any mask any persist replace-all-with { /Common/source_addr {default yes } } profiles replace-all-with { /Common/fastL4 {} } source 0.0.0.0/0 source-address-translation { type automap } translate-address disabled translate-port disabled };\n",
-                          "create ltm pool /'${partition}'/jumphost_http_pool { members replace-all-with { /'${partition}'/'${node1}':http { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open }};\n",
-                          "create ltm virtual /'${partition}'/bigip1_mgmt_http { description jumphost_mgmt_http destination /'${partition}'/'${virtualAddress}':http ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr {default yes }} pool /'${partition}'/jumphost_http_pool profiles replace-all-with { /Common/f5-tcp-progressive {} } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
-                          "create ltm pool /'${partition}'/jumphost_https_pool { members replace-all-with { /'${partition}'/'${node1}':https { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open } };\n",
-                          "create ltm virtual /'${partition}'/bigip1_mgmt_https {  description jumphost_mgmt_https destination /'${partition}'/'${virtualAddress}':https ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_https_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
-                          "create ltm pool /'${partition}'/jumphost_ssh_pool { members replace-all-with { /'${partition}'/'${node1}':ssh { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open }};\n",
-                          "create ltm virtual /'${partition}'/jumphost_mgmt_ssh {  description jumphost_mgmt_ssh destination /'${partition}'/'${virtualAddress}':ssh ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_ssh_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
                           "modify security ip-intelligence global-policy ip-intelligence-policy ip-intelligence;\n",
                           "submit cli transaction' | tmsh -q\n",
                           "\n",
@@ -1682,22 +1655,10 @@
                         ]
                         },
                         "'\n",
-                        "node1='",
-                        {
-                        "Ref": "pJumpHostPrivateIP"
-                        },
-                        "'\n",
                         "\n",
                         "### DELETE ITEMS FOR MGMT ACCESS\n",
                         "echo  -e 'create cli transaction;\n",
-                        "delete ltm virtual /'${partition}'/jumphost_mgmt_ssh;\n",
-                        "delete ltm virtual /'${partition}'/bigip1_mgmt_https;\n",
-                        "delete ltm virtual /'${partition}'/bigip1_mgmt_http;\n",
                         "delete ltm virtual /'${partition}'/forward_outbound;\n",
-                        "delete ltm pool /'${partition}'/jumphost_ssh_pool;\n",
-                        "delete ltm pool /'${partition}'/jumphost_https_pool;\n",
-                        "delete ltm pool /'${partition}'/jumphost_http_pool;\n",
-                        "delete ltm node /'${partition}'/'${node1}';\n",
                         "submit cli transaction' | tmsh -q\n",
                         "\n",
                         "echo  -e 'create cli transaction;\n",
@@ -2043,7 +2004,7 @@
           "Fn::Join": [
            "",
            [
-            "Big-IP1: ",
+            "BIG-IP Device 1: ",
             {
              "Ref": "AWS::StackName"
             }
@@ -2993,7 +2954,7 @@
           "Fn::Join": [
            "",
            [
-            "Big-IP2: ",
+            "BIG-IP Device 2: ",
             {
              "Ref": "AWS::StackName"
             }
