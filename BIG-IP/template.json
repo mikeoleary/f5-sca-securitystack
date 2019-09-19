@@ -2004,7 +2004,7 @@
           "Fn::Join": [
            "",
            [
-            "Big-IP1: ",
+            "BIG-IP Device 1: ",
             {
              "Ref": "AWS::StackName"
             }
@@ -2954,7 +2954,7 @@
           "Fn::Join": [
            "",
            [
-            "Big-IP2: ",
+            "BIG-IP Device 2: ",
             {
              "Ref": "AWS::StackName"
             }

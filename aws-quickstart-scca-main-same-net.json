@@ -1,5 +1,13 @@
 {
   "Conditions": {
+    "DeployDemoApps": {
+       "Fn::Equals": [
+           "Yes",
+           {
+           "Ref": "DeployDemoApps"
+           }
+       ]
+    },
     "GovCloud": {
       "Fn::Or": [
         {
@@ -116,6 +124,18 @@
       "Type": "String",
       "Default": "quickstart-f5-scca-security",
       "Description": "Project name to use for tagging"
+    },
+    "DeployDemoApps": {
+        "AllowedValues": [
+            "Yes",
+            "No"
+          ],
+          "ConstraintDescription": "Must choose Yes or No",
+          "Description": "Choose Yes to have demo apps deployed in connected VPC's",
+          "MaxLength": "255",
+          "MinLength": "1",
+          "Type": "String",
+          "Default": "Yes"
     },
     "pVdssVpcCidr": {
       "Type": "String",
@@ -266,6 +286,7 @@
       }
     },
     "AppVpcStack": {
+      "Condition": "DeployDemoApps",
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": "TransitGatewayStack",
       "Properties": {
@@ -308,6 +329,7 @@
       }
     },
     "FargateVpcStack": {
+      "Condition": "DeployDemoApps",
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": "TransitGatewayStack",
       "Properties": {
@@ -392,7 +414,7 @@
         "aws:cdk:path": "sccaMainStack/JumpHostStack"
       }
     },
-    "F5BIGIP1": {
+    "F5ExternalTier": {
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": "TransitGatewayStack",
       "Properties": {
@@ -460,10 +482,10 @@
         ]
       },
       "Metadata": {
-        "aws:cdk:path": "sccaMainStack/F5BIGIP1"
+        "aws:cdk:path": "sccaMainStack/F5ExternalTier"
       }
     },
-    "F5BIGIP2": {
+    "F5InternalTier": {
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": "TransitGatewayStack",
       "Properties": {
@@ -531,7 +553,7 @@
         ]
       },
       "Metadata": {
-        "aws:cdk:path": "sccaMainStack/F5BIGIP2"
+        "aws:cdk:path": "sccaMainStack/F5InternalTier"
       }
     },
     "IPSStack": {
@@ -609,13 +631,13 @@
           },
           "pBigIPStackNameTier1": {
             "Fn::GetAtt": [
-              "F5BIGIP1",
+              "F5ExternalTier",
               "Outputs.StackName"
             ]
           },
           "pBigIPStackNameTier2": {
             "Fn::GetAtt": [
-              "F5BIGIP2",
+              "F5InternalTier",
               "Outputs.StackName"
             ]
           }
@@ -697,7 +719,7 @@
           },
           "pBigIPMgmt": {
             "Fn::GetAtt": [
-              "F5BIGIP1",
+              "F5ExternalTier",
               "Outputs.Bigip1ManagementEipAddress"
             ]
           },
@@ -710,7 +732,7 @@
           "pBigIPInterface": "/Common/internal",
           "pBigIPS3Bucket": {
             "Fn::GetAtt": [
-              "F5BIGIP1",
+              "F5ExternalTier",
               "Outputs.S3BucketName"
             ]
           }
@@ -751,7 +773,7 @@
           },
           "pBigIPMgmt": {
             "Fn::GetAtt": [
-              "F5BIGIP2",
+              "F5InternalTier",
               "Outputs.Bigip1ManagementEipAddress"
             ]
           },
@@ -764,7 +786,7 @@
           "pBigIPInterface": "/Common/internal",
           "pBigIPS3Bucket": {
             "Fn::GetAtt": [
-              "F5BIGIP2",
+              "F5InternalTier",
               "Outputs.S3BucketName"
             ]
           }
