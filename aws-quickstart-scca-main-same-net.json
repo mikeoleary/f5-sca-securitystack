@@ -1,5 +1,110 @@
 {
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+         "ParameterGroups": [
+          {
+           "Label": {
+            "default": "ENVIRONMENT OPTIONS"
+           },
+           "Parameters": [
+            "pBaselineCompliance",
+            "DeployDemoApps",
+            "pVdssVpcCidr",
+            "pAppVpcCidr",
+            "pFargateVpcCidr"
+           ]
+          },
+          {
+           "Label": {
+            "default": "INSTANCE CONFIGURATION"
+           },
+           "Parameters": [
+            "instanceTypeTier1",
+            "instanceTypeTier2",
+            "sshKey"
+           ]
+          },
+          {
+            "Label": {
+             "default": "LICENSE KEYS"
+            },
+            "Parameters": [
+             "licenseKey1",
+             "licenseKey2",
+             "licenseKey3",
+             "licenseKey4"
+            ]
+          },
+          {
+           "Label": {
+            "default": "OTHER"
+           },
+           "Parameters": [
+            "pProject",
+            "pQuickstartS3BucketName",
+            "pQuickstartS3KeyPrefix"
+           ]
+          }
+         ],
+         "ParameterLabels": {
+          "pBaselineCompliance": {
+            "default": "Baseline Compliance"
+           },
+           "instanceTypeTier1": {
+            "default": "Instance Type (Tier 1)"
+           },
+           "instanceTypeTier2": {
+            "default": "Instance Type (Tier 2)"
+           },
+           "sshKey": {
+            "default": "SSH Key"
+           },
+          "licenseKey1": {
+           "default": "License Key 1"
+          },
+          "licenseKey2": {
+           "default": "License Key 2"
+          },
+          "licenseKey3": {
+            "default": "License Key 3"
+           },
+          "licenseKey4": {
+           "default": "License Key 4"
+          },
+          "DeployDemoApps": {
+           "default": "Deploy Demo Apps"
+          },
+          "pVdssVpcCidr": {
+           "default": "Security VPC CIDR"
+          },
+          "pAppVpcCidr": {
+            "default": "Demo App 1 VPC CIDR"
+           },
+          "pFargateVpcCidr": {
+            "default": "Demo App 2 VPC CIDR"
+          },
+          "pProject": {
+            "default": "Project Tag"
+           },
+          "pQuickstartS3BucketName": {
+            "default": "S3 Bucket Name"
+           },
+          "pQuickstartS3KeyPrefix": {
+            "default": "S3 Key Prefix"
+          }
+         }
+        },
+        "Version": "4.2.0"
+       },
   "Conditions": {
+    "DeployDemoApps": {
+       "Fn::Equals": [
+           "Yes",
+           {
+           "Ref": "DeployDemoApps"
+           }
+       ]
+    },
     "GovCloud": {
       "Fn::Or": [
         {
@@ -56,11 +161,11 @@
          "c5n.4xlarge"
         ],
         "ConstraintDescription": "Must be a valid EC2 instance type for BIG-IP",
-        "Default": "m5.xlarge",
+        "Default": "c4.xlarge",
         "Description": "Big-IP Tier 1: Size of the F5 BIG-IP Virtual Instance",
         "Type": "String"
        },
-       "instanceTypeTier2": {
+    "instanceTypeTier2": {
         "AllowedValues": [
          "m5.xlarge",
          "m5.2xlarge",
@@ -94,7 +199,7 @@
          "c5n.4xlarge"
         ],
         "ConstraintDescription": "Must be a valid EC2 instance type for BIG-IP",
-        "Default": "m5.2xlarge",
+        "Default": "c4.2xlarge",
         "Description": "Big-IP Tier 2: Size of the F5 BIG-IP Virtual Instance",
         "Type": "String"
        },
@@ -117,6 +222,18 @@
       "Default": "quickstart-f5-scca-security",
       "Description": "Project name to use for tagging"
     },
+    "DeployDemoApps": {
+        "AllowedValues": [
+            "Yes",
+            "No"
+          ],
+          "ConstraintDescription": "Must choose Yes or No",
+          "Description": "Choose Yes to have demo apps deployed in connected VPC's",
+          "MaxLength": "255",
+          "MinLength": "1",
+          "Type": "String",
+          "Default": "Yes"
+    },
     "pVdssVpcCidr": {
       "Type": "String",
       "Default": "10.0.0.0/16",
@@ -131,7 +248,7 @@
       "Default": "10.1.0.0/16",
       "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
-      "Description": "CIDR Block for the app VPC",
+      "Description": "CIDR Block for the app VPC. Only used if demo apps are deployed.",
       "MaxLength": 18,
       "MinLength": 9
     },
@@ -140,7 +257,7 @@
       "Default": "10.2.0.0/16",
       "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
-      "Description": "CIDR Block for the app VPC",
+      "Description": "CIDR Block for the Fargate VPC.  Only used if demo apps are deployed.",
       "MaxLength": 18,
       "MinLength": 9
     },
@@ -266,6 +383,7 @@
       }
     },
     "AppVpcStack": {
+      "Condition": "DeployDemoApps",
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": "TransitGatewayStack",
       "Properties": {
@@ -308,6 +426,7 @@
       }
     },
     "FargateVpcStack": {
+      "Condition": "DeployDemoApps",
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": "TransitGatewayStack",
       "Properties": {
@@ -392,7 +511,7 @@
         "aws:cdk:path": "sccaMainStack/JumpHostStack"
       }
     },
-    "F5BIGIP1": {
+    "F5ExternalTier": {
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": "TransitGatewayStack",
       "Properties": {
@@ -420,12 +539,6 @@
               "Outputs.StackName"
             ]
           },
-          "pJumpHostPrivateIP": {
-            "Fn::GetAtt": [
-              "JumpHostStack",
-              "Outputs.JumpHostPrivateIp"
-            ]
-          },
           "restrictedSrcAddressApp": "0.0.0.0/0",
           "licenseKey1": {
             "Ref": "licenseKey1"
@@ -434,9 +547,6 @@
             "Ref": "licenseKey2"
           },
           "pTier": "Tier1",
-          "instanceType": {
-            "Ref": "instanceTypeTier1"
-          },
           "sshKey": {
             "Ref": "sshKey"
           },
@@ -466,10 +576,10 @@
         ]
       },
       "Metadata": {
-        "aws:cdk:path": "sccaMainStack/F5BIGIP1"
+        "aws:cdk:path": "sccaMainStack/F5ExternalTier"
       }
     },
-    "F5BIGIP2": {
+    "F5InternalTier": {
       "Type": "AWS::CloudFormation::Stack",
       "DependsOn": "TransitGatewayStack",
       "Properties": {
@@ -494,12 +604,6 @@
               "Outputs.StackName"
             ]
           },
-          "pJumpHostPrivateIP": {
-            "Fn::GetAtt": [
-              "JumpHostStack",
-              "Outputs.JumpHostPrivateIp"
-            ]
-          },
           "pBaselineCompliance": {
             "Ref": "pBaselineCompliance"
           },
@@ -511,9 +615,6 @@
             "Ref": "licenseKey4"
           },
           "pTier": "Tier2",
-          "instanceType": {
-            "Ref": "instanceTypeTier2"
-          },
           "sshKey": {
             "Ref": "sshKey"
           },
@@ -543,7 +644,7 @@
         ]
       },
       "Metadata": {
-        "aws:cdk:path": "sccaMainStack/F5BIGIP2"
+        "aws:cdk:path": "sccaMainStack/F5InternalTier"
       }
     },
     "IPSStack": {
@@ -621,13 +722,13 @@
           },
           "pBigIPStackNameTier1": {
             "Fn::GetAtt": [
-              "F5BIGIP1",
+              "F5ExternalTier",
               "Outputs.StackName"
             ]
           },
           "pBigIPStackNameTier2": {
             "Fn::GetAtt": [
-              "F5BIGIP2",
+              "F5InternalTier",
               "Outputs.StackName"
             ]
           }
@@ -709,7 +810,7 @@
           },
           "pBigIPMgmt": {
             "Fn::GetAtt": [
-              "F5BIGIP1",
+              "F5ExternalTier",
               "Outputs.Bigip1ManagementEipAddress"
             ]
           },
@@ -722,7 +823,7 @@
           "pBigIPInterface": "/Common/internal",
           "pBigIPS3Bucket": {
             "Fn::GetAtt": [
-              "F5BIGIP1",
+              "F5ExternalTier",
               "Outputs.S3BucketName"
             ]
           }
@@ -763,7 +864,7 @@
           },
           "pBigIPMgmt": {
             "Fn::GetAtt": [
-              "F5BIGIP2",
+              "F5InternalTier",
               "Outputs.Bigip1ManagementEipAddress"
             ]
           },
@@ -776,7 +877,7 @@
           "pBigIPInterface": "/Common/internal",
           "pBigIPS3Bucket": {
             "Fn::GetAtt": [
-              "F5BIGIP2",
+              "F5InternalTier",
               "Outputs.S3BucketName"
             ]
           }
