@@ -530,9 +530,6 @@
           ]
         },
         "Parameters": {
-         "instanceType": {
-                "Ref": "instanceTypeTier1"
-              }, 
           "pBaselineCompliance": {
             "Ref": "pBaselineCompliance"
           },
@@ -600,10 +597,7 @@
             }
           ]
         },
-        "Parameters": {
-          "instanceType": {
-            "Ref": "instanceTypeTier2"
-          },    
+        "Parameters": { 
           "pVpcStackName": {
             "Fn::GetAtt": [
               "VdssStack",
