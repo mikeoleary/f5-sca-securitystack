@@ -1,5 +1,4 @@
 {
-  "mgmt-baseline": {
     "commands": {
         "084-apply-mgmt-baseline": { 
             "test" : "[ -f /config/deployBaseline.sh ]",
@@ -28,62 +27,6 @@
           "mode": "000755",
           "owner": "root",
           "content": {
-              "Fn::Join": [
-                  "",
-                  [
-                  "#!/bin/bash\n",
-                  "partition=\"mgmt\"",
-                  "\n",
-                  "virtualAddress='",
-                  {
-                  "Fn::GetAtt": [
-                  "Bigip1subnet1Az1Interface",
-                  "PrimaryPrivateIpAddress"
-                  ]
-                  },
-                  "'\n",
-                  "virtualAddress2='",
-                  {
-                  "Fn::GetAtt": [
-                  "Bigip2subnet1Az1Interface",
-                  "PrimaryPrivateIpAddress"
-                  ]
-                  },
-                  "'\n",
-                  "node1='",
-                  {
-                  "Ref": "pJumpHostPrivateIP"
-                  },
-                  "'\n",
-                  "\n",
-                  "### FILE CREATION FOR MGMT ACCESS\n",
-                  "echo  -e 'create cli transaction;\n",
-                  "create auth partition '${partition}' { };\n",
-                  "submit cli transaction' | tmsh -q\n",
-                  "\n",
-                  "echo  -e 'create cli transaction;\n",
-                  "cd /'${partition}';\n",
-                  "create ltm node /'${partition}'/'${node1}' { address '${node1}' };\n",
-                  "create ltm virtual /'${partition}'/forward_outbound { description foward_outbound destination /'${partition}'/0.0.0.0:any mask any persist replace-all-with { /Common/source_addr {default yes } } profiles replace-all-with { /Common/fastL4 {} } source 0.0.0.0/0 source-address-translation { type automap } translate-address disabled translate-port disabled };\n",
-                  "create ltm pool /'${partition}'/jumphost_http_pool { members replace-all-with { /'${partition}'/'${node1}':http { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open }};\n",
-                  "create ltm virtual /'${partition}'/bigip1_mgmt_http { description jumphost_mgmt_http destination /'${partition}'/'${virtualAddress}':http ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr {default yes }} pool /'${partition}'/jumphost_http_pool profiles replace-all-with { /Common/f5-tcp-progressive {} } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
-                  "create ltm pool /'${partition}'/jumphost_https_pool { members replace-all-with { /'${partition}'/'${node1}':https { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open } };\n",
-                  "create ltm virtual /'${partition}'/bigip1_mgmt_https {  description jumphost_mgmt_https destination /'${partition}'/'${virtualAddress}':https ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_https_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
-                  "create ltm pool /'${partition}'/jumphost_ssh_pool { members replace-all-with { /'${partition}'/'${node1}':ssh { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open }};\n",
-                  "create ltm virtual /'${partition}'/jumphost_mgmt_ssh {  description jumphost_mgmt_ssh destination /'${partition}'/'${virtualAddress}':ssh ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_ssh_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
-                  "modify security ip-intelligence global-policy ip-intelligence-policy ip-intelligence;\n",
-                  "submit cli transaction' | tmsh -q\n",
-                  "\n",
-                  "### END DEPLOYMENT OF FILE CREATION FOR MGMT ACCESS"
-                  ]
-              ]
-          }
-      },
-      "/config/deleteBaseline.sh": {
-        "group": "root",
-        "mode": "000755",
-        "owner": "root",
-        "content": {
             "Fn::Join": [
                 "",
                 [
@@ -92,10 +35,15 @@
                 "\n",
                 "virtualAddress='",
                 {
-                "Fn::GetAtt": [
-                "Bigip1subnet1Az1Interface",
-                "PrimaryPrivateIpAddress"
-                ]
+                  "Fn::Select": [
+                      "0",
+                      {
+                          "Fn::GetAtt": [
+                          "Bigip1subnet1Az1Interface",
+                          "SecondaryPrivateIpAddresses"
+                          ]
+                      }
+                      ]
                 },
                 "'\n",
                 "virtualAddress2='",
@@ -112,16 +60,93 @@
                 },
                 "'\n",
                 "\n",
+                "# internal gateway\n",
+                "network=$(/sbin/ifconfig internal | grep 'inet' | cut -d: -f2 | awk '{print $2}' | cut -d\".\" -f1-3)\n",
+                "gw=\"$network\"\".1\"\n",
+                "\n",
+                "### FILE CREATION FOR MGMT ACCESS\n",
+                "echo  -e 'create cli transaction;\n",
+                "create auth partition '${partition}' { };\n",
+                "submit cli transaction' | tmsh -q\n",
+                "\n",
+                "echo  -e 'create cli transaction;\n",
+                "cd /'${partition}';\n",
+                "create ltm node /'${partition}'/'${node1}' { address '${node1}' };\n",
+                "create ltm node /'${partition}'/'${gw}' { address '${gw}' };\n",
+                "create ltm pool /'${partition}'/internal_gw_pool { members replace-all-with { /'${partition}'/'${gw}':any { address '${gw}' } } min-active-members 1 monitor min 1 of { /Common/gateway_icmp }};\n",
+                "create ltm virtual /'${partition}'/internal_10 { description foward_internal_10 destination /'${partition}'/10.0.0.0:any mask 255.0.0.0 persist replace-all-with { /Common/source_addr {default yes } } profiles replace-all-with { /Common/fastL4 {} } pool /'${partition}'/internal_gw_pool source 0.0.0.0/0 source-address-translation { type automap } translate-address disabled translate-port disabled };\n",
+                "create ltm virtual /'${partition}'/internal_172 { description foward_internal_172 destination /'${partition}'/172.16.0.0:any mask 255.240.0.0 persist replace-all-with { /Common/source_addr {default yes } } profiles replace-all-with { /Common/fastL4 {} } pool /'${partition}'/internal_gw_pool source 0.0.0.0/0 source-address-translation { type automap } translate-address disabled translate-port disabled };\n",
+                "create ltm virtual /'${partition}'/internal_192 { description foward_internal_192 destination /'${partition}'/192.168.0.0:any mask 255.255.0.0 persist replace-all-with { /Common/source_addr {default yes } } profiles replace-all-with { /Common/fastL4 {} } pool /'${partition}'/internal_gw_pool source 0.0.0.0/0 source-address-translation { type automap } translate-address disabled translate-port disabled };\n",
+                "create ltm virtual /'${partition}'/forward_outbound { description foward_outbound destination /'${partition}'/0.0.0.0:any mask any persist replace-all-with { /Common/source_addr {default yes } } profiles replace-all-with { /Common/fastL4 {} } source 0.0.0.0/0 source-address-translation { type automap } translate-address disabled translate-port disabled };\n",
+                "create ltm pool /'${partition}'/jumphost_http_pool { members replace-all-with { /'${partition}'/'${node1}':http { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open }};\n",
+                "create ltm virtual /'${partition}'/bigip1_mgmt_http { description jumphost_mgmt_http destination /'${partition}'/'${virtualAddress}':http ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr {default yes }} pool /'${partition}'/jumphost_http_pool profiles replace-all-with { /Common/f5-tcp-progressive {} } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
+                "create ltm pool /'${partition}'/jumphost_https_pool { members replace-all-with { /'${partition}'/'${node1}':https { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open } };\n",
+                "create ltm virtual /'${partition}'/bigip1_mgmt_https {  description jumphost_mgmt_https destination /'${partition}'/'${virtualAddress}':https ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_https_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
+                "create ltm pool /'${partition}'/jumphost_ssh_pool { members replace-all-with { /'${partition}'/'${node1}':ssh { address '${node1}' } } min-active-members 1 monitor min 1 of { /Common/tcp_half_open }};\n",
+                "create ltm virtual /'${partition}'/jumphost_mgmt_ssh {  description jumphost_mgmt_ssh destination /'${partition}'/'${virtualAddress}':ssh ip-protocol tcp mask 255.255.255.255 persist replace-all-with { /Common/source_addr { default yes } } pool /'${partition}'/jumphost_ssh_pool profiles replace-all-with { /Common/f5-tcp-progressive { } } source 0.0.0.0/0 source-address-translation { type automap } translate-address enabled translate-port enabled };\n",
+                "submit cli transaction' | tmsh -q\n",
+                "\n",
+                "### END DEPLOYMENT OF FILE CREATION FOR MGMT ACCESS"
+                ]
+            ]
+        }
+      },
+      "/config/deleteBaseline.sh": {
+        "group": "root",
+        "mode": "000755",
+        "owner": "root",
+        "content": {
+            "Fn::Join": [
+                "",
+                [
+                "#!/bin/bash\n",
+                "partition=\"mgmt\"",
+                "\n",
+                "virtualAddress='",
+                {
+                    "Fn::Select": [
+                        "0",
+                        {
+                            "Fn::GetAtt": [
+                            "Bigip1subnet1Az1Interface",
+                            "SecondaryPrivateIpAddresses"
+                            ]
+                        }
+                        ]
+                    },
+                "'\n",
+                "virtualAddress2='",
+                {
+                "Fn::GetAtt": [
+                "Bigip2subnet1Az1Interface",
+                "PrimaryPrivateIpAddress"
+                ]
+                },
+                "'\n",
+                "node1='",
+                {
+                "Ref": "pJumpHostPrivateIP"
+                },
+                "'\n",
+                "\n",
+                "# internal gateway\n",
+                "network=$(/sbin/ifconfig internal | grep 'inet' | cut -d: -f2 | awk '{print $2}' | cut -d\".\" -f1-3)\n",
+                "gw=\"$network\"\".1\"\n",
+                "\n",
                 "### DELETE ITEMS FOR MGMT ACCESS\n",
                 "echo  -e 'create cli transaction;\n",
                 "delete ltm virtual /'${partition}'/jumphost_mgmt_ssh;\n",
                 "delete ltm virtual /'${partition}'/bigip1_mgmt_https;\n",
                 "delete ltm virtual /'${partition}'/bigip1_mgmt_http;\n",
                 "delete ltm virtual /'${partition}'/forward_outbound;\n",
+                "delete ltm virtual /'${partition}'/internal_10;\n",
+                "delete ltm virtual /'${partition}'/internal_172;\n",
+                "delete ltm virtual /'${partition}'/internal_192;\n",
                 "delete ltm pool /'${partition}'/jumphost_ssh_pool;\n",
                 "delete ltm pool /'${partition}'/jumphost_https_pool;\n",
                 "delete ltm pool /'${partition}'/jumphost_http_pool;\n",
                 "delete ltm node /'${partition}'/'${node1}';\n",
+                "delete ltm node /'${partition}'/'${gw}';\n",
                 "submit cli transaction' | tmsh -q\n",
                 "\n",
                 "echo  -e 'create cli transaction;\n",
@@ -134,5 +159,4 @@
         }
     }
     }
-  }
 }
