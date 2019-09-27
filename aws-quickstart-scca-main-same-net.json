@@ -320,7 +320,7 @@
               "S3Region": {
                 "Fn::If": [
                   "GovCloud",
-                  "s3-us-gov-east-1",
+                  "s3-us-gov-west-1",
                   "s3"
                 ]
               }
@@ -553,7 +553,7 @@
           "restrictedSrcAddress": "0.0.0.0/0",
           "declarationUrlrouting": {
             "Fn::Sub": [
-              "none",
+                "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json",
               {
                 "S3Region": {
                   "Fn::If": [
@@ -621,7 +621,7 @@
           "restrictedSrcAddress": "0.0.0.0/0",
           "declarationUrlrouting": {
             "Fn::Sub": [
-              "none",
+                "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json",
               {
                 "S3Region": {
                   "Fn::If": [
