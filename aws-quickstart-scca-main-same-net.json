@@ -553,7 +553,7 @@
           "restrictedSrcAddress": "0.0.0.0/0",
           "declarationUrlrouting": {
             "Fn::Sub": [
-                "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/AS3/forwardingVIP.json",
+                "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json",
               {
                 "S3Region": {
                   "Fn::If": [
@@ -621,7 +621,7 @@
           "restrictedSrcAddress": "0.0.0.0/0",
           "declarationUrlrouting": {
             "Fn::Sub": [
-                "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/AS3/forwardingVIP.json",
+                "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json",
               {
                 "S3Region": {
                   "Fn::If": [
