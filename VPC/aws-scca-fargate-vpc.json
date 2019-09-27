@@ -511,16 +511,17 @@
               "AssumeRolePolicyDocument":{
                 "Statement":[
                   {
+                    "Action":[
+                        "sts:AssumeRole"
+                    ],
                     "Effect":"Allow",
                     "Principal":{
                       "Service":
                         "ecs.amazonaws.com"
-                    },
-                    "Action":[
-                      "sts:AssumeRole"
-                    ]
+                    }                 
                   }
-                ]
+                ],
+                "Version": "2012-10-17"
               },
               "Path":"/",
               "Policies":[
@@ -553,16 +554,17 @@
               "AssumeRolePolicyDocument":{
                 "Statement":[
                   {
+                    "Action":[
+                        "sts:AssumeRole"
+                    ],
                     "Effect":"Allow",
                     "Principal":{
                       "Service":
                         "ecs-tasks.amazonaws.com"
-                    },
-                    "Action":[
-                      "sts:AssumeRole"
-                    ]
+                    }
                   }
-                ]
+                ],
+                "Version": "2012-10-17"
               },
               "Path":"/",
               "Policies":[
