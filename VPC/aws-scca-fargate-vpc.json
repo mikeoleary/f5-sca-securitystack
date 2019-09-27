@@ -513,9 +513,8 @@
                   {
                     "Effect":"Allow",
                     "Principal":{
-                      "Service":[
+                      "Service":
                         "ecs.amazonaws.com"
-                      ]
                     },
                     "Action":[
                       "sts:AssumeRole"
@@ -556,9 +555,8 @@
                   {
                     "Effect":"Allow",
                     "Principal":{
-                      "Service":[
-                        "ecs.amazonaws.com"
-                      ]
+                      "Service":
+                        "ecs-tasks.amazonaws.com"
                     },
                     "Action":[
                       "sts:AssumeRole"
@@ -569,7 +567,7 @@
               "Path":"/",
               "Policies":[
                 {
-                  "PolicyName":"ecs-service",
+                  "PolicyName":"ecs-service-task",
                   "PolicyDocument":{
                     "Statement":[
                       {
