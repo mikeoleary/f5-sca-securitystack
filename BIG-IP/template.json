@@ -361,6 +361,7 @@
       }
      },
      "Bigip1VipEipAddress": {
+      "Condition": "Tier1",
       "Description": "EIP address for VIP",
       "Value": {
        "Fn::Join": [
@@ -399,6 +400,7 @@
       }
      },
      "Bigip1subnet1Az1SelfEipAddress": {
+      "Condition":"Tier1",
       "Description": "IP Address of the External interface attached to BIG-IP",
       "Value": {
        "Ref": "Bigip1subnet1Az1SelfEipAddress"
@@ -488,6 +490,7 @@
       }
      },
      "Bigip2subnet1Az1SelfEipAddress": {
+      "Condition":"Tier1",
       "Description": "IP Address of the External interface attached to BIG-IP",
       "Value": {
        "Ref": "Bigip2subnet1Az1SelfEipAddress"
@@ -1059,11 +1062,22 @@
                ]
               },
               "'\n",
-              "VIPEIP='",
-              {
-               "Ref": "Bigip1VipEipAddress"
-              },
-              "'\n",
+              { "Fn::If" : [
+                "Tier1",
+                { "Fn::Join": [
+                  "",
+                  [
+                    "VIPEIP='",
+                    {
+                     "Ref": "Bigip1VipEipAddress"
+                    },
+                    "'\n"
+                    ]
+                  ]
+                },
+                ""
+              ]
+             },
               "PROGNAME=$(basename $0)\n",
               "function error_exit {\n",
               "echo \"${PROGNAME}: ${1:-\\\"Unknown Error\\\"}\" 1>&2\n",
@@ -2101,12 +2115,14 @@
       "Type": "AWS::EC2::NetworkInterface"
      },
      "Bigip1VipEipAddress": {
+      "Condition":"Tier1",
       "Properties": {
        "Domain": "vpc"
       },
       "Type": "AWS::EC2::EIP"
      },
      "Bigip1VipEipAssociation": {
+      "Condition":"Tier1",
       "Properties": {
        "AllocationId": {
         "Fn::GetAtt": [
@@ -2167,12 +2183,14 @@
       "Type": "AWS::EC2::NetworkInterface"
      },
      "Bigip1subnet1Az1SelfEipAddress": {
+      "Condition":"Tier1",
       "Properties": {
        "Domain": "vpc"
       },
       "Type": "AWS::EC2::EIP"
      },
      "Bigip1subnet1Az1SelfEipAssociation": {
+      "Condition":"Tier1",
       "Properties": {
        "AllocationId": {
         "Fn::GetAtt": [
@@ -3071,12 +3089,14 @@
       "Type": "AWS::EC2::NetworkInterface"
      },
      "Bigip2subnet1Az1SelfEipAddress": {
+      "Condition":"Tier1",
       "Properties": {
        "Domain": "vpc"
       },
       "Type": "AWS::EC2::EIP"
      },
      "Bigip2subnet1Az1SelfEipAssociation": {
+      "Condition":"Tier1",
       "Properties": {
        "AllocationId": {
         "Fn::GetAtt": [
