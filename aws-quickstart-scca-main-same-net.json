@@ -314,18 +314,7 @@
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/aws-quickstart-scca-transit-gateway-stack.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/aws-quickstart-scca-transit-gateway-stack.json"
         },
         "Tags": [
           {
@@ -345,18 +334,7 @@
       "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-vdss-stack-singleAZ.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-vdss-stack-singleAZ.json"
         },
         "Parameters": {
           "pTransitGatewayStackName": {
@@ -388,18 +366,7 @@
       "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-app-vpc.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-app-vpc.json"
         },
         "Parameters": {
           "pTransitGatewayStackName": {
@@ -431,18 +398,7 @@
       "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-fargate-vpc.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/aws-scca-fargate-vpc.json"
         },
         "Parameters": {
           "pTransitGatewayStackName": {
@@ -473,18 +429,7 @@
       "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/JumpHost/template.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/JumpHost/template.json"
         },
         "Parameters": {
           "pVpcStackName": {
@@ -516,18 +461,7 @@
       "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/template.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/template.json"
         },
         "Parameters": {
           "pBaselineCompliance": {
@@ -552,18 +486,7 @@
           },
           "restrictedSrcAddress": "0.0.0.0/0",
           "declarationUrlrouting": {
-            "Fn::Sub": [
-                "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json",
-              {
-                "S3Region": {
-                  "Fn::If": [
-                    "GovCloud",
-                    "s3-us-gov-west-1",
-                    "s3"
-                  ]
-                }
-              }
-            ]
+            "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json"
           }
         },
         "Tags": [
@@ -584,18 +507,8 @@
       "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/template.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/template.json"
+
         },
         "Parameters": { 
           "pVpcStackName": {
@@ -620,18 +533,7 @@
           },
           "restrictedSrcAddress": "0.0.0.0/0",
           "declarationUrlrouting": {
-            "Fn::Sub": [
-                "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json",
-              {
-                "S3Region": {
-                  "Fn::If": [
-                    "GovCloud",
-                    "s3-us-gov-west-1",
-                    "s3"
-                  ]
-                }
-              }
-            ]
+            "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json"
           }
         },
         "Tags": [
@@ -652,18 +554,7 @@
       "DependsOn": "TransitGatewayStack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/IPS/template.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/IPS/template.json"
         },
         "Parameters": {
           "pVpcStackName": {
@@ -694,18 +585,7 @@
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/route-table-update-post-EC2-builds.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/VPC/route-table-update-post-EC2-builds.json"
         },
         "Parameters": {
           "pVpcStackName": {
@@ -750,18 +630,7 @@
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/install_lambda.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/install_lambda.json"
         },
         "Parameters": {
           "pPrefix": {
@@ -791,18 +660,7 @@
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/ha_iapp.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/ha_iapp.json"
         },
         "Parameters": {
           "pPrefix": {
@@ -845,18 +703,7 @@
       "Type": "AWS::CloudFormation::Stack",
       "Properties": {
         "TemplateURL": {
-          "Fn::Sub": [
-            "https://${pQuickstartS3BucketName}.${S3Region}.amazonaws.com/${pQuickstartS3KeyPrefix}/ha_iapp.json",
-            {
-              "S3Region": {
-                "Fn::If": [
-                  "GovCloud",
-                  "s3-us-gov-west-1",
-                  "s3"
-                ]
-              }
-            }
-          ]
+          "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/ha_iapp.json"
         },
         "Parameters": {
           "pPrefix": {
