@@ -538,7 +538,8 @@
                             "ec2:DeleteNetworkInterface",
                             "ec2:DeleteNetworkInterfacePermission",
                             "ec2:Describe*",
-                            "ec2:DetachNetworkInterface"
+                            "ec2:DetachNetworkInterface",
+                            "sts:AssumeRole"
                         ],
                         "Resource":"*"
                       }
@@ -580,6 +581,7 @@
                             "ecr:GetDownloadUrlForLayer",
                             "ecr:BatchGetImage",
                             "logs:CreateLogStream",
+                            "sts:AssumeRole",
                             "logs:PutLogEvents"
 
                         ],
