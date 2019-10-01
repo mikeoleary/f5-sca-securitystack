@@ -7,6 +7,7 @@ phases:
   build:
     commands:
       # test and build f5_sca_libs
+       - yum install which -y
        - cd lambda/f5_sca_libs
        - make install 
        - pipenv run make test
