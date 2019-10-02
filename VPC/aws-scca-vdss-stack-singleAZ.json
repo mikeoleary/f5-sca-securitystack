@@ -14,6 +14,24 @@
             "MaxLength": 18,
             "MinLength": 9
         },
+        "pAppVpcCidr": {
+            "Type": "String",
+            "Default": "10.1.0.0/16",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+            "Description": "CIDR Block for the App VPC",
+            "MaxLength": 18,
+            "MinLength": 9
+        },
+        "pFargateVpcCidr": {
+            "Type": "String",
+            "Default": "10.2.0.0/16",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+            "Description": "CIDR Block for the App VPC",
+            "MaxLength": 18,
+            "MinLength": 9
+        },
         "pTransitGatewayStackName": {
             "Type": "String",
             "Default": "SccaTgwStack",
@@ -542,6 +560,36 @@
                 "aws:cdk:path": "SccaVdssStack/rVdssOutsideRouteTableIgwRoute"
             }
         },
+        "rVdssManagementRouteTableAppVpcRoute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "rVdssManagementRouteTable"
+                },
+                "DestinationCidrBlock": { "Ref" : "pAppVpcCidr" },
+                "GatewayId": {
+                    "Ref": "rVdssIgw"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaVdssStack/rVdssManagementRouteTableAppVpcRoute"
+            }
+        },
+        "rVdssManagementRouteTableFargateVpcRoute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "rVdssManagementRouteTable"
+                },
+                "DestinationCidrBlock": { "Ref" : "pFargateVpcCidr" },
+                "GatewayId": {
+                    "Ref": "rVdssIgw"
+                }
+            },
+            "Metadata": {
+                "aws:cdk:path": "SccaVdssStack/rVdssManagementRouteTableFargateVpcRoute"
+            }
+        },
         "rVdssManagementSubnet": {
             "Type": "AWS::EC2::Subnet",
             "Properties": {
@@ -790,6 +838,48 @@
             "Properties" : {
               "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
               "DestinationCidrBlock" : "192.168.0.0/16",
+              "TransitGatewayId": {
+               "Fn::ImportValue": {
+                   "Fn::Join": [
+                     "",
+                     [
+                         {
+                             "Ref": "pTransitGatewayStackName"
+                         },
+                         "-SccaTgwId"
+                     ]
+                   ]
+                 }
+             }
+         }
+        },
+        "rInternalAppVPC" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rTransitGatewayAttachement",
+            "Properties" : {
+              "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
+              "DestinationCidrBlock" : { "Ref" : "pAppVpcCidr" },
+              "TransitGatewayId": {
+               "Fn::ImportValue": {
+                   "Fn::Join": [
+                     "",
+                     [
+                         {
+                             "Ref": "pTransitGatewayStackName"
+                         },
+                         "-SccaTgwId"
+                     ]
+                   ]
+                 }
+             }
+         }
+        },
+        "rInternalFargateVPC" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rTransitGatewayAttachement",
+            "Properties" : {
+              "RouteTableId" : { "Ref" : "rVdssInternalRouteTable" },
+              "DestinationCidrBlock" : { "Ref" : "pFargateVpcCidr" },
               "TransitGatewayId": {
                "Fn::ImportValue": {
                    "Fn::Join": [

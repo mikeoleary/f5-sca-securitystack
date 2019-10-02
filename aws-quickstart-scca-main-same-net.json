@@ -345,6 +345,12 @@
           },
           "pVdssVpcCidr": {
             "Ref": "pVdssVpcCidr"
+          },
+          "pAppVpcCidr": {
+            "Ref": "pAppVpcCidr"
+          },
+          "pFargateVpcCidr": {
+            "Ref": "pFargateVpcCidr"
           }
         },
         "Tags": [
@@ -375,8 +381,14 @@
               "Outputs.StackName"
             ]
           },
+          "pVdssVpcCidr": {
+            "Ref": "pVdssVpcCidr"
+          },
           "pAppVpcCidr": {
             "Ref": "pAppVpcCidr"
+          },
+          "pFargateVpcCidr": {
+            "Ref": "pFargateVpcCidr"
           }
         },
         "Tags": [
@@ -406,6 +418,12 @@
               "TransitGatewayStack",
               "Outputs.StackName"
             ]
+          },
+          "pVdssVpcCidr": {
+            "Ref": "pVdssVpcCidr"
+          },
+          "pAppVpcCidr": {
+            "Ref": "pAppVpcCidr"
           },
           "pFargateVpcCidr": {
             "Ref": "pFargateVpcCidr"
