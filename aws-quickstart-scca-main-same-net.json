@@ -499,6 +499,12 @@
             "Ref": "licenseKey2"
           },
           "pTier": "Tier1",
+          "internalRoutesGWIP": {
+            "Fn::GetAtt": [
+              "IPSStack",
+              "Outputs.IpsExternalInterfaceIPAddress"
+            ]
+          },
           "sshKey": {
             "Ref": "sshKey"
           },
@@ -546,6 +552,12 @@
             "Ref": "licenseKey4"
           },
           "pTier": "Tier2",
+          "internalRoutesGWIP": {
+            "Fn::GetAtt": [
+              "VdssStack",
+              "Outputs.InsideSubnetGWIP"
+            ]
+          },
           "sshKey": {
             "Ref": "sshKey"
           },

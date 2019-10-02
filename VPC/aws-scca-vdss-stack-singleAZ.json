@@ -1031,6 +1031,58 @@
                 }
             }
         },
+        "InsideSubnetGWIP": {
+            "Value": {
+                "Fn::Join": [
+                    ".",
+                    [
+                        {"Fn::Select" : [ 0, { "Fn::Split": [ ".", { "Fn::Select" : [ 3, { "Fn::Cidr": [ { "Ref": "pVdssVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        {"Fn::Select" : [ 1, { "Fn::Split": [ ".", { "Fn::Select" : [ 3, { "Fn::Cidr": [ { "Ref": "pVdssVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        {"Fn::Select" : [ 2, { "Fn::Split": [ ".", { "Fn::Select" : [ 3, { "Fn::Cidr": [ { "Ref": "pVdssVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        "1"
+                    ]
+                ]
+             },
+             "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-InsideSubnetGWIP"
+                        ]
+                    ]
+                }
+            }
+        },
+        "InternalTierVIP": {
+            "Value": {
+                "Fn::Join": [
+                    ".",
+                    [
+                        {"Fn::Select" : [ 0, { "Fn::Split": [ ".", { "Fn::Select" : [ 2, { "Fn::Cidr": [ { "Ref": "pVdssVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        {"Fn::Select" : [ 1, { "Fn::Split": [ ".", { "Fn::Select" : [ 2, { "Fn::Cidr": [ { "Ref": "pVdssVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        {"Fn::Select" : [ 2, { "Fn::Split": [ ".", { "Fn::Select" : [ 2, { "Fn::Cidr": [ { "Ref": "pVdssVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        "50"
+                    ]
+                ]
+             },
+             "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-InternalTierVIP"
+                        ]
+                    ]
+                }
+            }
+        },
         "VdssVpcId": {
             "Value": {
                 "Ref": "rVdssVpc"

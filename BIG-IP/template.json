@@ -142,6 +142,7 @@
         "Parameters": [
          "pVpcStackName",
          "pTier",
+         "internalRoutesGWIP",
          "numberOfAdditionalNics",
          "additionalNicLocation"
         ]
@@ -203,6 +204,9 @@
         },
        "pTier": {
         "default": "Tier1 or Tier2. Defines which Tier of the architecture the BIG-IP devices will sit in."
+        },
+        "internalRoutesGWIP": {
+         "default": "GW IP address for routes to point via Internal interface."
         },
        "pBaselineCompliance": {
         "default": "Choose your baseline compliance posture"
@@ -552,6 +556,10 @@
         "ConstraintDescription": "Must be Tier1 or Tier2.",
         "Type": "String",
         "Default": "Tier1"
+       },
+       "internalRoutesGWIP": {
+        "Type": "String",
+        "Default": "10.0.3.1"
        },
      "pBaselineCompliance": {
       "AllowedValues" : ["Enterprise", "SCCA"],
@@ -1469,6 +1477,32 @@
         },
         "AS3-baseline-routing": {
             "commands": {
+                "010-apply-device-routes": { 
+                    "test" : "[ -f /config/deployDeviceRoutes.sh ]",
+                    "command": { 
+                       "Fn::Join": [  
+                        " ", 
+                        [ 
+                         "nohup /config/waitThenRun.sh",
+                         "f5-rest-node /config/cloud/aws/node_modules/@f5devcentral/f5-cloud-libs/scripts/runScript.js",
+                         "--file /config/deployDeviceRoutes.sh",
+                         "--output /var/log/deployDeviceRoutes.log",
+                         "--log-level silly",
+                         {
+                            "Fn::If":
+                               [
+                                   "SCCA",
+                                   "--wait-for CERTS_DONE",
+                                   "--wait-for PASSWORD_REMOVED"
+                               ]
+                        },
+                         "--signal DEVICE_ROUTES_DONE",
+                         "&>> /var/log/cloud/aws/install.log < /dev/null &"
+                        ] 
+                       ] 
+                  }, 
+                  "cwd" : "/config"  
+                  }, 
                 "083-apply-AS3-baseline-routing": { 
                     "test" : "[ -f /config/deployBaselineRouting.sh ]",
                     "command": { 
@@ -1480,14 +1514,7 @@
                          "--file /config/deployBaselineRouting.sh",
                          "--output /var/log/deployBaselineRouting.log",
                          "--log-level silly",
-                         {
-                            "Fn::If":
-                               [
-                                   "SCCA",
-                                   "--wait-for CERTS_DONE",
-                                   "--wait-for PASSWORD_REMOVED"
-                               ]
-                        },
+                         "--wait-for DEVICE_ROUTES_DONE",
                          "--signal AS3_ROUTING_DONE",
                          "&>> /var/log/cloud/aws/install.log < /dev/null &"
                         ] 
@@ -1498,6 +1525,31 @@
                   
             },
             "files": {
+                "/config/deployDeviceRoutes.sh": {
+                    "group": "root",
+                    "mode": "000755",
+                    "owner": "root",
+                    "content": {
+                        "Fn::Join": [
+                            "",
+                            [
+                            "#!/bin/bash\n",
+                            "gw='",
+                            {
+                                "Ref": "internalRoutesGWIP"
+                            },
+                            "'\n",
+                            "\n",
+                            "echo  -e 'create cli transaction;\n",
+                            "create net route 10.0.0.0/8 gw '${gw}'\n",
+                            "create net route 172.16.0.0/12 gw '${gw}'\n",
+                            "create net route 192.168.0.0/16 gw '${gw}'\n",
+                            "save /sys config\n",
+                            "submit cli transaction' | tmsh -q\n"
+                            ]
+                        ]
+                    }
+                },
                 "/config/deployBaselineRouting.sh": {
                     "group": "root",
                     "mode": "000755",
@@ -1544,7 +1596,7 @@
                             ]
                         ]
                     }
-                }   
+                }    
             }
         },
         "mgmt-baseline": {
