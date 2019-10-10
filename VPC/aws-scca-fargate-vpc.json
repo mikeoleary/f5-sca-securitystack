@@ -5,12 +5,30 @@
             "Default": "SCCA-App-Demo",
             "Description": "Project name to use for tagging"
         },
+        "pVdssVpcCidr": {
+            "Type": "String",
+            "Default": "10.0.0.0/16",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+            "Description": "CIDR Block for the VDSS VPC",
+            "MaxLength": 18,
+            "MinLength": 9
+        },
+        "pAppVpcCidr": {
+            "Type": "String",
+            "Default": "10.1.0.0/16",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
+            "Description": "CIDR Block for the App VPC",
+            "MaxLength": 18,
+            "MinLength": 9
+        },
         "pFargateVpcCidr": {
             "Type": "String",
             "Default": "10.2.0.0/16",
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
             "ConstraintDescription": "Must be a valid IP CIDR range of the form x.x.x.x/x.",
-            "Description": "CIDR Block for the app VPC",
+            "Description": "CIDR Block for the App VPC",
             "MaxLength": 18,
             "MinLength": 9
         },
@@ -382,7 +400,49 @@
                  }
             }
         }
-      }
+        },
+        "FargateRouteToVdss" : {
+          "Type" : "AWS::EC2::Route",
+          "DependsOn" : "rFargateTransitGatewayAttachement",
+          "Properties" : {
+            "RouteTableId" : { "Ref" : "rFargateMainRouteTable" },
+            "DestinationCidrBlock" : { "Ref" : "pVdssVpcCidr" },
+            "TransitGatewayId": {
+              "Fn::ImportValue": {
+                "Fn::Join": [
+                  "",
+                  [
+                   {
+                    "Ref": "pTransitGatewayStackName"
+                   },
+                   "-SccaTgwId"
+                  ]
+                ]
+              }
+            }
+          }
+        },
+        "FargateRouteToAppVpc" : {
+            "Type" : "AWS::EC2::Route",
+            "DependsOn" : "rFargateTransitGatewayAttachement",
+            "Properties" : {
+            "RouteTableId" : { "Ref" : "rFargateMainRouteTable" },
+            "DestinationCidrBlock" : { "Ref" : "pAppVpcCidr" },
+            "TransitGatewayId": {
+            "Fn::ImportValue": {
+                "Fn::Join": [
+                    "",
+                    [
+                        {
+                            "Ref": "pTransitGatewayStackName"
+                        },
+                        "-SccaTgwId"
+                    ]
+                ]
+                }
+            }
+        }
+        }
     },
     "Outputs": {
         "StackName": {

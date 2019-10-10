@@ -371,6 +371,19 @@
             "Name" : {"Fn::Sub": "${AWS::StackName}-IpsExternalInterface" }
         }
     },
+    "IpsExternalInterfaceIPAddress": {
+        "Description": "External IP of IPS",
+        "Value":
+        {
+            "Fn::GetAtt": [
+              "IpsExternalInterface",
+              "PrimaryPrivateIpAddress"
+            ]
+        },
+        "Export" : {
+            "Name" : {"Fn::Sub": "${AWS::StackName}-IpsExternalInterfaceIPAddress" }
+        }
+    },
     "IpsInternalInterface": {
         "Description": "Internal interface of IPS",
         "Value": {
@@ -378,6 +391,19 @@
         },
         "Export" : {
             "Name" : {"Fn::Sub": "${AWS::StackName}-IpsInternalInterface" }
+        }
+    },
+    "IpsInternalInterfaceIPAddress": {
+        "Description": "Internal IP of IPS",
+        "Value":
+        {
+            "Fn::GetAtt": [
+              "IpsInternalInterface",
+              "PrimaryPrivateIpAddress"
+            ]
+        },
+        "Export" : {
+            "Name" : {"Fn::Sub": "${AWS::StackName}-IpsInternalInterfaceIPAddress" }
         }
     }
   }

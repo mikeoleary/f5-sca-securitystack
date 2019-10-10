@@ -19,8 +19,8 @@
             "default": "INSTANCE CONFIGURATION"
            },
            "Parameters": [
-            "instanceTypeTier1",
-            "instanceTypeTier2",
+            "instanceTypeExternalTier",
+            "instanceTypeInternalTier",
             "sshKey"
            ]
           },
@@ -50,11 +50,11 @@
           "pBaselineCompliance": {
             "default": "Baseline Compliance"
            },
-           "instanceTypeTier1": {
-            "default": "Instance Type (Tier 1)"
+           "instanceTypeExternalTier": {
+            "default": "Instance Type (External Tier)"
            },
-           "instanceTypeTier2": {
-            "default": "Instance Type (Tier 2)"
+           "instanceTypeInternalTier": {
+            "default": "Instance Type (Internal Tier)"
            },
            "sshKey": {
             "default": "SSH Key"
@@ -127,7 +127,7 @@
     }
   },
   "Parameters": {
-    "instanceTypeTier1": {
+    "instanceTypeExternalTier": {
         "AllowedValues": [
          "m5.xlarge",
          "m5.2xlarge",
@@ -165,7 +165,7 @@
         "Description": "Big-IP Tier 1: Size of the F5 BIG-IP Virtual Instance",
         "Type": "String"
        },
-    "instanceTypeTier2": {
+    "instanceTypeInternalTier": {
         "AllowedValues": [
          "m5.xlarge",
          "m5.2xlarge",
@@ -345,6 +345,12 @@
           },
           "pVdssVpcCidr": {
             "Ref": "pVdssVpcCidr"
+          },
+          "pAppVpcCidr": {
+            "Ref": "pAppVpcCidr"
+          },
+          "pFargateVpcCidr": {
+            "Ref": "pFargateVpcCidr"
           }
         },
         "Tags": [
@@ -375,8 +381,14 @@
               "Outputs.StackName"
             ]
           },
+          "pVdssVpcCidr": {
+            "Ref": "pVdssVpcCidr"
+          },
           "pAppVpcCidr": {
             "Ref": "pAppVpcCidr"
+          },
+          "pFargateVpcCidr": {
+            "Ref": "pFargateVpcCidr"
           }
         },
         "Tags": [
@@ -392,6 +404,46 @@
         "aws:cdk:path": "sccaMainStack/AppVPCStack"
       }
     },
+    "DemoApp": {
+        "Condition": "DeployDemoApps",
+        "Type": "AWS::CloudFormation::Stack",
+        "DependsOn": "RouteTableUpdates",
+        "Properties": {
+          "TemplateURL": {
+            "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/DemoApp/demoApp.json"
+          },
+          "Parameters": {
+            "sshKey": {
+                "Ref": "sshKey"
+              },
+            "InstanceType": "t2.small",
+            "ubuntuVersion": "Ubuntu16",
+            "vpcStackName": {
+                "Fn::GetAtt": [
+                  "AppVpcStack",
+                  "Outputs.StackName"
+                ]
+              },
+            "demoAppPrivateIP": {
+            "Fn::GetAtt": [
+                "AppVpcStack",
+                "Outputs.demoAppPrivateIP"
+            ]
+            }
+          },
+          "Tags": [
+            {
+              "Key": "Project",
+              "Value": {
+                "Ref": "pProject"
+              }
+            }
+          ]
+        },
+        "Metadata": {
+          "aws:cdk:path": "sccaMainStack/DemoApp"
+        }
+      },
     "FargateVpcStack": {
       "Condition": "DeployDemoApps",
       "Type": "AWS::CloudFormation::Stack",
@@ -406,6 +458,12 @@
               "TransitGatewayStack",
               "Outputs.StackName"
             ]
+          },
+          "pVdssVpcCidr": {
+            "Ref": "pVdssVpcCidr"
+          },
+          "pAppVpcCidr": {
+            "Ref": "pAppVpcCidr"
           },
           "pFargateVpcCidr": {
             "Ref": "pFargateVpcCidr"
@@ -481,13 +539,49 @@
             "Ref": "licenseKey2"
           },
           "pTier": "Tier1",
+          "internalRoutesGWIP": {
+            "Fn::GetAtt": [
+              "IPSStack",
+              "Outputs.IpsExternalInterfaceIPAddress"
+            ]
+          },
+          "demoAppVIP": {
+            "Fn::GetAtt": [
+                "VdssStack",
+                "Outputs.ExternalTierVIP"
+              ]
+           },
+          "extSelfIP": {
+            "Fn::GetAtt": [
+                "VdssStack",
+                "Outputs.extSelfIPExternalTier"
+              ]
+           },
+          "demoAppPoolMember": {
+            "Fn::GetAtt": [
+              "VdssStack",
+              "Outputs.InternalTierVIP"
+            ]
+          },
           "sshKey": {
             "Ref": "sshKey"
           },
+          "instanceType": {
+            "Ref": "instanceTypeExternalTier"
+           },
           "restrictedSrcAddress": "0.0.0.0/0",
           "declarationUrlrouting": {
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json"
-          }
+          },
+          "declarationUrldemoApp": {
+            "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/tier1/demoAppVIP-ExternalTier.json"
+          },
+          "as3rpmUrl": {
+            "Fn::Sub": "http://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/dist/lts/3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
+           },
+         "as3InstallFileUrl": {
+            "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/install-rpm.sh"
+           } 
         },
         "Tags": [
           {
@@ -528,13 +622,49 @@
             "Ref": "licenseKey4"
           },
           "pTier": "Tier2",
+          "internalRoutesGWIP": {
+            "Fn::GetAtt": [
+              "VdssStack",
+              "Outputs.InsideSubnetGWIP"
+            ]
+          },
+          "demoAppVIP": {
+            "Fn::GetAtt": [
+                "VdssStack",
+                "Outputs.InternalTierVIP"
+              ]
+           },
+           "extSelfIP": {
+            "Fn::GetAtt": [
+                "VdssStack",
+                "Outputs.extSelfIPInternalTier"
+              ]
+           },
+          "demoAppPoolMember": {
+            "Fn::GetAtt": [
+              "AppVpcStack",
+              "Outputs.demoAppPrivateIP"
+            ]
+          },
           "sshKey": {
             "Ref": "sshKey"
           },
+          "instanceType": {
+            "Ref": "instanceTypeInternalTier"
+           },
           "restrictedSrcAddress": "0.0.0.0/0",
           "declarationUrlrouting": {
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/mgmt_forwardingVIP.json"
-          }
+          },
+          "declarationUrldemoApp": {
+            "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/tier3/demoAppVIP-InternalTier.json"
+          },
+          "as3rpmUrl": {
+            "Fn::Sub": "http://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/dist/lts/3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
+           },
+         "as3InstallFileUrl": {
+            "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/install-rpm.sh"
+           } 
         },
         "Tags": [
           {
