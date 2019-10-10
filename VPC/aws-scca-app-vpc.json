@@ -568,6 +568,32 @@
                 }
             }
         },
+        "demoAppPrivateIP": {
+            "Value": {
+                "Fn::Join": [
+                    ".",
+                    [
+                        {"Fn::Select" : [ 0, { "Fn::Split": [ ".", { "Fn::Select" : [ 0, { "Fn::Cidr": [ { "Ref": "pAppVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        {"Fn::Select" : [ 1, { "Fn::Split": [ ".", { "Fn::Select" : [ 0, { "Fn::Cidr": [ { "Ref": "pAppVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        {"Fn::Select" : [ 2, { "Fn::Split": [ ".", { "Fn::Select" : [ 0, { "Fn::Cidr": [ { "Ref": "pAppVpcCidr" }, 16, "8" ] } ] } ] } ]},
+                        "50"
+                    ]
+                ]
+             },
+             "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-demoAppPrivateIP"
+                        ]
+                    ]
+                }
+            }
+        },
         "AppSubnetPeertId": {
             "Value": {
                 "Ref": "rAppSubnetPeer"

@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion" : "2010-09-09",
-    "Description" : "Installing Cloudformation helper scripts in Ubuntu 16.04 LTS, starting reference for template was at https://github.com/awslabs/aws-cloudformation-templates/tree/master/aws/solutions/HelperNonAmaznAmi",
+    "Description" : "Installing Cloudformation helper scripts in Ubuntu Ubuntu16 LTS, starting reference for template was at https://github.com/awslabs/aws-cloudformation-templates/tree/master/aws/solutions/HelperNonAmaznAmi",
     "Parameters" : {
       "sshKey": {
         "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
@@ -12,7 +12,14 @@
         "Default" : "t2.small",
         "AllowedValues" : [ "t1.micro", "t2.nano", "t2.micro", "t2.small", "t2.medium", "t2.large", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "m3.medium", "m3.large", "m3.xlarge", "m3.2xlarge", "m4.large", "m4.xlarge", "m4.2xlarge", "m4.4xlarge", "m4.10xlarge", "c1.medium", "c1.xlarge", "c3.large", "c3.xlarge", "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "c4.large", "c4.xlarge", "c4.2xlarge", "c4.4xlarge", "c4.8xlarge", "g2.2xlarge", "g2.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge", "r3.8xlarge", "i2.xlarge", "i2.2xlarge", "i2.4xlarge", "i2.8xlarge", "d2.xlarge", "d2.2xlarge", "d2.4xlarge", "d2.8xlarge", "hi1.4xlarge", "hs1.8xlarge", "cr1.8xlarge", "cc2.8xlarge", "cg1.4xlarge"],
         "ConstraintDescription" : "must be a valid EC2 instance type."
-      },  
+      },
+      "ubuntuVersion": {
+        "Description" : "Ubuntu Version",
+        "Type" : "String",
+        "Default" : "Ubuntu16",
+        "AllowedValues" : [ "Ubuntu16", "Ubuntu18"],
+        "ConstraintDescription" : "must be a valid EC2 instance type."
+      },
       "SSHLocation" : {
         "Description" : "The IP address range that can be used to SSH to the EC2 instances",
         "Type": "String",
@@ -22,66 +29,61 @@
         "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
         "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
      },
-     "pVpcStackName" : {
+     "vpcStackName" : {
           "Description" : "Name of the Stack that deployed the VPC",
-          "Type": "String",
-          "Default": "VDSS"
+          "Type": "String"
+     },
+     "demoAppPrivateIP": {
+        "Description" : "Private IP for NIC",
+        "Type": "String"
      }
     },
     "Mappings": {
-      "AWSRegionAMIEC2" : {
-        "us-east-1"        : {"Ubuntu16" : "ami-d15a75c7"},
-        "us-east-2"        : {"Ubuntu16" : "ami-8b92b4ee"},
-        "us-west-2"        : {"Ubuntu16" : "ami-746aba14"},
-        "us-west-1"        : {"Ubuntu16" : "ami-a9a8e4c9"},
-        "eu-west-1"        : {"Ubuntu16" : "ami-844e0bf7"},
-        "eu-central-1"     : {"Ubuntu16" : "ami-a9a557c6"},
-        "ap-northeast-1"   : {"Ubuntu16" : "ami-d82efcb9"},
-        "ap-southeast-1"   : {"Ubuntu16" : "ami-d554f1b6"},
-        "ap-southeast-2"   : {"Ubuntu16" : "ami-0bc1f168"},
-        "us-gov-west-1"    : {"Ubuntu16" : "ami-939412f2"},
-        "us-gov-east-1"    : {"Ubuntu16" : "ami-9350b7e2"}
-        }
-    },         
+        "AWSRegionAMIEC2" : {
+            "us-east-1"        : {"Ubuntu16" : "ami-d15a75c7", "Ubuntu18" : "ami-064a0193585662d74"},
+            "us-east-2"        : {"Ubuntu16" : "ami-8b92b4ee", "Ubuntu18" : "ami-021b7b04f1ac696c2"},
+            "us-west-2"        : {"Ubuntu16" : "ami-746aba14", "Ubuntu18" : "ami-09a3d8a7177216dcf"},
+            "us-west-1"        : {"Ubuntu16" : "ami-a9a8e4c9", "Ubuntu18" : "ami-056d04da775d124d7"},
+            "eu-west-1"        : {"Ubuntu16" : "ami-844e0bf7", "Ubuntu18" : "ami-01cca82393e531118"},
+            "eu-central-1"     : {"Ubuntu16" : "ami-a9a557c6", "Ubuntu18" : "ami-0cdab515472ca0bac"},
+            "ap-northeast-1"   : {"Ubuntu16" : "ami-d82efcb9", "Ubuntu18" : "ami-0cb1c8cab7f5249b6"},
+            "ap-southeast-1"   : {"Ubuntu16" : "ami-d554f1b6", "Ubuntu18" : "ami-099d318f80eab7e94"},
+            "ap-southeast-2"   : {"Ubuntu16" : "ami-0bc1f168", "Ubuntu18" : "ami-08a648fb5cc86fb74"},
+            "us-gov-west-1"    : {"Ubuntu16" : "ami-939412f2", "Ubuntu18" : "ami-60501e01"},
+            "us-gov-east-1"    : {"Ubuntu16" : "ami-9350b7e2", "Ubuntu18" : "ami-cce606bd"}
+            },
+          "UbuntuVersionSources" : {
+            "Ubuntu16" : { "cmd": "deb https://nginx.org/packages/mainline/ubuntu/ xenial nginx\ndeb-src https://nginx.org/packages/mainline/ubuntu/ xenial nginx\n"},
+            "Ubuntu18" : { "cmd": "deb https://nginx.org/packages/mainline/ubuntu/ bionic nginx\ndeb-src https://nginx.org/packages/mainline/ubuntu/ bionic nginx\n"}
+          }
+    },      
    "Resources" : {
-      "JumpHostNetworkInterface": {
+      "networkInterface": {
         "Properties": {
-         "Description": "Public External Interface for the IPS",
+         "PrivateIpAddress": {
+            "Ref": "demoAppPrivateIP"
+           },
+         "Description": "Public External Interface",
          "GroupSet": [
           {
-           "Ref": "JumpHostSecurityGroup"
+           "Ref": "securityGroup"
           }
          ],
          "SourceDestCheck": false,
          "SubnetId": {
-            "Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-VdssManagementSubnetId" }
-         }
+            "Fn::ImportValue" : {"Fn::Sub": "${vpcStackName}-AppSubnetAID" }
+         },
+         "Tags": [
+            {
+                "Key" : "Application",
+                "Value" : "demoApp"
+            }
+            ]
         },
         "Type": "AWS::EC2::NetworkInterface"
        },
-       "JumpHostEipAddress": {
-        "Properties": {
-         "Domain": "vpc"
-        },
-        "Type": "AWS::EC2::EIP"
-       },
-       "JumpHostEipAddressAssociation": {
-        "Properties": {
-         "AllocationId": {
-          "Fn::GetAtt": [
-           "JumpHostEipAddress",
-           "AllocationId"
-          ]
-         },
-         "NetworkInterfaceId": {
-          "Ref": "JumpHostNetworkInterface"
-         }
-        },
-        "Type": "AWS::EC2::EIPAssociation"
-       },
       "EC2Instance" : {
         "Type" : "AWS::EC2::Instance",
-        "DependsOn": "JumpHostEipAddressAssociation",
         "CreationPolicy" : {
           "ResourceSignal" : {
             "Timeout" : "PT10M",
@@ -91,7 +93,9 @@
         "Metadata" : {
           "AWS::CloudFormation::Init" : {
             "configSets" : {
-              "full_install" : [ "install_and_enable_cfn_hup" ]
+              "full_install" : [ "install_and_enable_cfn_hup" ],
+              "install_nginx" : [ "install_and_enable_cfn_hup", "install_nginx" ],
+			  "install_docker" : [ "install_and_enable_cfn_hup", "install_docker" ]
             },
             "install_and_enable_cfn_hup" : {
               "files" : {
@@ -113,7 +117,7 @@
                               "action=/opt/aws/bin/cfn-init -v ",
                               "         --stack ", { "Ref" : "AWS::StackName" },
                               "         --resource EC2Instance ",
-                              "         --configsets full_install ",
+                              "         --configsets install_docker ",
                               "         --region ", { "Ref" : "AWS::Region" }, "\n",
                               "runas=root\n"
                             ]]}
@@ -138,7 +142,49 @@
                         "command" : "systemctl start cfn-hup.service"
                     }
                 }
-             }
+             },
+             "install_nginx": {
+               "files": {
+                 "/etc/apt/sources.list.d/nginx.list": {
+                    "content": {
+                      "Fn::FindInMap": [ "UbuntuVersionSources", { "Ref": "ubuntuVersion" }, "cmd"]
+                    }
+                  }
+                },
+                "commands": {
+                  "010-download_key_and_install_nginx": {
+                     "command": {
+                        "Fn::Join": [
+                        "\n",
+                        [
+                          "wget https://nginx.org/keys/nginx_signing.key",
+                          "apt-key add nginx_signing.key",
+                          "apt-get update",
+                          "sudo apt-get install nginx",
+                          "nginx"
+                        ]
+                        ]
+                     }
+                  }
+                }
+             },
+			 "install_docker": {
+			   "files": {
+			   },
+			   "commands": {
+                 "010-install-docker": {
+                     "command": {
+                        "Fn::Join": [
+                        "\n",
+                        [
+						  "sudo apt-get install -y docker.io",
+						  "sudo docker run -d -p 80:80 --net=host --restart unless-stopped -e F5DEMO_APP=website -e F5DEMO_NODENAME='F5 Secure Cloud Architecture' -e F5DEMO_COLOR=ffd734 -e F5DEMO_NODENAME_SSL='F5 Secure Cloud Architecture (SSL)' -e F5DEMO_COLOR_SSL=a0bf37 chen23/f5-demo-app:ssl"
+                        ]
+                        ]
+                     }
+                  }
+			   }
+			 }
           }
         },
         "Properties" : {
@@ -149,38 +195,28 @@
              "Description": "Public or External Interface of IPS",
              "DeviceIndex": "0",
              "NetworkInterfaceId": {
-              "Ref": "JumpHostNetworkInterface"
+              "Ref": "networkInterface"
              }
             }
            ],
           "Tags": [
             {
              "Key": "Name",
-             "Value": {
-              "Fn::Join": [
-               "",
-               [
-                "IPS:",
-                {
-                 "Ref": "AWS::StackName"
-                }
-               ]
-              ]
-             }
+             "Value": {"Fn::Sub": "${AWS::StackName}-ubuntu-VM" }
             }
            ],
-          "ImageId" : {"Fn::FindInMap": [ "AWSRegionAMIEC2", { "Ref": "AWS::Region" },"Ubuntu16"]},
+          "ImageId" : {"Fn::FindInMap": [ "AWSRegionAMIEC2", { "Ref": "AWS::Region" },{ "Ref": "ubuntuVersion" }]},
           "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
                "#!/bin/bash -xe\n",
                "apt-get update -y\n",
                "apt-get install -y python-setuptools\n",
                "mkdir -p /opt/aws/bin\n",
                "wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
-               "easy_install --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz\n",
+               "sudo python /usr/lib/python2.7/dist-packages/easy_install.py --script-dir /opt/aws/bin aws-cfn-bootstrap-latest.tar.gz\n",
                 "/opt/aws/bin/cfn-init -v ",
                "         --stack ", { "Ref" : "AWS::StackName" },
                "         --resource EC2Instance ",
-               "         --configsets full_install ",
+               "         --configsets install_docker ",
                "         --region ", { "Ref" : "AWS::Region" }, "\n",
   
                "/opt/aws/bin/cfn-signal -e $? ",
@@ -189,9 +225,9 @@
                "         --region ", { "Ref" : "AWS::Region" }, "\n"
               ]]}}}
       },
-      "JumpHostSecurityGroup": {
+      "securityGroup": {
         "Properties": {
-         "GroupDescription": "Public or external interface rules for jumphost interface",
+         "GroupDescription": "Public or external interface rules for interface",
          "SecurityGroupIngress": [
           {
            "CidrIp": "0.0.0.0/0",
@@ -221,21 +257,11 @@
          "Tags": [
           {
            "Key": "Name",
-           "Value": {
-            "Fn::Join": [
-             "",
-             [
-              "JumpHost Security Group:",
-              {
-               "Ref": "AWS::StackName"
-              }
-             ]
-            ]
-           }
+           "Value": {"Fn::Sub": "${AWS::StackName}-securityGroup" }
           }
          ],
          "VpcId": {
-          "Fn::ImportValue" : {"Fn::Sub": "${pVpcStackName}-VdssVpcId" }
+          "Fn::ImportValue" : {"Fn::Sub": "${vpcStackName}-AppVpcId" }
          }
         },
         "Type": "AWS::EC2::SecurityGroup"
@@ -245,30 +271,30 @@
     "StackName": {
         "Value": {
          "Ref": "AWS::StackName"
-        }
-    },
-    "JumpHostEipAddress": {
-        "Description": "Public IP address of the JumpHost",
-        "Value": {
-         "Ref": "JumpHostEipAddress"
-        }
-       },
-    "JumpHostPrivateIp": {
-        "Description": "Internally routable IP of the jump host",
-        "Value": {
-         "Fn::GetAtt": [
-          "JumpHostNetworkInterface",
-          "PrimaryPrivateIpAddress"
-         ]
-        }
-       },
-    "JumpHostNetworkInterface": {
-        "Description": "Network interface of JumpHost",
-        "Value": {
-         "Ref": "JumpHostNetworkInterface"
         },
         "Export" : {
-            "Name" : {"Fn::Sub": "${AWS::StackName}-JumpHostNetworkInterface" }
+            "Name" : {"Fn::Sub": "${AWS::StackName}-StackName" }
+        }
+    },
+    "privateIp": {
+        "Description": "Internally routable IP",
+        "Value": {
+         "Fn::GetAtt": [
+          "networkInterface",
+          "PrimaryPrivateIpAddress"
+         ]
+        },
+        "Export" : {
+            "Name" : {"Fn::Sub": "${AWS::StackName}-privateIp" }
+        }
+       },
+    "networkInterface": {
+        "Description": "Network interface",
+        "Value": {
+         "Ref": "networkInterface"
+        },
+        "Export" : {
+            "Name" : {"Fn::Sub": "${AWS::StackName}-networkInterface" }
         }
     }
   }
