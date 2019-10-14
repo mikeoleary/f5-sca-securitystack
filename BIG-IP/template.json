@@ -919,7 +919,7 @@
                        [
                            "Tier1",
                            "--modules ltm:nominal,afm:nominal",
-                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                           "--modules ltm:nominal,asm:nominal"
                         ]
                 },
                 "--license ",
@@ -965,7 +965,7 @@
                        [
                            "Tier1",
                            "--modules ltm:nominal,afm:nominal",
-                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                           "--modules ltm:nominal,asm:nominal"
                         ]
                 },
                 "--license ",
@@ -2530,7 +2530,7 @@
                        [
                            "Tier1",
                            "--modules ltm:nominal,afm:nominal",
-                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                           "--modules ltm:nominal,asm:nominal"
                         ]
                 },
                 "--license ",
@@ -2576,7 +2576,7 @@
                        [
                            "Tier1",
                            "--modules ltm:nominal,afm:nominal",
-                           "--modules ltm:nominal,asm:nominal,apm:nominal"
+                           "--modules ltm:nominal,asm:nominal"
                         ]
                 },
                 "--license ",

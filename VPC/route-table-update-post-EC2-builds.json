@@ -173,14 +173,35 @@
             } ]
             },
         "Path": "/",
+        "Policies": [
+            {
+             "PolicyDocument": {
+              "Statement": [
+               {
+                "Action": [
+                 "ec2:AssignPrivateIpAddresses",
+                 "ec2:UnassignPrivateIpAddresses", 
+                 "ec2:ReplaceRoute",
+                 "sts:AssumeRole"
+                ],
+                "Effect": "Allow",
+                "Resource": [
+                 "*"
+                ]
+               }
+              ],
+              "Version": "2012-10-17"
+             },
+             "PolicyName": "RouteUpdatesPolicy"
+            }
+           ],
         "ManagedPolicyArns": [
-            "arn:aws:iam::aws:policy/AmazonVPCFullAccess",
             "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
             "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
         ]
         }
     },
-  "CustomUpdateRoute2" : {
+  "CustomUpdateDMZ2RouteToIPS" : {
     "Type": "Custom::ReplaceRoute",
     "Version" : "1.0",
     "Properties" : {
@@ -196,11 +217,11 @@
          }
     }
   },
-  "GetActiveDeviceTier1" : {
+  "CustomUpdateDMZ1RouteToBIGIPExternalTier" : {
     "Type": "Custom::ReplaceRoute",
     "Version" : "1.0",
     "Properties" : {
-      "ServiceToken": { "Fn::GetAtt" : ["LambdaGetActiveDevice", "Arn"] },
+      "ServiceToken": { "Fn::GetAtt" : ["LambdaReplaceRouteActiveDevice", "Arn"] },
       "mgmt_ip1" : {
         "Fn::ImportValue": {
         "Fn::Sub": "${pBigIPStackNameTier1}-Bigip1ManagementEipAddress" 
@@ -230,11 +251,11 @@
             }
     }
    },
-   "GetActiveDeviceTier2" : {
+   "CustomUpdateInternalRouteToBIGIPInternalTier" : {
     "Type": "Custom::ReplaceRoute",
     "Version" : "1.0",
     "Properties" : {
-      "ServiceToken": { "Fn::GetAtt" : ["LambdaGetActiveDevice", "Arn"] },
+      "ServiceToken": { "Fn::GetAtt" : ["LambdaReplaceRouteActiveDevice", "Arn"] },
       "mgmt_ip1" : {
         "Fn::ImportValue": {
         "Fn::Sub": "${pBigIPStackNameTier2}-Bigip1ManagementEipAddress" 
@@ -308,7 +329,7 @@
             "Timeout": 20
         }
     },
-    "LambdaGetActiveDevice": {
+    "LambdaReplaceRouteActiveDevice": {
         "Type": "AWS::Lambda::Function",
         "Properties": {
             "Handler": "index.lambda_handler",
@@ -379,6 +400,128 @@
                     "    response = client.replace_route(DestinationCidrBlock=dest_cidr_block,NetworkInterfaceId=interface_id,RouteTableId=routetable_id)",
                     "",
                     "    print(responseData)",
+                    "", 
+                    "    cfnresponse.send(event, context, cfnresponse.SUCCESS, response)",
+                    "",
+                    "   if event['RequestType'] == 'Delete':",
+                    "     responseData = {}",
+                    "     cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)",
+                    "  except:",
+                    "    logger.info('FAILED!')",
+                    "    cfnresponse.send(event, context, \"FAILED\", {\"Message\": \"Exception during processing\"})"
+                ]]}
+                },
+            "Runtime": "python2.7",
+            "Timeout": 20
+        }
+    },
+      "CustomReassignPrivateIP" : {
+        "Type": "Custom::ReassignPrivateIP",
+        "Version" : "1.0",
+        "Properties" : {
+          "ServiceToken": { "Fn::GetAtt" : ["LambdaReassignPrivateIP", "Arn"] },
+          "mgmt_ip1" : {
+            "Fn::ImportValue": {
+              "Fn::Sub": "${pBigIPStackNameTier1}-Bigip1ManagementEipAddress" 
+            }
+          },
+          "mgmt_ip2" : {
+            "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2ManagementEipAddress" 
+            }
+          },
+          "bucket" : {
+            "Fn::ImportValue": {
+            "Fn::Sub": "${pBigIPStackNameTier1}-S3BucketName" }
+            },
+          "dest_cidr_block" : "0.0.0.0/0",
+          "interface_id1" : {
+            "Fn::ImportValue": {
+              "Fn::Sub": "${pBigIPStackNameTier1}-Bigip1ExternalInterface" }
+          },
+          "interface_id2" : {
+            "Fn::ImportValue": {
+              "Fn::Sub": "${pBigIPStackNameTier1}-Bigip2ExternalInterface" }
+          },
+          "private_ip" : {
+          "Fn::ImportValue": {
+            "Fn::Sub": "${pVpcStackName}-ExternalTierVIP" }
+          }
+        }
+      },
+      "LambdaReassignPrivateIP": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+            "Handler": "index.lambda_handler",
+            "Role": {
+                "Fn::GetAtt": [ 
+                    "IamRole",
+                    "Arn" ]
+                 },
+            "Code": {
+                "ZipFile":  { "Fn::Join": ["\n", [
+                    "import logging",
+                    "import boto3",
+                    "import cfnresponse",
+                    "import json",
+                    "from botocore.vendored import requests",
+                    "",
+                    "logger = logging.getLogger()",
+                    "logger.setLevel(logging.INFO)",
+                    "s3 = boto3.client('s3')",
+                    "ec2 = boto3.resource('ec2')",
+                    "client = boto3.client('ec2')",
+                    "",
+                    "def lambda_handler(event, context):",
+                    "  try:",
+                    "   if event['RequestType'] == 'Create':",
+                    "    #set initial variables",
+                    "    logger.info('got event {}'.format(event))",
+                    "    interface_id1 = event['ResourceProperties'].get('interface_id1')",
+                    "    interface_id2 = event['ResourceProperties'].get('interface_id2')",
+                    "    private_ip = event['ResourceProperties'].get('private_ip')",
+                    "    mgmt_ip1 = event['ResourceProperties'].get('mgmt_ip1')",
+                    "    mgmt_ip2 = event['ResourceProperties'].get('mgmt_ip2')",
+                    "    bucket = event['ResourceProperties'].get('bucket')",
+                    "    key = 'credentials/master'",
+                    "",
+                    "    data = s3.get_object(Bucket=bucket, Key=key)",
+                    "    json_data = data['Body'].read()",
+                    "    password = json.loads(json_data)[\"password\"]",
+                    "    user = json.loads(json_data)[\"username\"]",
+                    "    headers = (user, password)",
+                    "",
+                    "    url1 = ('https://' + mgmt_ip1 + '/mgmt/tm/cm/failover-status')",
+                    "    r1 = requests.get(url1, verify=False, auth=headers)",
+                    "    logger.info('r1.text is {}'.format(r1.text))",
+                    "",
+                    "    url2 = ('https://' + mgmt_ip2 + '/mgmt/tm/cm/failover-status')",
+                    "    r2 = requests.get(url2, verify=False, auth=headers)",
+                    "    logger.info('r2.text is {}'.format(r2.text))",
+                    "",
+                    "    resposeJson1 = json.loads(r1.text)",
+                    "    status1 = resposeJson1['entries']['https://localhost/mgmt/tm/cm/failover-status/0']['nestedStats']['entries']['status']['description']",
+                    "    print(status1)",
+                    "",
+                    "    resposeJson2 = json.loads(r2.text)",
+                    "    status2 = resposeJson2['entries']['https://localhost/mgmt/tm/cm/failover-status/0']['nestedStats']['entries']['status']['description']",
+                    "    print(status2)",
+                    "",
+                    "    if (status1=='ACTIVE' and status2!='ACTIVE'):",
+                    "        responseData={\"ActiveDevice\": \"Bigip1\"}",
+                    "        interface_id=interface_id1",
+                    "    elif (status2=='ACTIVE' and status1!='ACTIVE'):",
+                    "        responseData={\"ActiveDevice\": \"Bigip2\"}",
+                    "        interface_id=interface_id2",
+                    "    else:",
+                    "     raise Exception('Failed to determine the ACTIVE device in cluster')",
+                    "",
+                    "    print(responseData)",
+                    "",
+                    "    #make API call to re-map privateIPAddress to external NIC of Active device",
+                    "    response = client.assign_private_ip_addresses(AllowReassignment=True,NetworkInterfaceId=interface_id,PrivateIpAddresses=[private_ip])",
+                    "",
+                    "    print(response)",
                     "", 
                     "    cfnresponse.send(event, context, cfnresponse.SUCCESS, response)",
                     "",
