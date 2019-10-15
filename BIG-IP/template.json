@@ -2038,7 +2038,7 @@
                             "# add asm bot and logging\n",
                             "echo  -e 'create cli transaction;\n",
                             "modify ltm virtual /'${partition}'/'${appName}'_https profiles add { /'${partition}'/'${appName}'_bot } policies add { /'${partition}'/'${appName}'_asm_policy_https} security-log-profiles replace-all-with { /'${partition}'/'${appName}'_sec_log };\n",
-                            "modify ltm virtual /'${partition}'/'${appName}'_http profiles add { /'${partition}'/'${appName}'_bot } policies add { /'${partition}'/'${appName}'_asm_policy_https} security-log-profiles replace-all-with { /Common/serverssl /'${partition}'/'${appName}'_sec_log };\n",
+                            "modify ltm virtual /'${partition}'/'${appName}'_http profiles add { /Common/serverssl /'${partition}'/'${appName}'_bot } policies add { /'${partition}'/'${appName}'_asm_policy_https} security-log-profiles replace-all-with { /'${partition}'/'${appName}'_sec_log };\n",
                             "submit cli transaction' | tmsh -q\n",
                             "\n",
                             "\n",
