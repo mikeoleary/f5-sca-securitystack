@@ -164,7 +164,7 @@
                         }
                     ]
                 },
-                "MapPublicIpOnLaunch": true,
+                "MapPublicIpOnLaunch": false,
                 "Tags": [
                     {
                         "Key": "Name",
