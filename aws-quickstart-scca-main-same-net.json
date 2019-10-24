@@ -577,7 +577,7 @@
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/tier1/demoAppVIP-ExternalTier.json"
           },
           "as3rpmUrl": {
-            "Fn::Sub": "http://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/dist/lts/3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
+            "Fn::Sub": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
            },
          "as3InstallFileUrl": {
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/install-rpm.sh"
@@ -660,7 +660,7 @@
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/tier3/demoAppVIP-InternalTier.json"
           },
           "as3rpmUrl": {
-            "Fn::Sub": "http://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/dist/lts/3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
+            "Fn::Sub": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
            },
          "as3InstallFileUrl": {
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/install-rpm.sh"
