@@ -442,6 +442,51 @@
                 }
             }
         }
+        },
+        "rECSTaskExecutionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ecs-tasks.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "AmazonECSTaskExecutionRolePolicy",
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ecr:GetAuthorizationToken",
+                                        "ecr:BatchCheckLayerAvailability",
+                                        "ecr:GetDownloadUrlForLayer",
+                                        "ecr:BatchGetImage",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "rECSCluster": {
+            "Type": "AWS::ECS::Cluster"
         }
     },
     "Outputs": {
@@ -639,6 +684,43 @@
                     ]
                 }
             }
-        }
+        },
+        "ECSTaskExecutionRole": {
+            "Value": {
+                "Ref": "rECSTaskExecutionRole"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-ECSTaskExecutionRole"
+                        ]
+                    ]
+                }
+            }
+        },
+        "ClusterName": {
+            "Description": "The name of the ECS cluster",
+            "Value": {
+                "Ref": "rECSCluster"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "sca-juiceShop-cluster"
+                        ]
+                    ]
+                }
+            }
+        }    
     }
 }
