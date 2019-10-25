@@ -489,25 +489,25 @@
             "TemplateURL": {
               "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/fargateDemoApp/fargateDemoApp.json"
             },
-        "Parameters": {
-            "FG_VPC_StackName": {
-                "Fn::GetAtt": [
-                  "FargateVpcStack",
-                  "Outputs.StackName"
-                ]
-              },
-              "ServiceName": "sca-juice-shop",
-              "ImageUrl": "bkimminich/juice-shop",
-              "ContainerPort": 80,
-              "ContainerCpu": 256,
-              "ContainerMemory": 512,
-              "DesiredCount": 2,
-              "Role": ""
+            "Parameters": {
+                "FG_VPC_StackName": {
+                    "Fn::GetAtt": [
+                    "FargateVpcStack",
+                    "Outputs.StackName"
+                    ]
+                },
+                "ServiceName": "sca-juice-shop",
+                "ImageUrl": "bkimminich/juice-shop",
+                "ContainerPort": 80,
+                "ContainerCpu": 256,
+                "ContainerMemory": 512,
+                "DesiredCount": 2,
+                "Role": ""
+            }
         },
         "Metadata": {
             "aws:cdk:path": "sccaMainStack/fargateDemoApp"
             }
-        }
     },
     "JumpHostStack": {
       "Type": "AWS::CloudFormation::Stack",
