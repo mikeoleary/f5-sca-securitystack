@@ -105,18 +105,15 @@ There is a root Cloud Formation Template (CFT) which in turn calls multiple chil
 | Parameter | Required | Description |
 | --- | --- | --- |
 | BaselineCompliance | Yes | Choose your baseline compliance posture. <br>'Enterprise' consists of standard architecture. <br>'SCCA' consists of some extra layers of security. |
-
 | Deploy Demo Apps | No | Choose Yes to have demo apps deployed in connected VPC's |
 | Security VPC CIDR | Yes | CIDR Block for the VDSS VPC. <br><br> Default is '10.0.0.0/16'. |
 | Demo App 1 VPC CIDR | No | CIDR Block for the app VPC. Only used if demo apps are deployed. |
 | Demo App 2 VPC CIDR | No | CIDR Block for the Fargate VPC. Only used if demo apps are deployed. |
 | SSH Key | Yes | EC2 SSH Key for BIG-IP and Linux images |
-
 | licenseKey1 | Yes | BIG-IP License #1 BYOL |
 | licenseKey2 | Yes | BIG-IP License #2 BYOL |
 | licenseKey3 | Yes | BIG-IP License #3 BYOL |
 | licenseKey4 | Yes | BIG-IP License #4 BYOL |
-
 | Project Tag | No | Project name to use for tagging. |
 | S3 Bucket Name | Yes | S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-). <br><br> Default is 'f5-sca-securitystack'. |
 | S3 Key Prefix | Yes | Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). <br><br> Default is 'master'. |
