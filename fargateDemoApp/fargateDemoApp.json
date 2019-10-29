@@ -1,9 +1,8 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "Deploy a service on AWS Fargate, hosted in a private subnet, behind a private load balancer.",
-    "DependsOn": "FargateVpcStack",
     "Parameters": {
-        "FG_VPC_StackName": {
+        "FGVPCStackName": {
             "Type": "String",
             "Default": "sca-dev",
             "Description": "The name of the parent Fargate networking stack that you created. Necessary to locate and reference resources created by that stack."
@@ -20,7 +19,7 @@
         },
         "ContainerPort": {
             "Type": "Number",
-            "Default": 80,
+            "Default": 3000,
             "Description": "What port number the application inside the docker container is binding to"
         },
         "ContainerCpu": {
@@ -88,10 +87,10 @@
                 "ExecutionRoleArn": {
                     "Fn::ImportValue": {
                         "Fn::Join": [
-                            ":",
+                            "-",
                             [
                                 {
-                                    "Ref": "FG_VPC_StackName"
+                                    "Ref": "FGVPCStackName"
                                 },
                                 "ECSTaskExecutionRole"
                             ]
@@ -134,9 +133,31 @@
                 ]
             }
         },
+        "securityGroup": {
+            "Properties": {
+            "GroupDescription": "Public or external interface rules for interface",
+            "SecurityGroupIngress": [
+            {
+            "CidrIp": "0.0.0.0/0",
+            "FromPort": "3000",
+            "IpProtocol": "tcp",
+            "ToPort": "3000"
+            }
+            ],
+            "Tags": [
+            {
+            "Key": "Name",
+            "Value": {"Fn::Sub": "${AWS::StackName}-securityGroup" }
+            }
+            ],
+            "VpcId": {
+            "Fn::ImportValue" : {"Fn::Sub": "${FGVPCStackName}-FargateVpcId" }
+            }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
         "Service": {
             "Type": "AWS::ECS::Service",
-            "DependsOn": "LoadBalancerRule",
             "Properties": {
                 "ServiceName": {
                     "Ref": "ServiceName"
@@ -144,12 +165,12 @@
                 "Cluster": {
                     "Fn::ImportValue": {
                         "Fn::Join": [
-                            ":",
+                            "-",
                             [
                                 {
-                                    "Ref": "FG_VPC_StackName"
+                                    "Ref": "FGVPCStackName"
                                 },
-                                "ClusterName"
+                                "sca-juiceShop-cluster"
                             ]
                         ]
                     }
@@ -167,29 +188,19 @@
                         "AssignPublicIp": "DISABLED",
                         "SecurityGroups": [
                             {
-                                "Fn::ImportValue": {
-                                    "Fn::Join": [
-                                        ":",
-                                        [
-                                            {
-                                                "Ref": "FG_VPC_StackName"
-                                            },
-                                            "FargateContainerSecurityGroup"
-                                        ]
-                                    ]
-                                }
-                            }
+                                "Ref": "securityGroup"
+                               }
                         ],
                         "Subnets": [
                             {
                                 "Fn::ImportValue": {
                                     "Fn::Join": [
-                                        ":",
+                                        "-",
                                         [
                                             {
-                                                "Ref": "FG_VPC_StackName"
+                                                "Ref": "FGVPCStackName"
                                             },
-                                            "PrivateSubnetOne"
+                                            "FargateSubnetAID"
                                         ]
                                     ]
                                 }
@@ -197,12 +208,12 @@
                             {
                                 "Fn::ImportValue": {
                                     "Fn::Join": [
-                                        ":",
+                                        "-",
                                         [
                                             {
-                                                "Ref": "FG_VPC_StackName"
+                                                "Ref": "FGVPCStackName"
                                             },
-                                            "PrivateSubnetTwo"
+                                            "FargateSubnetBId"
                                         ]
                                     ]
                                 }
@@ -212,90 +223,6 @@
                 },
                 "TaskDefinition": {
                     "Ref": "TaskDefinition"
-                },
-                "LoadBalancers": [
-                    {
-                        "ContainerName": {
-                            "Ref": "ServiceName"
-                        },
-                        "ContainerPort": {
-                            "Ref": "ContainerPort"
-                        },
-                        "TargetGroupArn": {
-                            "Ref": "TargetGroup"
-                        }
-                    }
-                ]
-            }
-        },
-        "TargetGroup": {
-            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "Properties": {
-                "HealthCheckIntervalSeconds": 6,
-                "HealthCheckPath": "/",
-                "HealthCheckProtocol": "HTTP",
-                "HealthCheckTimeoutSeconds": 5,
-                "HealthyThresholdCount": 2,
-                "TargetType": "ip",
-                "Name": {
-                    "Ref": "ServiceName"
-                },
-                "Port": {
-                    "Ref": "ContainerPort"
-                },
-                "Protocol": "HTTP",
-                "UnhealthyThresholdCount": 2,
-                "VpcId": {
-                    "Fn::ImportValue": {
-                        "Fn::Join": [
-                            ":",
-                            [
-                                {
-                                    "Ref": "FG_VPC_StackName"
-                                },
-                                "VPCId"
-                            ]
-                        ]
-                    }
-                }
-            }
-        },
-        "LoadBalancerRule": {
-            "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
-            "Properties": {
-                "Actions": [
-                    {
-                        "TargetGroupArn": {
-                            "Ref": "TargetGroup"
-                        },
-                        "Type": "forward"
-                    }
-                ],
-                "Conditions": [
-                    {
-                        "Field": "path-pattern",
-                        "Values": [
-                            {
-                                "Ref": "Path"
-                            }
-                        ]
-                    }
-                ],
-                "ListenerArn": {
-                    "Fn::ImportValue": {
-                        "Fn::Join": [
-                            ":",
-                            [
-                                {
-                                    "Ref": "FG_VPC_StackName"
-                                },
-                                "PrivateListener"
-                            ]
-                        ]
-                    }
-                },
-                "Priority": {
-                    "Ref": "Priority"
                 }
             }
         }

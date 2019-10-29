@@ -484,13 +484,13 @@
     },
     "fargateDemoApp": {
         "Type": "AWS::CloudFormation::Stack",
-        "DependsOn": "FargateVpcStack",
+        "DependsOn": "RouteTableUpdates",
         "Properties": {
             "TemplateURL": {
               "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/fargateDemoApp/fargateDemoApp.json"
             },
             "Parameters": {
-                "FG_VPC_StackName": {
+                "FGVPCStackName": {
                     "Fn::GetAtt": [
                     "FargateVpcStack",
                     "Outputs.StackName"
@@ -498,7 +498,7 @@
                 },
                 "ServiceName": "sca-juice-shop",
                 "ImageUrl": "bkimminich/juice-shop",
-                "ContainerPort": 80,
+                "ContainerPort": 3000,
                 "ContainerCpu": 256,
                 "ContainerMemory": 512,
                 "DesiredCount": 2,
@@ -604,7 +604,7 @@
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/tier1/demoAppVIP-ExternalTier.json"
           },
           "as3rpmUrl": {
-            "Fn::Sub": "http://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/dist/lts/3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
+            "Fn::Sub": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
            },
          "as3InstallFileUrl": {
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/install-rpm.sh"
@@ -687,7 +687,7 @@
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/tier3/demoAppVIP-InternalTier.json"
           },
           "as3rpmUrl": {
-            "Fn::Sub": "http://raw.githubusercontent.com/F5Networks/f5-appsvcs-extension/master/dist/lts/3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
+            "Fn::Sub": "https://github.com/F5Networks/f5-appsvcs-extension/releases/download/v3.13.2/f5-appsvcs-3.13.2-1.noarch.rpm"
            },
          "as3InstallFileUrl": {
             "Fn::Sub": "https://${pQuickstartS3BucketName}.s3.amazonaws.com/${pQuickstartS3KeyPrefix}/BIG-IP/atc/as3/install-rpm.sh"
